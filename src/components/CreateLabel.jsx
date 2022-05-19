@@ -12,82 +12,16 @@ import LegalNotes from "./LegalNotes";
 import { Heading, Card, Button } from "@shopify/polaris";
 import NutritionInfoCheck from "./NutritionInfoCheck";
 import NutritionInfo from "./NutritionInfoEU";
-const formData = [
-  {
-    name: "Fat",
-    per100g: "9.2",
-    perportion: "8",
-    unit: "Grams",
-    bold: "No",
-    leftSpacing: "0",
-    order: "",
-  },
-  {
-    name: "Of which Saturates",
-    per100g: "5.6",
-    perportion: "3.7",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-  },
-  {
-    name: "Carbohydrate",
-    per100g: "46",
-    perportion: "9",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-  },
-  {
-    name: "Of which Sugars",
-    per100g: "21",
-    perportion: "8",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-  },
-  {
-    name: "Protein",
-    per100g: "5.0",
-    perportion: "2.7",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-  },
-  {
-    name: "Salt",
-    per100g: "0.2",
-    perportion: "0.11",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-  },
-];
+
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
 const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
 const formLables = {
   formLablesCA_NA,
   formLablesEU,
 };
-const order = formData.length;
 
-const newFormSet = {
-  name: "",
-  per100g: "",
-  perportion: "",
-  unit: "Grams",
-  bold: "Yes",
-  leftSpacing: "0",
-  order: order,
-};
-
-function CreateLabel({ langState }) {
-  const [formValues, setFormValues] = useState(formData);
+function CreateLabel({ langState, formData, newFormSet }) {
+  const [formValues, setFormValues] = useState(formData.length ? formData : []);
   const [data, setData] = useState({
     ingredientsText:
       "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
@@ -264,7 +198,11 @@ function CreateLabel({ langState }) {
         </div>
         {/* //  Todo right side page */}
         <div style={{ width: "30%", marginTop: "10px" }}>
-          <TablePreview data={data} />
+          <TablePreview
+            data={data}
+            formValues={formValues}
+            productToPrepare={productToPrepare}
+          />
         </div>
       </div>
     </div>

@@ -43,7 +43,78 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-
+const formData = [
+  {
+    name: "Fat",
+    per100g: "9.2",
+    perportion: "8",
+    unit: "Grams",
+    bold: "No",
+    leftSpacing: "0",
+    order: "",
+    RI: "10",
+  },
+  {
+    name: "Of which Saturates",
+    per100g: "5.6",
+    perportion: "3.7",
+    unit: "Grams",
+    bold: "Yes",
+    leftSpacing: "0",
+    order: "",
+    RI: "10",
+  },
+  {
+    name: "Carbohydrate",
+    per100g: "46",
+    perportion: "9",
+    unit: "Grams",
+    bold: "Yes",
+    leftSpacing: "0",
+    order: "",
+    RI: "10",
+  },
+  {
+    name: "Of which Sugars",
+    per100g: "21",
+    perportion: "8",
+    unit: "Grams",
+    bold: "Yes",
+    leftSpacing: "0",
+    order: "",
+    RI: "10",
+  },
+  {
+    name: "Protein",
+    per100g: "5.0",
+    perportion: "2.7",
+    unit: "Grams",
+    bold: "Yes",
+    leftSpacing: "0",
+    order: "",
+    RI: "10",
+  },
+  {
+    name: "Salt",
+    per100g: "0.2",
+    perportion: "0.11",
+    unit: "Grams",
+    bold: "Yes",
+    leftSpacing: "0",
+    order: "",
+    RI: "10",
+  },
+];
+const order = formData.length;
+const newFormSet = {
+  name: "",
+  per100g: "",
+  perportion: "",
+  unit: "Grams",
+  bold: "Yes",
+  leftSpacing: "0",
+  order: order,
+};
 function TabsPage({ host, shop }) {
   console.log(host);
   const app = useAppBridge();
@@ -164,7 +235,13 @@ function TabsPage({ host, shop }) {
     {
       id: "Create Label",
       content: "Create Label",
-      tab: <CreateLabel langState={langState} />,
+      tab: (
+        <CreateLabel
+          langState={langState}
+          formData={formData}
+          newFormSet={newFormSet}
+        />
+      ),
     },
     {
       id: "Language",

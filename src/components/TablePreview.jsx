@@ -2,7 +2,7 @@ import { Banner, Card, Heading } from "@shopify/polaris";
 import React, { useState } from "react";
 import "../assets/previewStyles.css";
 import { Markup } from "interweave";
-function TablePreview({ data }) {
+function TablePreview({ data, formValues, productToPrepare }) {
   const [bannerDismissed, setBannerDismissed] = useState(true);
 
   return (
@@ -19,18 +19,36 @@ function TablePreview({ data }) {
       ) : null}
       <div className="table_conatiner">
         <header className="performance-facts__header">
-          <div className="performance-facts__header">
-            <Heading>Nutrition Information</Heading>
-          </div>
-          <hr style={{ margin: "0" }} />
-          {/* <h4>6 serving per container</h4> */}
-          <div className="performance-facts_secondaryHeader">
-            <h3>Serving size </h3>
-            <h3>{data.servingSize || 0}</h3>
-          </div>
+          <Heading>Nutrition Information</Heading>
         </header>
-        <table className="performance-facts__table">
+        <table
+          className="performance-facts__table"
+          style={{ width: "100%", borderCollapse: "collapse" }}
+        >
           <tbody>
+            <tr
+              style={{
+                textAlign: "left",
+                width: "100%",
+              }}
+            >
+              <th>Serving size</th>
+              <th>Per 100 g</th>
+              {productToPrepare ? (
+                <th>
+                  <p>
+                    <strong>
+                      Prepared <br />
+                    </strong>
+                    portion
+                    <br /> 25 g
+                  </p>
+                </th>
+              ) : (
+                <></>
+              )}
+              <th>% RI*</th>
+            </tr>
             <tr>
               <th colSpan="2">
                 <b>Energy</b>
@@ -47,42 +65,21 @@ function TablePreview({ data }) {
                 </div>
               </td>
             </tr>
-            <tr>
-              <th colSpan="2">
-                <b>Fat</b>
-              </th>
-              <td>{data.fat || 0}</td>
-            </tr>
-            <tr>
-              <th colSpan="2">
-                <b>Of which Saturates</b>
-              </th>
-              <td>{data.fatSaturates || 0}</td>
-            </tr>
-            <tr>
-              <th colSpan="2">
-                <b>Carbohydrate</b>
-              </th>
-              <td>{data.carbs || 0}</td>
-            </tr>
-            <tr>
-              <th colSpan="2">
-                <b>Of which Sugars</b>
-              </th>
-              <td>{data.carbsSugars || 0}</td>
-            </tr>
-            <tr>
-              <th colSpan="2">
-                <b>Protein</b>
-              </th>
-              <td>{data.protein || 0}</td>
-            </tr>
-            <tr>
-              <th colSpan="2">
-                <b>Salt</b>
-              </th>
-              <td>{data.salt || 0}</td>
-            </tr>
+
+            {formValues ? (
+              formValues.map((element, index) => (
+                <tr key={index}>
+                  <th colSpan="2">
+                    <b>{element.name}</b>
+                  </th>
+                  <td>{element.per100g || 0}</td>
+                  <td>{element.perportion || 0}</td>
+                  <td>{element.RI || 0}</td>
+                </tr>
+              ))
+            ) : (
+              <></>
+            )}
           </tbody>
         </table>
       </div>

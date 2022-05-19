@@ -221,7 +221,7 @@ export async function createServer(
     );
     const products = await Product.all({
       session,
-      fields: "id,title,product_type",
+      fields: "id,title,product_type,images",
     });
     for (var i = 0; i < products.length; i++) {
       delete products[i]["session"];

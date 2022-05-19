@@ -6,6 +6,7 @@ import {
   Card,
   Heading,
   TextField,
+  Stack,
 } from "@shopify/polaris";
 import React, { useCallback, useEffect, useState } from "react";
 import PopOverComponent from "./PopOverComponent";
@@ -67,28 +68,21 @@ function NutritionInfo({
   return (
     <div style={{ marginTop: "20px", marginBottom: "20px" }}>
       <Card Sectioned>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            margin: "0px 10px 0px 10px",
-            paddingTop: "10px",
-          }}
-        >
-          <Heading>Nutrition Informaion</Heading>
-          <Button
-            variant="contained"
-            className="button add"
-            type="button"
-            onClick={() => addFormFields()}
-            style={{ margin: "4px" }}
-            primary
-          >
-            Add
-          </Button>
-        </div>
+        <Card.Section>
+          <Stack distribution="equalSpacing">
+            <Heading>Nutrition Informaion</Heading>
+            <Button
+              variant="contained"
+              className="button add"
+              type="button"
+              onClick={() => addFormFields()}
+              style={{ margin: "4px" }}
+              primary
+            >
+              Add
+            </Button>
+          </Stack>
+        </Card.Section>
         <Card.Section>
           <form onSubmit={handleSave}>
             <div

@@ -8,50 +8,30 @@ import {
   Layout,
   Page,
   DisplayText,
+  EmptyState,
+  Stack,
 } from "@shopify/polaris";
-
-const mendatoryData = [
-  "cals",
-  "fat",
-  "satfat",
-  "transfat",
-  "carbs",
-  "sugars",
-  "protein",
-  "salt",
-];
+import MyLablesTable from "./MyLablesTable";
 
 function MyLables({ handleTabChange }) {
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
   const [checkPlan, setCheckPlan] = useState(true);
   const [productobj, setProductobj] = useState();
-
+  const [emptyStore, setEmptyStore] = useState(false);
   const fetchProducts = async () => {
     const data = await fetch("/products-list").then((res) => res.json());
+    setProductobj(data);
+    console.log(data);
     if (data.length) {
-      for (var i = 0; i < data.length; i++) {
-        for (var j = 0; j < mendatoryData.length; j++) {
-          data[i][mendatoryData[j]] = 0;
-        }
-      }
-      setProductobj(data);
-      // const food = [];
-      // const handleFood = () => {
-      //   for (var i = 0; i < data.length; i++) {
-      //     if (
-      //       data[i].product_type === "Food, Beverages & Tobacco" ||
-      //       data[i].product_type === "Health & Beauty"
-      //     ) {
-      //       food.push(data[i]);
-      //     }
+      // for (var i = 0; i < data.length; i++) {
+      //   for (var j = 0; j < mendatoryData.length; j++) {
+      //     data[i][mendatoryData[j]] = 0;
       //   }
-      // };
-      // await handleFood();
-      // setProductobj(food);
-      console.log(data);
+      // }
     } else {
       //Todo
+      setEmptyStore(true);
       console.log("No products found!");
     }
   };
@@ -100,47 +80,33 @@ function MyLables({ handleTabChange }) {
           <></>
         )}
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <Stack distribution="equalSpacing">
         <Heading element="h1">Products</Heading>
         <Button onClick={() => handleTabChange(1)} primary>
           Create Label
         </Button>
-      </div>
+      </Stack>
       <div style={{ marginTop: "10px" }}>
         <Card sectioned>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            {/* //Todo image position */}
-            <img src="" type="" />
-            <Heading>This is where you'll manage your lables</Heading>
-            <div style={{ marginBottom: "10px", color: "#808080" }}>
-              You can create a new label or edit
-              <br />
-              <div style={{ marginLeft: "20px" }}>your products label here</div>
-            </div>
-            <Button
-              onClick={() =>
-                location.replace(
-                  "https://nutritiontable.myshopify.com/admin/products?selectedView=all"
-                )
-              }
-              primary
+          {emptyStore ? (
+            <EmptyState
+              heading="This is where you'll manage your lables"
+              image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
             >
-              Create a new Label
-            </Button>
-          </div>
+              <div style={{ marginBottom: "10px", color: "#808080" }}>
+                You can create a new label or edit
+                <br />
+                <div style={{ marginLeft: "20px" }}>
+                  your products label here
+                </div>
+              </div>
+              <Button primary>Create a new Label</Button>
+            </EmptyState>
+          ) : (
+            <MyLablesTable
+              products={productobj === undefined ? "none" : productobj}
+            />
+          )}
         </Card>
       </div>
     </div>

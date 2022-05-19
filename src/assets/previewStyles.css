@@ -10,7 +10,8 @@
 .performance-facts_secondaryHeader{
     display:flex;
     flex-direction: row;
-    justify-content:space-between;
+    flex-wrap: wrap;
+    /* justify-content:space-between; */
  
 }
 .performance-facts__header_title{
