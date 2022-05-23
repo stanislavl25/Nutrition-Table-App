@@ -105,6 +105,99 @@ const formData = [
     RI: "10",
   },
 ];
+
+const formDataCA_NA = [
+  {
+    name: "Fat / Lipides",
+    quantity: "0",
+    Unit: "Grams",
+    dailyValue: "0",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "Saturated / saturés",
+    quantity: "0",
+    Unit: "Grams",
+    dailyValue: "0",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "+ Trans / trans",
+    quantity: "0",
+    Unit: "Grams",
+    dailyValue: "",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "Carbohydrate / Glucid",
+    quantity: "26",
+    Unit: "Grams",
+    dailyValue: "",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "Fibre & Fibres",
+    quantity: "0",
+    Unit: "Grams",
+    dailyValue: "0",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "Sugars / sucres",
+    quantity: "22",
+    Unit: "Grams",
+    dailyValue: "22",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "Protein / Protéines",
+    quantity: "2",
+    Unit: "Grams",
+    dailyValue: "",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "Cholesterol / Cholest",
+    quantity: "0",
+    Unit: "Grams",
+    dailyValue: "",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+  {
+    name: "Sodium",
+    quantity: "0",
+    Unit: "Grams",
+    dailyValue: "0",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+    preparedProduct: "5",
+  },
+];
 const order = formData.length;
 const newFormSet = {
   name: "",
@@ -240,6 +333,7 @@ function TabsPage({ host, shop }) {
           langState={langState}
           formData={formData}
           newFormSet={newFormSet}
+          formDataCA_NA={formDataCA_NA}
         />
       ),
     },

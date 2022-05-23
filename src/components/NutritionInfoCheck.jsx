@@ -1,6 +1,6 @@
 import React from "react";
 import NutritionInfoEU from "./NutritionInfoEU";
-import NutritionInfoCA from "./NutritionInfoCA";
+import NutritionInfoCA from "./NutritionInfoCANA";
 import NutritionInfoNA from "./NutritionInfoNA";
 function NutritionInfoCheck({
   locationPlan,

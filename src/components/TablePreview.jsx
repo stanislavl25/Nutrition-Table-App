@@ -18,24 +18,30 @@ function TablePreview({ data, formValues, productToPrepare }) {
         </Banner>
       ) : null}
       <div className="table_conatiner">
-        <header className="performance-facts__header">
+        <div className="table_header">
           <Heading>Nutrition Information</Heading>
-        </header>
-        <table
-          className="performance-facts__table"
-          style={{ width: "100%", borderCollapse: "collapse" }}
+        </div>
+        <div
+          style={{
+            color: "white",
+            textAlign: "center",
+            backgroundColor: "black",
+            width: "100%",
+            paddingTop: "10px",
+            paddingBottom: "10px",
+          }}
         >
-          <tbody>
-            <tr
-              style={{
-                textAlign: "left",
-                width: "100%",
-              }}
-            >
-              <th>Serving size</th>
-              <th>Per 100 g</th>
+          <strong>A prepared portion is equivalent to 25 g</strong>
+        </div>
+        <table className="table_cont">
+          <thead className="thead">
+            <tr>
+              <th scope="col" style={{ textAlign: "left" }}>
+                Serving size
+              </th>
+              <th scope="col">Per 100 g</th>
               {productToPrepare ? (
-                <th>
+                <th scope="col">
                   <p>
                     <strong>
                       Prepared <br />
@@ -47,34 +53,58 @@ function TablePreview({ data, formValues, productToPrepare }) {
               ) : (
                 <></>
               )}
-              <th>% RI*</th>
+              <th scope="col" style={{ borderRight: "none" }}>
+                % RI*
+              </th>
             </tr>
+          </thead>
+          <tbody className="tbody">
             <tr>
-              <th colSpan="2">
+              <th className="thtd" style={{ textAlign: "left" }}>
                 <b>Energy</b>
               </th>
-              <td>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
+              <td className="thtd td">
+                <div>
                   <div>{data.energyKj || 0}</div>
                   <div>{data.energyKcal || 0}</div>
                 </div>
+              </td>
+              {productToPrepare ? (
+                <td className="thtd td">
+                  <div>
+                    <div>{data.energyKj || 0}</div>
+                    <div>{data.energyKcal || 0}</div>
+                  </div>
+                </td>
+              ) : (
+                <></>
+              )}
+
+              <td className="thtd td" style={{ borderRight: "none" }}>
+                {data.energyKcal || 8} %
               </td>
             </tr>
 
             {formValues ? (
               formValues.map((element, index) => (
                 <tr key={index}>
-                  <th colSpan="2">
+                  <th
+                    className="thtd"
+                    scope="row"
+                    style={{ textAlign: "left" }}
+                  >
                     <b>{element.name}</b>
                   </th>
-                  <td>{element.per100g || 0}</td>
-                  <td>{element.perportion || 0}</td>
-                  <td>{element.RI || 0}</td>
+                  <td className="thtd td">{element.per100g || 0}</td>
+
+                  {productToPrepare ? (
+                    <td className="thtd td"> {element.perportion || 0}</td>
+                  ) : (
+                    <></>
+                  )}
+                  <td className="thtd td" style={{ borderRight: "none" }}>
+                    {element.RI || 0} %
+                  </td>
                 </tr>
               ))
             ) : (
@@ -82,24 +112,29 @@ function TablePreview({ data, formValues, productToPrepare }) {
             )}
           </tbody>
         </table>
-      </div>
-      <div className="small-info topBorderThick">
-        <Markup content={data.notesText} />
-      </div>
-      <div className="Ingredients_container">
-        <div className="topBorderThin thin-end">
-          <Heading>Ingredients</Heading>
+        <div className="small-info topBorderThick">
+          <Markup content={data.notesText} />
         </div>
-        <Markup content={data.ingredientsText} />
-      </div>
-      <div className="Allergy_information thin-end">
-        <div className="topBorderThin thin-end">
-          <Heading>Allergy information</Heading>
+        <hr style={{ width: "100%", borderCollapse: "collapse" }} />
+        <div className="Ingredients_container">
+          <div className="topBorderThin thin-end">
+            <Heading>Ingredients</Heading>
+          </div>
+          <hr style={{ width: "100%" }} />
+          <Markup content={data.ingredientsText} />
         </div>
-        <Markup content={data.allergyInfoText} />
-      </div>
-      <div className="LEGAL_NOTICE">
-        <Markup content={data.lEGALNOTICEText} />
+        <hr />
+        <div className="Allergy_information thin-end">
+          <div className="topBorderThin thin-end">
+            <Heading>Allergy information</Heading>
+          </div>
+          <hr style={{ width: "100%" }} />
+          <Markup content={data.allergyInfoText} />
+        </div>
+        <hr />
+        <div className="LEGAL_NOTICE">
+          <Markup content={data.lEGALNOTICEText} />
+        </div>
       </div>
     </Card>
   );

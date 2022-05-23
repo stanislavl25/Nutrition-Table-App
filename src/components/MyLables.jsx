@@ -19,25 +19,33 @@ function MyLables({ handleTabChange }) {
   const [checkPlan, setCheckPlan] = useState(true);
   const [productobj, setProductobj] = useState();
   const [emptyStore, setEmptyStore] = useState(false);
+  const [locationObj, setlocationObj] = useState({});
   const fetchProducts = async () => {
     const data = await fetch("/products-list").then((res) => res.json());
     setProductobj(data);
     console.log(data);
     if (data.length) {
-      // for (var i = 0; i < data.length; i++) {
-      //   for (var j = 0; j < mendatoryData.length; j++) {
-      //     data[i][mendatoryData[j]] = 0;
-      //   }
-      // }
     } else {
       //Todo
       setEmptyStore(true);
       console.log("No products found!");
     }
   };
+  const fetchLocations = async () => {
+    const data = await fetch("/locations").then((res) => res.json());
+    setlocationObj(data);
+    console.log(data);
+    if (data.length) {
+    } else {
+      //Todo
+      // setEmptyStore(true);
+      console.log("No products found!");
+    }
+  };
   // todo clean up after the use effect
   useEffect(() => {
     fetchProducts();
+    fetchLocations();
   }, []);
 
   return (

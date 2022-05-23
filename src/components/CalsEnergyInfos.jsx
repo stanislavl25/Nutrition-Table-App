@@ -1,7 +1,48 @@
 import React from "react";
-
+import {
+  Card,
+  TextStyle,
+  TextField,
+  Stack,
+  Tooltip,
+  Link,
+} from "@shopify/polaris";
 function CalsEnergyInfos() {
-  return <div>CalsEnergyInfos</div>;
+  return (
+    <div style={{ marginTop: "20px" }}>
+      <Card title="Calories/Energy Information" sectioned>
+        <TextStyle variation="subdued">
+          You only need to enter the calories information in KJ or Kcal, we will
+          calculate the rest.
+        </TextStyle>
+        <div style={{ marginTop: "10px" }}>
+          <Stack distribution="fillEvenly">
+            <TextField label="Energy (KJ) per 100 g" value="ea" />
+            <TextField label="Energy (KJ) per 25 g" value="ea" />
+          </Stack>
+        </div>
+        <div style={{ marginTop: "10px" }}>
+          <Stack distribution="fillEvenly">
+            <TextField label="Energy (Kcal) per 100 g" value="ea" />
+            <TextField label="Energy (Kcal) per 25 g" value="ea" />
+          </Stack>
+        </div>
+        <div style={{ marginTop: "10px" }}>
+          <Stack>
+            <Tooltip
+              dismissOnMouseOut
+              content="The RI* percentage is automatically calculated based on your country standard %RI*: you can still edit these valueson <Link url='#'>the Recommended Intake page</Link>."
+            >
+              <TextField label="% RI* Recommended intake" value="8" />
+            </Tooltip>
+          </Stack>
+        </div>
+        <div>
+          <div></div>
+        </div>
+      </Card>
+    </div>
+  );
 }
 
 export default CalsEnergyInfos;

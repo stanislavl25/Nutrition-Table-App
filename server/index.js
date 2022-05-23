@@ -231,6 +231,20 @@ export async function createServer(
     res.status(200).send(products);
   });
 
+  /**return the locations object */
+
+  app.get("/locations", verifyRequest(app), async (req, res) => {
+    const { Location } = await import(
+      "@shopify/shopify-api/dist/rest-resources/2022-04/index.js"
+    );
+    const test_session = await Shopify.Utils.loadCurrentSession(req, res);
+    const locations = await Location.all({
+      session: test_session,
+    });
+    console.log(locations);
+    res.status(200).send(locations);
+  });
+
   /**
    *
    * @param {'productId'} itemId

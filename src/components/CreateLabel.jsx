@@ -20,13 +20,12 @@ const formLables = {
   formLablesEU,
 };
 
-function CreateLabel({ langState, formData, newFormSet }) {
-  const [formValues, setFormValues] = useState(formData.length ? formData : []);
+function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
   const [data, setData] = useState({
     ingredientsText:
       "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
     notesText:
-      "<p>*The%Daily Value (DV) tells you how muchanutrient in aserving ofafood contributs toadaily diet. 2,000 caloriesaday is used for general nutrition advice.</p>",
+      "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving ofafood contributs toadaily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>",
     allergyInfoText:
       "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
     lEGALNOTICEText:
@@ -40,10 +39,19 @@ function CreateLabel({ langState, formData, newFormSet }) {
       caloriesPerServingBasic: "110",
     },
     locationPlan: {
-      location: "EU",
+      location: "CA",
       plan: "Basic",
     },
   });
+  const [formValues, setFormValues] = useState(
+    data.locationPlan.location === "EU"
+      ? formData.length
+        ? formData
+        : []
+      : formDataCA_NA.length
+      ? formDataCA_NA
+      : []
+  );
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [editableProduct, setEditableProduct] = useState(false);
   const handleOrderSet = () => {
@@ -125,7 +133,7 @@ function CreateLabel({ langState, formData, newFormSet }) {
             servingSizeCA={data.servingSizeCA}
             handleServingSizeCAChange={handleServingSizeCAChange}
           />
-          {data.locationPlan === "EU" ? <CalsEnergyInfos /> : <></>}
+          {data.locationPlan.location === "EU" ? <CalsEnergyInfos /> : <></>}
           {/* <NutritionInfoCheck
             locationPlan={data.locationPlan}
             formValues={formValues}
