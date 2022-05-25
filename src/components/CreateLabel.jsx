@@ -9,7 +9,7 @@ import Notes from "./Notes";
 import Ingredients from "./Ingredients";
 import AllergyInfo from "./AllergyInfo";
 import LegalNotes from "./LegalNotes";
-import { Heading, Card, Button } from "@shopify/polaris";
+import { Heading, Card, Button, Page, TextStyle } from "@shopify/polaris";
 import NutritionInfoCheck from "./NutritionInfoCheck";
 import NutritionInfo from "./NutritionInfoEU";
 
@@ -53,7 +53,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
       : []
   );
   const [productToPrepare, setProductToPrepare] = useState(false);
-  const [editableProduct, setEditableProduct] = useState(false);
+  const [nonFoodProduct, setNonFoodProduct] = useState(false);
   const handleOrderSet = () => {
     for (var i = 0; i < formValues.length; i++) {
       let newFormValues = [...formValues];
@@ -92,8 +92,8 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     (newChecked) => setProductToPrepare(newChecked),
     []
   );
-  const handleEditableProduct = useCallback(
-    (newChecked) => setEditableProduct(newChecked),
+  const handleNonFoodProduct = useCallback(
+    (newChecked) => setNonFoodProduct(newChecked),
     []
   );
   const handleIngredientsTextChange = async (e, editor) => {
@@ -116,25 +116,51 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     setData((prevState) => ({ ...prevState, notesText: editedText }));
   };
   return (
-    <div>
-      <Heading element="h1"> Create Label</Heading>
+    <Page title="Create Label" primaryAction={{ content: "Save Label" }}>
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
         <div style={{ width: "65%", marginTop: "10px", marginRight: "20px" }}>
           <ProductInfo
             productToPrepare={productToPrepare}
             handleproductToPrepare={handleproductToPrepare}
-            editableProduct={editableProduct}
-            handleEditableProduct={handleEditableProduct}
+            nonFoodProduct={nonFoodProduct}
+            handleNonFoodProduct={handleNonFoodProduct}
             handleNutriScoreCheckElem={handleNutriScoreCheckElem}
           />
-          <ServingSize
-            productToPrepare={productToPrepare}
-            servingSizeCA={data.servingSizeCA}
-            handleServingSizeCAChange={handleServingSizeCAChange}
-          />
-          {data.locationPlan.location === "EU" ? <CalsEnergyInfos /> : <></>}
-          {/* <NutritionInfoCheck
+          {nonFoodProduct ? (
+            <Card sectioned>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Heading>This product doesn’t need a nutrition label.</Heading>
+                <div style={{ textAlign: "center", marginTop: "10px" }}>
+                  <TextStyle variation="subdued">
+                    Since this product is a non-food item, you do not need to
+                    enter any further information. By default, no nutrition
+                    label is displayed for this product on the product detail
+                    page.
+                  </TextStyle>
+                </div>
+              </div>
+            </Card>
+          ) : (
+            <div>
+              <ServingSize
+                productToPrepare={productToPrepare}
+                servingSizeCA={data.servingSizeCA}
+                handleServingSizeCAChange={handleServingSizeCAChange}
+              />
+              {data.locationPlan.location === "EU" ? (
+                <CalsEnergyInfos />
+              ) : (
+                <></>
+              )}
+              {/* <NutritionInfoCheck
             locationPlan={data.locationPlan}
             formValues={formValues}
             setFormValues={setFormValues}
@@ -142,45 +168,47 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
             handleOrderChange={handleOrderChange}
             newFormSet={newFormSet}
           /> */}
-          <NutritionInfo
-            locationPlan={data.locationPlan}
-            formValues={formValues}
-            setFormValues={setFormValues}
-            handleOrderChange={handleOrderChange}
-            newFormSet={newFormSet}
-            formLables={
-              data.locationPlan.location === "EU"
-                ? formLables.formLablesEU
-                : formLables.formLablesCA_NA
-            }
-          />
-          <Vitamins />
-          <Minerals />
-          <Notes
-            notesText={data.notesText}
-            handleTextChange={handleNotesTextChange}
-          />
-          <Ingredients
-            data={langState.values.Ingredients}
-            ingredientsText={data.ingredientsText}
-            handleTextChange={handleIngredientsTextChange}
-          />
-          <AllergyInfo
-            data={langState.values.AllergyInformation}
-            allergyInfoText={data.allergyInfoText}
-            handleTextChange={handleAllergyInfoTextChange}
-          />
-          <LegalNotes
-            data={langState.values.LEGALNOTICE}
-            lEGALNOTICEText={data.lEGALNOTICEText}
-            handleTextChange={handleLEGALNOTICETextChange}
-          />
+              <NutritionInfo
+                locationPlan={data.locationPlan}
+                formValues={formValues}
+                setFormValues={setFormValues}
+                handleOrderChange={handleOrderChange}
+                newFormSet={newFormSet}
+                formLables={
+                  data.locationPlan.location === "EU"
+                    ? formLables.formLablesEU
+                    : formLables.formLablesCA_NA
+                }
+              />
+              <Vitamins />
+              <Minerals />
+              <Notes
+                notesText={data.notesText}
+                handleTextChange={handleNotesTextChange}
+              />
+              <Ingredients
+                data={langState.values.Ingredients}
+                ingredientsText={data.ingredientsText}
+                handleTextChange={handleIngredientsTextChange}
+              />
+              <AllergyInfo
+                data={langState.values.AllergyInformation}
+                allergyInfoText={data.allergyInfoText}
+                handleTextChange={handleAllergyInfoTextChange}
+              />
+              <LegalNotes
+                data={langState.values.LEGALNOTICE}
+                lEGALNOTICEText={data.lEGALNOTICEText}
+                handleTextChange={handleLEGALNOTICETextChange}
+              />
+            </div>
+          )}
           <div
             style={{
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
-              marginTop: "10px",
+              marginTop: "20px",
             }}
           >
             <Button
@@ -213,7 +241,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
           />
         </div>
       </div>
-    </div>
+    </Page>
   );
 }
 

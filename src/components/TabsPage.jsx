@@ -6,14 +6,16 @@ import { SubscriptionPage } from "./SubscriptionPage";
 import { ProductsManagement } from "./ProductsManagement";
 import { BulkProductManagement } from "./BulkProductManagement";
 import MyLables from "./MyLables";
-import LanguagePage from "./Language";
+import Translations from "./Translations";
 import CreateLabel from "./CreateLabel";
 // import Tabs from "@mui/material/Tabs";
 // import Tab from "@mui/material/Tab";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
+import RecommendedIntake from "./RecommendedIntake";
+import PricinPlans from "./PricingPlans";
 import PropTypes from "prop-types";
+import Documentation from "./Documentation";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -312,8 +314,8 @@ function TabsPage({ host, shop }) {
       </IconButton>
     </React.Fragment>
   );
-  const LangPage = (
-    <LanguagePage
+  const TranslationsPage = (
+    <Translations
       langState={langState}
       setLangState={setLangState}
       fetchLang={fetchLangChanges}
@@ -321,13 +323,13 @@ function TabsPage({ host, shop }) {
   );
   const tabs = [
     {
-      id: "My Lables",
-      content: "My Lables",
+      id: "Prodcuts",
+      content: "Prodcuts",
       tab: <MyLables handleTabChange={handleTabChange} />,
     },
     {
-      id: "Create Label",
-      content: "Create Label",
+      id: "Customize Label",
+      content: "Customize Label",
       tab: (
         <CreateLabel
           langState={langState}
@@ -338,9 +340,24 @@ function TabsPage({ host, shop }) {
       ),
     },
     {
-      id: "Language",
-      content: "Language",
-      tab: LangPage,
+      id: "Recommended Intake",
+      content: "Recommended Intake",
+      tab: <RecommendedIntake />,
+    },
+    {
+      id: "Translations",
+      content: "Translations",
+      tab: TranslationsPage,
+    },
+    {
+      id: "Documentation",
+      content: "Documentation",
+      tab: <Documentation />,
+    },
+    {
+      id: "PricinPlans",
+      content: "Pricing Plans",
+      tab: <PricinPlans />,
     },
   ];
 

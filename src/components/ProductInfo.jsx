@@ -1,23 +1,44 @@
-import { Typography } from "@mui/material";
 import {
   Button,
   Card,
   Checkbox,
   Heading,
   Select,
+  Stack,
   Subheading,
+  Tag,
+  TextField,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
+const newBadgeFormSet = {
+  name: "",
+};
 function ProductInfo({
   productToPrepare,
   handleproductToPrepare,
-  editableProduct,
-  handleEditableProduct,
   handleNutriScoreCheckElem,
+  setNonFoodProduct,
+  nonFoodProduct,
+  handleNonFoodProduct,
 }) {
   const [nutriScoreCheck, setNutriScore] = useState(false);
   const [selected, setSelected] = useState("");
+  const [badgesFormValue, setBadgeFormValue] = useState([]);
+  const [badgeName, setBadgeName] = useState("");
+  const handleBadgeAdding = useCallback((name) => {
+    setBadgeName(name);
+  });
+  const handleSettingNewBadge = useCallback(() => {
+    try {
+      if (badgeName.length) {
+        newBadgeFormSet.name = badgeName;
+        setBadgeFormValue([...badgesFormValue, newBadgeFormSet]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  });
   const handleSelectChange = useCallback((value) => {
     handleNutriScoreCheckElem(value);
     setSelected(value);
@@ -26,6 +47,7 @@ function ProductInfo({
     (newChecked) => setNutriScore(newChecked),
     []
   );
+
   const options = [
     { label: "A", value: "A" },
     { label: "B", value: "B" },
@@ -33,6 +55,19 @@ function ProductInfo({
     { label: "D", value: "D" },
     { label: "E", value: "E" },
   ];
+  const removeTag = useCallback(
+    (tag) => () => {
+      setBadgeFormValue((previousTags) =>
+        previousTags.filter((previousTag) => previousTag !== tag)
+      );
+    },
+    []
+  );
+  const tagMarkup = badgesFormValue.map((option, index) => (
+    <Tag key={index} onRemove={removeTag(option)}>
+      {option.name}
+    </Tag>
+  ));
 
   return (
     <Card sectioned title="Product Info">
@@ -40,41 +75,61 @@ function ProductInfo({
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
+          width: "100%",
         }}
       >
         <div
           style={{
+            width: "100%",
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "center",
-            padding: "10px",
+            marginBottom: "10px",
           }}
         >
-          <Typography>
+          <Subheading>
             {/* // todo Product name goes here */}
             Product
-          </Typography>
-          <Button>Manage</Button>
+          </Subheading>
+          <Button plain>Manage</Button>
         </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            marginTop: "10px",
+          }}
+        >
+          <TextField
+            inputMode="text"
+            placeholder="Assign products to this label"
+            autoComplete="false"
+            autoFocus={false}
+            onChange={handleBadgeAdding}
+            onBlur={handleSettingNewBadge}
+            value={badgeName}
+          />
 
-        <Checkbox
-          label="This is a non-food product"
-          checked={editableProduct}
-          onChange={handleEditableProduct}
-        />
-        <Checkbox
-          label="Product to prepare"
-          checked={productToPrepare}
-          onChange={handleproductToPrepare}
-        />
-        <Checkbox
-          label="Show Nutri-Score"
-          checked={nutriScoreCheck}
-          onChange={handleNutriScore}
-        />
+          <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+            <Stack>{tagMarkup}</Stack>
+          </div>
+          <Checkbox
+            label="This is a non-food product"
+            checked={nonFoodProduct}
+            onChange={handleNonFoodProduct}
+          />
+          <Checkbox
+            label="Product to prepare"
+            checked={productToPrepare}
+            onChange={handleproductToPrepare}
+          />
+          <Checkbox
+            label="Show Nutri-Score"
+            checked={nutriScoreCheck}
+            onChange={handleNutriScore}
+          />
+        </div>
         {nutriScoreCheck ? (
           <div style={{ marginTop: "10px" }}>
             <Subheading>Nutri-Score Letter</Subheading>

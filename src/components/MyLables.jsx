@@ -12,7 +12,7 @@ import {
   Stack,
 } from "@shopify/polaris";
 import MyLablesTable from "./MyLablesTable";
-
+import star from "../assets/nta_star_for_plan_banner.png";
 function MyLables({ handleTabChange }) {
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
@@ -66,17 +66,29 @@ function MyLables({ handleTabChange }) {
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "row",
                     justifyContent: "flex-start",
+                    alignItems: "center",
                   }}
                 >
-                  <Heading element="h5">
-                    Take advantage of the priceless benefits of the Advanced
-                    Plan.
-                  </Heading>
-                  <p>
-                    Customize your Label, add Vitamins and Minerals, and more!
-                  </p>
+                  <img
+                    src={star}
+                    alt=""
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      marginRight: "4px",
+                    }}
+                  />
+                  <div>
+                    <Heading element="h5">
+                      Take advantage of the priceless benefits of the Advanced
+                      Plan.
+                    </Heading>
+                    <p>
+                      Customize your Label, add Vitamins and Minerals, and more!
+                    </p>
+                  </div>
                 </div>
                 <div>
                   <Button primary>Get the Advanced plan</Button>

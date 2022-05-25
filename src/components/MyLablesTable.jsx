@@ -1,4 +1,5 @@
 import {
+  ActionList,
   Button,
   Card,
   Filters,
@@ -9,8 +10,41 @@ import {
   TextStyle,
   Thumbnail,
   useIndexResourceState,
+  Stack,
+  FormLayout,
+  Popover,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
+
+const PopOverElem = ({ index }) => {
+  const [popoverActive, setPopoverActive] = useState(false);
+
+  const togglePopoverActive = useCallback(
+    () => setPopoverActive((popoverActive) => !popoverActive),
+    []
+  );
+  const activator = (
+    <Button onClick={togglePopoverActive} disclosure>
+      More
+    </Button>
+  );
+  return (
+    <Popover
+      active={popoverActive}
+      activator={activator}
+      onClose={togglePopoverActive}
+      sectioned
+      autofocusTarget="none"
+      ariaHaspopup={false}
+    >
+      <FormLayout>
+        <Button plain destructive>
+          Delete Label
+        </Button>
+      </FormLayout>
+    </Popover>
+  );
+};
 
 function MyLablesTable({ products }) {
   const resourceName = {
@@ -107,16 +141,10 @@ function MyLablesTable({ products }) {
             <IndexTable.Cell>{Salt ? Salt : "0"} g</IndexTable.Cell>
             <IndexTable.Cell>{foodProduct ? foodProduct : "@"}</IndexTable.Cell>
             <IndexTable.Cell>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
+              <Stack>
                 <Button primary>Edit</Button>
-                <Button>More</Button>
-              </div>
+                <PopOverElem index={index} />
+              </Stack>
             </IndexTable.Cell>
           </IndexTable.Row>
         )

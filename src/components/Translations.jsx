@@ -2,7 +2,7 @@ import { TextField, Typography } from "@mui/material";
 import { Card, Heading, Layout, Page } from "@shopify/polaris";
 import React from "react";
 
-function LanguagePage({ langState, setLangState, fetchLang }) {
+function Translatins({ langState, setLangState, fetchLang }) {
   /**
    * Handle field change
    *
@@ -135,4 +135,4 @@ function LanguagePage({ langState, setLangState, fetchLang }) {
   );
 }
 
-export default LanguagePage;
+export default Translatins;
