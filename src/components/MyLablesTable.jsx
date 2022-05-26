@@ -29,20 +29,22 @@ const PopOverElem = ({ index }) => {
     </Button>
   );
   return (
-    <Popover
-      active={popoverActive}
-      activator={activator}
-      onClose={togglePopoverActive}
-      sectioned
-      autofocusTarget="none"
-      ariaHaspopup={false}
-    >
-      <FormLayout>
-        <Button plain destructive>
-          Delete Label
-        </Button>
-      </FormLayout>
-    </Popover>
+    <div style={{ marginLeft: "15px" }}>
+      <Popover
+        active={popoverActive}
+        activator={activator}
+        onClose={togglePopoverActive}
+        sectioned
+        autofocusTarget="none"
+        ariaHaspopup={false}
+      >
+        <FormLayout>
+          <Button plain destructive>
+            Delete Label
+          </Button>
+        </FormLayout>
+      </Popover>
+    </div>
   );
 };
 
@@ -141,10 +143,16 @@ function MyLablesTable({ products }) {
             <IndexTable.Cell>{Salt ? Salt : "0"} g</IndexTable.Cell>
             <IndexTable.Cell>{foodProduct ? foodProduct : "@"}</IndexTable.Cell>
             <IndexTable.Cell>
-              <Stack>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
                 <Button primary>Edit</Button>
                 <PopOverElem index={index} />
-              </Stack>
+              </div>
             </IndexTable.Cell>
           </IndexTable.Row>
         )

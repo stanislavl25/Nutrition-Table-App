@@ -21,14 +21,20 @@ function MyLables({ handleTabChange }) {
   const [emptyStore, setEmptyStore] = useState(false);
   const [locationObj, setlocationObj] = useState({});
   const fetchProducts = async () => {
-    const data = await fetch("/products-list").then((res) => res.json());
-    setProductobj(data);
-    console.log(data);
-    if (data.length) {
-    } else {
-      //Todo
+    try {
+      const data = await fetch("/products-list").then((res) => res.json());
+      // setEmptyStore(true);
+      if (data.length) {
+        setProductobj(data);
+        console.log(data);
+      } else {
+        //Todo
+        setEmptyStore(true);
+        console.log("No products found!");
+      }
+    } catch (err) {
+      console.log(err);
       setEmptyStore(true);
-      console.log("No products found!");
     }
   };
   const fetchLocations = async () => {
@@ -50,85 +56,87 @@ function MyLables({ handleTabChange }) {
 
   return (
     <div>
-      <div>
-        {checkPlan ? (
-          <div style={{ marginBottom: "10px" }}>
-            <Card sectioned>
+      {checkPlan ? (
+        <div style={{ marginBottom: "10px" }}>
+          <Card sectioned>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              {/* //Todo star position */}
               <div
                 style={{
                   display: "flex",
                   flexDirection: "row",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-start",
                   alignItems: "center",
                 }}
               >
-                {/* //Todo star position */}
-                <div
+                <img
+                  src={star}
+                  alt=""
                   style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
+                    width: "40px",
+                    height: "40px",
+                    marginRight: "4px",
                   }}
-                >
-                  <img
-                    src={star}
-                    alt=""
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      marginRight: "4px",
-                    }}
-                  />
-                  <div>
-                    <Heading element="h5">
-                      Take advantage of the priceless benefits of the Advanced
-                      Plan.
-                    </Heading>
-                    <p>
-                      Customize your Label, add Vitamins and Minerals, and more!
-                    </p>
+                />
+                <div>
+                  <Heading element="h5">
+                    Take advantage of the priceless benefits of the Advanced
+                    Plan.
+                  </Heading>
+                  <p>
+                    Customize your Label, add Vitamins and Minerals, and more!
+                  </p>
+                </div>
+              </div>
+              <div>
+                <Button primary>Get the Advanced plan</Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ) : (
+        <></>
+      )}
+
+      <Page
+        fullWidth
+        title="Products"
+        primaryAction={{
+          content: "Create Label",
+          onAction: () => handleTabChange(1),
+        }}
+      >
+        <div style={{ marginTop: "10px" }}>
+          <Card sectioned>
+            {emptyStore ? (
+              <EmptyState
+                heading="This is where you'll manage your lables"
+                image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+              >
+                <div style={{ marginBottom: "10px", color: "#808080" }}>
+                  You can create a new label or edit
+                  <br />
+                  <div style={{ marginLeft: "20px" }}>
+                    your products label here
                   </div>
                 </div>
-                <div>
-                  <Button primary>Get the Advanced plan</Button>
-                </div>
-              </div>
-            </Card>
-          </div>
-        ) : (
-          <></>
-        )}
-      </div>
-      <Stack distribution="equalSpacing">
-        <Heading element="h1">Products</Heading>
-        <Button onClick={() => handleTabChange(1)} primary>
-          Create Label
-        </Button>
-      </Stack>
-      <div style={{ marginTop: "10px" }}>
-        <Card sectioned>
-          {emptyStore ? (
-            <EmptyState
-              heading="This is where you'll manage your lables"
-              image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-            >
-              <div style={{ marginBottom: "10px", color: "#808080" }}>
-                You can create a new label or edit
-                <br />
-                <div style={{ marginLeft: "20px" }}>
-                  your products label here
-                </div>
-              </div>
-              <Button primary>Create a new Label</Button>
-            </EmptyState>
-          ) : (
-            <MyLablesTable
-              products={productobj === undefined ? "none" : productobj}
-            />
-          )}
-        </Card>
-      </div>
+                <Button primary>Create a new Label</Button>
+              </EmptyState>
+            ) : (
+              <MyLablesTable
+                products={productobj === undefined ? "none" : productobj}
+              />
+            )}
+          </Card>
+        </div>
+      </Page>
     </div>
   );
 }

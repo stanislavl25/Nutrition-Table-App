@@ -39,7 +39,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
       caloriesPerServingBasic: "110",
     },
     locationPlan: {
-      location: "CA",
+      location: "EU",
       plan: "Basic",
     },
   });
@@ -126,6 +126,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
             nonFoodProduct={nonFoodProduct}
             handleNonFoodProduct={handleNonFoodProduct}
             handleNutriScoreCheckElem={handleNutriScoreCheckElem}
+            locationPlan={data.locationPlan}
           />
           {nonFoodProduct ? (
             <Card sectioned>
@@ -154,6 +155,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
                 productToPrepare={productToPrepare}
                 servingSizeCA={data.servingSizeCA}
                 handleServingSizeCAChange={handleServingSizeCAChange}
+                locationPlan={data.locationPlan}
               />
               {data.locationPlan.location === "EU" ? (
                 <CalsEnergyInfos />

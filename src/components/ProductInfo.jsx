@@ -21,6 +21,7 @@ function ProductInfo({
   setNonFoodProduct,
   nonFoodProduct,
   handleNonFoodProduct,
+  locationPlan,
 }) {
   const [nutriScoreCheck, setNutriScore] = useState(false);
   const [selected, setSelected] = useState("");
@@ -119,16 +120,40 @@ function ProductInfo({
             checked={nonFoodProduct}
             onChange={handleNonFoodProduct}
           />
-          <Checkbox
-            label="Product to prepare"
-            checked={productToPrepare}
-            onChange={handleproductToPrepare}
-          />
-          <Checkbox
-            label="Show Nutri-Score"
-            checked={nutriScoreCheck}
-            onChange={handleNutriScore}
-          />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Checkbox
+              label="Product to prepare"
+              checked={productToPrepare}
+              onChange={handleproductToPrepare}
+              disabled={locationPlan.plan === "Basic" ? true : false}
+            />
+            <div style={{ marginLeft: "5px" }}>
+              <Button plain>Upgrade your plan to use this feature</Button>
+            </div>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Checkbox
+              label="Show Nutri-Score"
+              checked={nutriScoreCheck}
+              onChange={handleNutriScore}
+              disabled={locationPlan.plan === "Basic" ? true : false}
+            />
+            <div style={{ marginLeft: "5px" }}>
+              <Button plain>Upgrade your plan to use this feature</Button>
+            </div>
+          </div>
         </div>
         {nutriScoreCheck ? (
           <div style={{ marginTop: "10px" }}>

@@ -1,4 +1,11 @@
-import { Card, Heading, Layout, Select, TextField } from "@shopify/polaris";
+import {
+  Card,
+  Heading,
+  Layout,
+  Select,
+  Stack,
+  TextField,
+} from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
 const SelectElement = ({ val, handleServingSizeCAChange }) => {
@@ -10,25 +17,24 @@ const SelectElement = ({ val, handleServingSizeCAChange }) => {
   }, []);
 
   const options = [
-    { label: "Liters", value: "Liters" },
-    { label: "Milliliters", value: "Milliliters" },
+    { label: "Grams", value: "Grams" },
+    { label: "MilliGrams", value: "MilliGrams" },
   ];
 
   return (
-    <div style={{ marginRight: "10px" }}>
-      <Select
-        label=""
-        options={options}
-        onChange={handleSelectChange}
-        value={selected}
-      />
-    </div>
+    <Select
+      label="Unit"
+      options={options}
+      onChange={handleSelectChange}
+      value={selected}
+    />
   );
 };
 function ServingSize({
   productToPrepare,
   servingSizeCA,
   handleServingSizeCAChange,
+  locationPlan,
 }) {
   return (
     <div
@@ -38,67 +44,59 @@ function ServingSize({
     >
       <Card title="Serving Size">
         <Card.Section>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <label style={{ minWidth: "100px", marginLeft: "10px" }}>
-              Serving size
-            </label>
-            <label style={{ minWidth: "130px", marginLeft: "10px" }}>
-              Serving reference
-            </label>
-            <label style={{ minWidth: "140px", marginLeft: "10px" }}>
-              Bilingual reference
-            </label>
-            <label style={{ minWidth: "100px", marginLeft: "10px" }}>
-              Unit
-            </label>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: "10px",
-            }}
-          >
-            <TextField
-              value={servingSizeCA.servingSizeBasic || ""}
-              onChange={(e) => handleServingSizeCAChange(e, "servingSizeBasic")}
-            />
-            <TextField
-              value={servingSizeCA.servingRefBasic || ""}
-              onChange={(e) => handleServingSizeCAChange(e, "servingRefBasic")}
-            />
-            <TextField
-              value={servingSizeCA.bilingualRefBasic || ""}
-              onChange={(e) =>
-                handleServingSizeCAChange(e, "bilingualRefBasic")
-              }
-            />
-            <div>
+          <Stack wrap={false}>
+            <Stack.Item fill>
+              <TextField
+                label="Serving size"
+                value={servingSizeCA.servingSizeBasic || ""}
+                onChange={(e) =>
+                  handleServingSizeCAChange(e, "servingSizeBasic")
+                }
+              />
+            </Stack.Item>
+            <Stack.Item>
+              <TextField
+                label="Serving reference"
+                value={servingSizeCA.servingRefBasic || ""}
+                onChange={(e) =>
+                  handleServingSizeCAChange(e, "servingRefBasic")
+                }
+              />
+            </Stack.Item>
+            <Stack.Item fill>
+              <TextField
+                label="Bilingual reference"
+                value={servingSizeCA.bilingualRefBasic || ""}
+                onChange={(e) =>
+                  handleServingSizeCAChange(e, "bilingualRefBasic")
+                }
+              />
+            </Stack.Item>
+            <Stack.Item>
               <SelectElement
                 val={servingSizeCA.unitBasic || ""}
                 handleServingSizeCAChange={handleServingSizeCAChange}
               />
+            </Stack.Item>
+          </Stack>
+          {locationPlan.location === "CA" ? (
+            <div>
+              <label style={{ minWidth: "100px", marginBottom: "30px" }}>
+                Calories per serving
+              </label>
+              <Stack>
+                <TextField
+                  size="small"
+                  value={servingSizeCA.caloriesPerServingBasic || ""}
+                  onChange={(e) =>
+                    handleServingSizeCAChange(e, "caloriesPerServingBasic")
+                  }
+                />
+              </Stack>
             </div>
-          </div>
-          <div>
-            <label style={{ minWidth: "100px", marginBottom: "30px" }}>
-              Calories per serving
-            </label>
-            <TextField
-              size="small"
-              value={servingSizeCA.caloriesPerServingBasic || ""}
-              onChange={(e) =>
-                handleServingSizeCAChange(e, "caloriesPerServingBasic")
-              }
-            />
-          </div>
+          ) : (
+            <></>
+          )}
         </Card.Section>
         {productToPrepare ? (
           <div>

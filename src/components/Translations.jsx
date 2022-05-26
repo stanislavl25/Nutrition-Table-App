@@ -27,111 +27,108 @@ function Translatins({ langState, setLangState, fetchLang }) {
   };
 
   return (
-    <div>
-      <Heading element="h1">Language</Heading>
-      <Page fullWidth>
-        <Layout>
-          <Layout.Section>
-            <Card>
+    <Page fullWidth title="Language">
+      <Layout>
+        <Layout.Section>
+          <Card>
+            <div
+              style={{
+                padding: "15px",
+              }}
+            >
+              <Typography
+                style={{ margin: "15px 0px 15px 0px", fontWeight: "bold" }}
+                variant="body1"
+              >
+                Label Titles
+              </Typography>
               <div
                 style={{
-                  padding: "15px",
+                  margin: "0px 0px 15px 0px",
                 }}
               >
                 <Typography
-                  style={{ margin: "15px 0px 15px 0px", fontWeight: "bold" }}
-                  variant="body1"
+                  variant="body2"
+                  style={{ margin: "0px 0px 5px 0px" }}
                 >
-                  Label Titles
+                  Nutrition Information
                 </Typography>
-                <div
+                <TextField
                   style={{
-                    margin: "0px 0px 15px 0px",
+                    "&:focus": {
+                      borderColor: "red",
+                    },
                   }}
-                >
-                  <Typography
-                    variant="body2"
-                    style={{ margin: "0px 0px 5px 0px" }}
-                  >
-                    Nutrition Information
-                  </Typography>
-                  <TextField
-                    style={{
-                      "&:focus": {
-                        borderColor: "red",
-                      },
-                    }}
-                    name="NutritionInformation"
-                    value={langState.values.NutritionInformation || ""}
-                    onChange={handleChange}
-                    onBlur={handleFetch}
-                    fullWidth
-                  />
-                </div>
-
-                <div
-                  style={{
-                    margin: "0px 0px 15px 0px",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    style={{ margin: "0px 0px 5px 0px" }}
-                  >
-                    Ingredients
-                  </Typography>
-                  <TextField
-                    name="Ingredients"
-                    value={langState.values.Ingredients || ""}
-                    onChange={handleChange}
-                    onBlur={handleFetch}
-                    fullWidth
-                  />
-                </div>
-                <div
-                  style={{
-                    margin: "0px 0px 15px 0px",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    style={{ margin: "0px 0px 5px 0px" }}
-                  >
-                    Allergy Information
-                  </Typography>
-                  <TextField
-                    name="AllergyInformation"
-                    value={langState.values.AllergyInformation || ""}
-                    onChange={handleChange}
-                    onBlur={handleFetch}
-                    fullWidth
-                  />
-                </div>
-                <div
-                  style={{
-                    margin: "0px 0px 15px 0px",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    style={{ margin: "0px 0px 5px 0px" }}
-                  >
-                    LEGAL NOTICE
-                  </Typography>
-                  <TextField
-                    name="LEGALNOTICE"
-                    value={langState.values.LEGALNOTICE || ""}
-                    onChange={handleChange}
-                    onBlur={handleFetch}
-                    fullWidth
-                  />
-                </div>
+                  name="NutritionInformation"
+                  value={langState.values.NutritionInformation || ""}
+                  onChange={handleChange}
+                  onBlur={handleFetch}
+                  fullWidth
+                />
               </div>
-            </Card>
-          </Layout.Section>
-        </Layout>
-      </Page>
-    </div>
+
+              <div
+                style={{
+                  margin: "0px 0px 15px 0px",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  style={{ margin: "0px 0px 5px 0px" }}
+                >
+                  Ingredients
+                </Typography>
+                <TextField
+                  name="Ingredients"
+                  value={langState.values.Ingredients || ""}
+                  onChange={handleChange}
+                  onBlur={handleFetch}
+                  fullWidth
+                />
+              </div>
+              <div
+                style={{
+                  margin: "0px 0px 15px 0px",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  style={{ margin: "0px 0px 5px 0px" }}
+                >
+                  Allergy Information
+                </Typography>
+                <TextField
+                  name="AllergyInformation"
+                  value={langState.values.AllergyInformation || ""}
+                  onChange={handleChange}
+                  onBlur={handleFetch}
+                  fullWidth
+                />
+              </div>
+              <div
+                style={{
+                  margin: "0px 0px 15px 0px",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  style={{ margin: "0px 0px 5px 0px" }}
+                >
+                  LEGAL NOTICE
+                </Typography>
+                <TextField
+                  name="LEGALNOTICE"
+                  value={langState.values.LEGALNOTICE || ""}
+                  onChange={handleChange}
+                  onBlur={handleFetch}
+                  fullWidth
+                />
+              </div>
+            </div>
+          </Card>
+        </Layout.Section>
+      </Layout>
+    </Page>
   );
 }
 
