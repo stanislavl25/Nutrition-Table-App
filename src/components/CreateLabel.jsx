@@ -116,7 +116,11 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     setData((prevState) => ({ ...prevState, notesText: editedText }));
   };
   return (
-    <Page title="Create Label" primaryAction={{ content: "Save Label" }}>
+    <Page
+      title="Create Label"
+      primaryAction={{ content: "Save Label" }}
+      fullWidth
+    >
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
         <div style={{ width: "65%", marginTop: "10px", marginRight: "20px" }}>

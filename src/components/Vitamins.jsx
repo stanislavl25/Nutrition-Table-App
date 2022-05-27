@@ -7,6 +7,8 @@ import {
   FormLayout,
   Select,
   TextField,
+  Layout,
+  Stack,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
@@ -132,7 +134,7 @@ const SelectElement = () => {
   ];
 
   return (
-    <div style={{ marginRight: "10px" }}>
+    <div style={{ minWidth: "60px" }}>
       <Select
         label=""
         options={options}
@@ -187,13 +189,14 @@ function Vitamins() {
   };
 
   return (
-    <Card sectioned>
+    <Card>
       <div
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
+          padding: "20px",
         }}
       >
         <Heading>Vitamins</Heading>
@@ -208,78 +211,72 @@ function Vitamins() {
           Add
         </Button>
       </div>
-
       {formValues.length === 0 ? (
         <div style={{ textAlign: "center" }}>
           <p>Click add to create a new Vitamin</p>
         </div>
       ) : (
         <form onSubmit={handleSave}>
-          <div style={{ display: "flex" }}>
-            <label style={{ width: "150px", marginRight: "10px" }}>Name</label>
-            <label style={{ width: "90px", marginRight: "10px" }}>
+          <div style={{ display: "flex", padding: "0px 20px 0px 20px" }}>
+            <label style={{ width: "140px", marginRight: "10px" }}>Name</label>
+            <label style={{ width: "70px", marginRight: "75px" }}>
               Per 100 g
             </label>
-            <label style={{ width: "130px", marginRight: "10px" }}>
+            <label style={{ width: "120px", marginRight: "20px" }}>
               Per portion 25 g
             </label>
             <label style={{ width: "100px", marginRight: "10px" }}>Unit</label>
           </div>
-          <hr style={{ borderTop: "1px solid #cecece" }} />
-          {formValues.map((element, index) => (
-            <div
-              className="form-inline"
-              key={index}
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                marginTop: "10px",
-              }}
-            >
-              <TextField
-                size="small"
-                style={{ width: "150px", marginRight: "10px" }}
-                type="text"
-                variant="outlined"
-                name="name"
-                value={element.name || ""}
-                onChange={(e) => handleChange(e, index, "name")}
-              />
-              <TextField
-                size="small"
-                style={{ width: "90px", marginRight: "10px" }}
-                variant="outlined"
-                type="text"
-                name="per100g"
-                value={element.per100g || ""}
-                onChange={(e) => handleChange(e, index, "per100g")}
-              />
-              <TextField
-                style={{ width: "130px", marginRight: "10px" }}
-                size="small"
-                variant="outlined"
-                type="text"
-                name="perportion"
-                value={element.perportion || ""}
-                onChange={(e) => handleChange(e, index, "perportion")}
-              />
-              <SelectElement />
-              <PopoverElement
-                element={element}
-                removeFormFields={removeFormFields}
-                handleChange={handleChange}
-                index={index}
-              />
-            </div>
-          ))}
+          <hr style={{ borderTop: "1px solid #cecece", width: "100%" }} />
+          <div style={{ padding: "20px 20px 20px 10px", marginRight: "10px" }}>
+            {formValues.map((element, index) => (
+              <Stack wrap={false} className="form-inline" key={index}>
+                <Stack.Item fill>
+                  <TextField
+                    type="text"
+                    name="name"
+                    value={element.name || ""}
+                    onChange={(e) => handleChange(e, index, "name")}
+                  />
+                </Stack.Item>
+                <Stack.Item fill>
+                  <TextField
+                    type="text"
+                    name="per100g"
+                    value={element.per100g || ""}
+                    onChange={(e) => handleChange(e, index, "per100g")}
+                  />
+                </Stack.Item>
+                <Stack.Item fill></Stack.Item>
+                <Stack.Item fill>
+                  <TextField
+                    type="text"
+                    name="perportion"
+                    value={element.perportion || ""}
+                    onChange={(e) => handleChange(e, index, "perportion")}
+                  />
+                </Stack.Item>
+                <Stack.Item fill>
+                  <SelectElement />
+                </Stack.Item>
+                <Stack.Item fill>
+                  <PopoverElement
+                    element={element}
+                    removeFormFields={removeFormFields}
+                    handleChange={handleChange}
+                    index={index}
+                  />
+                </Stack.Item>
+              </Stack>
+            ))}
+          </div>
           <div className="button-section">
             {/* <Button
             className="button submit"
             type="submit"
             variant="contained"
             style={{ margin: "4px" }}
-          >
+            >
             Save
           </Button> */}
           </div>
