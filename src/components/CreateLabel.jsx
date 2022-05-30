@@ -240,11 +240,15 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
         </div>
         {/* //  Todo right side page */}
         <div style={{ width: "30%", marginTop: "10px" }}>
-          <TablePreview
-            data={data}
-            formValues={formValues}
-            productToPrepare={productToPrepare}
-          />
+          {nonFoodProduct ? (
+            <></>
+          ) : (
+            <TablePreview
+              data={data}
+              formValues={formValues}
+              productToPrepare={productToPrepare}
+            />
+          )}
         </div>
       </div>
     </Page>

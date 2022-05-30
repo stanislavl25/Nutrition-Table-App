@@ -1,29 +1,23 @@
 import {
+  Banner,
   Button,
   Card,
-  DataTable,
   FormLayout,
   Page,
   Popover,
   Select,
   TextField,
 } from "@shopify/polaris";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 
-const Edit = ({ index }) => {
+const Edit = ({ index, element, handleChange, handleDelete }) => {
   const [popoverActive, setPopoverActive] = useState(false);
-  const [tagValue, setTagValue] = useState("");
-  const [selected, setSelected] = useState("today");
 
-  const handleSelectChange = useCallback((value) => setSelected(value), []);
   const togglePopoverActive = useCallback(
     () => setPopoverActive((popoverActive) => !popoverActive),
     []
   );
 
-  const handleTagValueChange = useCallback((value) => {
-    setTagValue(value);
-  }, []);
   const activator = (
     <Button onClick={togglePopoverActive} primary>
       Edit
@@ -36,30 +30,32 @@ const Edit = ({ index }) => {
       activator={activator}
       onClose={togglePopoverActive}
       ariaHaspopup={false}
+      autofocusTarget="none"
+      preventFocusOnClose={false}
       sectioned
     >
       <FormLayout>
         <TextField
           label="Name"
-          value={tagValue}
-          onChange={handleTagValueChange}
+          value={element.name}
+          onChange={(e) => handleChange(e, index, "name")}
           autoComplete="off"
           inputMode="text"
         />
         <TextField
           label="Quantity"
-          value={tagValue}
-          onChange={handleTagValueChange}
+          value={element.quantity}
+          onChange={(e) => handleChange(e, index, "quantity")}
           autoComplete="off"
           inputMode="number"
         />
         <Select
           label="Show all customers where:"
-          value={selected}
-          onChange={handleSelectChange}
+          value={element.unit}
+          onChange={(e) => handleChange(e, index, "unit")}
           options={["Grams", "Milligrams"]}
         />
-        <Button destructive outline>
+        <Button destructive outline onClick={() => handleDelete(index)}>
           Delete
         </Button>
       </FormLayout>
@@ -67,41 +63,111 @@ const Edit = ({ index }) => {
   );
 };
 
-const row = { name: "", quantity: "", unit: "", editbutton: "" };
+const rows = [
+  { name: "Energy", quantity: "2000", unit: "Grams" },
+  { name: "Fat", quantity: "44", unit: "Grams" },
+  { name: "Of which Saturates", quantity: "", unit: "Grams" },
+  { name: "Carbohydrates", quantity: "00", unit: "Grams" },
+  { name: "Of which Sugars", quantity: "00", unit: "Grams" },
+  { name: "Protein", quantity: "00", unit: "Grams" },
+  { name: "Salt", quantity: "00", unit: "Grams" },
+  { name: "Vitamin C", quantity: "00", unit: "Grams" },
+];
+const newRow = { name: "", quantity: "", unit: "Grams" };
 function RecommendedIntake() {
-  const rows = [
-    ["Energy", "2000", "Grams"],
-    ["Fat", "00", "Grams"],
-    ["Of which Saturates", "00", "Grams"],
-    ["Carbohydrates", "00", "Grams"],
-    ["Of which Sugars", "00", "Grams"],
-    ["Protein", "00", "Grams"],
-    ["Salt", "00", "Grams"],
-    ["Vitamin C", "00", "Grams"],
-  ];
-  const [createdRow, setCreatedRow] = useState([]);
-  const keys = Object.keys(row);
-  const handleCreateRow = () => {
-    for (var i = 0; i < rows.length; i++) {
-      rows[i].push(<Edit index={i} />);
-    }
-  };
-  useEffect(() => {
-    handleCreateRow();
-    console.log(createdRow);
+  const [elementData, setElementData] = useState(rows);
+
+  const handleChange = useCallback((value, i, tag) => {
+    let newValues = [...elementData];
+    newValues[i][tag] = value;
+    setElementData(newValues);
   }, []);
+
+  const handleAddNewRow = () => {
+    setElementData([...elementData, newRow]);
+  };
+  const handleDelete = (i) => {
+    let newValues = [...elementData];
+    newValues.splice(i, 1);
+    setElementData(newValues);
+  };
   return (
-    <Page title="Recommended Intake Standards">
-      <Card>
-        <DataTable
-          verticalAlign="bottom"
-          columnContentTypes={["text", "numeric", "text"]}
-          headings={["Nutrient", "Quantity", "Unit", ""]}
-          rows={rows}
-          stickyHeader={true}
-        />
-      </Card>
-    </Page>
+    <div>
+      <div style={{ margin: "0px 30px 0px 30px" }}>
+        <Banner status="warning">
+          <p>
+            Please make sure that the names you give the nutrients on this page
+            exactly match the names of the nutrients you want to use on the
+            label pages. This is the only way we can automatically calculate the
+            recommended daily intake properly.
+          </p>
+        </Banner>
+      </div>
+      <Page
+        title="Recommended Intake Standards"
+        fullWidth
+        primaryAction={
+          <Button onClick={handleAddNewRow} primary>
+            Add Reference
+          </Button>
+        }
+      >
+        <Card sectioned>
+          <table style={{ width: "100%" }}>
+            <tr
+              style={{
+                width: "100%",
+                textAlign: "left",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <th>Nutrient</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+              <th></th>
+            </tr>
+            <tbody>
+              {elementData.map((elem, index) => (
+                <>
+                  <tr
+                    style={{
+                      width: "100%",
+                      borderTop: "1px solid #E1E3E5",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginTop: "10px",
+                    }}
+                  >
+                    {elem.name.length ? (
+                      <>
+                        <td>{elem.name}</td>
+                        <td>{elem.quantity || 0}</td>
+                        <td>{elem.unit || 0}</td>
+                      </>
+                    ) : (
+                      <>
+                        <td>New Reference</td>
+                      </>
+                    )}
+                    <td>
+                      <Edit
+                        index={index}
+                        element={elem}
+                        handleChange={handleChange}
+                        handleDelete={handleDelete}
+                      />
+                    </td>
+                  </tr>
+                </>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      </Page>
+    </div>
   );
 }
 
