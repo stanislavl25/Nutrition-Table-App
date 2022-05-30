@@ -1,4 +1,12 @@
-import { Badge, Card, Heading, Page, Stack, TextStyle } from "@shopify/polaris";
+import {
+  Badge,
+  Button,
+  Card,
+  Heading,
+  Page,
+  Stack,
+  TextStyle,
+} from "@shopify/polaris";
 import React from "react";
 
 function PricinPlans() {
@@ -16,31 +24,87 @@ function PricinPlans() {
           alignItems: "center",
         }}
       >
-        <Card sectioned>
-          <Heading>Basic plan</Heading>
-          <p>No more than 999 products.</p>
-          <div style={{ marginTop: "20px" }}>
-            <p>
-              <span
-                style={{
-                  fontSize: "32",
-                  color: "#007F60",
-                  fontWeight: "bolder",
-                }}
-              >
-                5$
-              </span>
-              USD/month
-            </p>
-          </div>
+        <Card>
+          <Card.Section>
+            <Heading>Basic plan</Heading>
+            <p>No more than 999 products.</p>
+            <div style={{ marginTop: "20px", width: "100%" }}>
+              <p>
+                <span
+                  style={{
+                    fontSize: "32px",
+                    color: "#007F60",
+                    fontWeight: "bolder",
+                  }}
+                >
+                  $5
+                </span>
+                USD/month
+              </p>
+            </div>
+            <div
+              style={{ marginTop: "20px", width: "100%", textAlign: "center" }}
+            >
+              <Button size="large">Current Plan</Button>
+            </div>
+          </Card.Section>
+          <Card.Section title="MAIN FEATURES"></Card.Section>
         </Card>
-        <Card sectioned>
-          <Heading>Advanced plan</Heading>
-          <p>No more than 999 products.</p>
+        <Card>
+          <Card.Section>
+            <Heading>Advanced plan</Heading>
+            <p>No more than 999 products.</p>
+            <div style={{ marginTop: "20px" }}>
+              <p>
+                <span
+                  style={{
+                    fontSize: "32px",
+                    color: "#007F60",
+                    fontWeight: "bolder",
+                  }}
+                >
+                  $20
+                </span>
+                USD/month
+              </p>
+            </div>
+            <div
+              style={{ marginTop: "20px", width: "100%", textAlign: "center" }}
+            >
+              <Button size="large" primary>
+                Upgrade
+              </Button>
+            </div>
+          </Card.Section>
+          <Card.Section title="MAIN FEATURES"></Card.Section>
         </Card>
-        <Card sectioned>
-          <Heading>Enterprise plan</Heading>
-          <TextStyle variation="strong">Unlimited products.</TextStyle>
+        <Card>
+          <Card.Section>
+            <Heading>Enterprise plan</Heading>
+            <TextStyle variation="strong">Unlimited products.</TextStyle>
+            <div style={{ marginTop: "20px" }}>
+              <p>
+                <span
+                  style={{
+                    fontSize: "32px",
+                    color: "#007F60",
+                    fontWeight: "bolder",
+                  }}
+                >
+                  $100
+                </span>
+                USD/month
+              </p>
+            </div>
+            <div
+              style={{ marginTop: "20px", width: "100%", textAlign: "center" }}
+            >
+              <Button size="large" primary>
+                Upgrade
+              </Button>
+            </div>
+          </Card.Section>
+          <Card.Section title="MAIN FEATURES"></Card.Section>
         </Card>
       </div>
     </Page>
