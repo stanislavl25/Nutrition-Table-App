@@ -30,6 +30,7 @@ const SelectElement = ({ val, handleServingSizeCAChange }) => {
     />
   );
 };
+
 function ServingSize({
   productToPrepare,
   servingSizeCA,

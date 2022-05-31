@@ -3,108 +3,213 @@ import {
   Button,
   Card,
   Heading,
+  Icon,
+  Layout,
   Page,
   Stack,
+  TextContainer,
   TextStyle,
 } from "@shopify/polaris";
+import { CircleTickMajor } from "@shopify/polaris-icons";
 import React from "react";
 
 function PricinPlans() {
   return (
     <Page
       title="Plans and Pricing"
-      // titleMetadata={}
+      divider
+      subtitle={<Badge status="info">Basic</Badge>}
     >
-      <Badge status="info">Basic</Badge>
+      <Layout>
+        <Layout.Section oneThird>
+          <Card>
+            <Card.Section>
+              <Heading>Basic plan</Heading>
+              <p>No more than 999 products.</p>
+              <div style={{ marginTop: "20px", width: "100%" }}>
+                <p>
+                  <span
+                    style={{
+                      fontSize: "32px",
+                      color: "#007F60",
+                      fontWeight: "bolder",
+
+                      textAlign: "center",
+                    }}
+                  >
+                    $5
+                  </span>
+                  USD/month
+                </p>
+              </div>
+              <div
+                style={{
+                  marginTop: "20px",
+                }}
+              >
+                <Button size="large" fullWidth>
+                  Current Plan
+                </Button>
+              </div>
+            </Card.Section>
+            <Card.Section title="MAIN FEATURES">
+              <div style={{ marginTop: "10px" }}>
+                <TextContainer>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Basic Appearance Customization</p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Basic label data editing </p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>European, American, and Canadian labels</p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Ingredients and Allergens list</p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Bulk edit products</p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Language settings</p>
+                  </Stack>
+                </TextContainer>
+              </div>
+            </Card.Section>
+          </Card>
+        </Layout.Section>
+        <Layout.Section oneThird>
+          <Card>
+            <Card.Section>
+              <Heading>Advanced plan</Heading>
+              <p>No more than 999 products.</p>
+              <div style={{ marginTop: "20px" }}>
+                <p>
+                  <span
+                    style={{
+                      fontSize: "32px",
+                      color: "#007F60",
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    $20
+                  </span>
+                  USD/month
+                </p>
+              </div>
+              <div
+                style={{
+                  marginTop: "20px",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              >
+                <Button size="large" primary fullWidth>
+                  Upgrade
+                </Button>
+              </div>
+            </Card.Section>
+            <Card.Section title="MAIN FEATURES">
+              <div style={{ marginTop: "10px" }}>
+                <TextContainer>
+                  <TextStyle variation="strong">
+                    Everything included on Basic Plan.
+                  </TextStyle>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Advanced Appearance Customization</p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Advanced label data editing </p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Custom fields</p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Minerals & Vitamins</p>
+                  </Stack>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Automatic data calculation</p>
+                  </Stack>
+                </TextContainer>
+              </div>
+            </Card.Section>
+          </Card>
+        </Layout.Section>
+        <Layout.Section oneThird>
+          <Card>
+            <Card.Section>
+              <Heading>Enterprise plan</Heading>
+              <TextStyle variation="strong">Unlimited products.</TextStyle>
+              <div style={{ marginTop: "20px" }}>
+                <p>
+                  <span
+                    style={{
+                      fontSize: "32px",
+                      color: "#007F60",
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    $100
+                  </span>
+                  USD/month
+                </p>
+              </div>
+              <div
+                style={{
+                  marginTop: "20px",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              >
+                <Button size="large" primary fullWidth>
+                  Upgrade
+                </Button>
+              </div>
+            </Card.Section>
+            <Card.Section title="MAIN FEATURES">
+              <div style={{ paddingBottom: "207px", marginTop: "10px" }}>
+                <TextContainer>
+                  <TextStyle variation="strong">
+                    Everything included on Advanced Plan.
+                  </TextStyle>
+                  <Stack wrap={false}>
+                    <Icon source={CircleTickMajor} color="primary" />{" "}
+                    <p>Unlimited Products</p>
+                  </Stack>
+                </TextContainer>
+              </div>
+            </Card.Section>
+          </Card>
+        </Layout.Section>
+      </Layout>
       <div
         style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
+          marginTop: "20px",
         }}
       >
-        <Card>
-          <Card.Section>
-            <Heading>Basic plan</Heading>
-            <p>No more than 999 products.</p>
-            <div style={{ marginTop: "20px", width: "100%" }}>
-              <p>
-                <span
-                  style={{
-                    fontSize: "32px",
-                    color: "#007F60",
-                    fontWeight: "bolder",
-                  }}
-                >
-                  $5
-                </span>
-                USD/month
-              </p>
-            </div>
-            <div
-              style={{ marginTop: "20px", width: "100%", textAlign: "center" }}
-            >
-              <Button size="large">Current Plan</Button>
-            </div>
+        <Card title="Plan comparison">
+          <div style={{ margin: "10px 0px 10px 0px" }}>
+            <Stack wrap={false} spacing="fillEvenly">
+              <Heading element="h5">FEATURE</Heading>
+              <Heading>BASIC PLAN</Heading>
+              <Heading>ADVANCED PLAN</Heading>
+              <Heading>ENTERPRISE PLAN</Heading>
+            </Stack>
+          </div>
+          <Card.Section title="Number of products">
+            <p>You can have so many products in your store.</p>
           </Card.Section>
-          <Card.Section title="MAIN FEATURES"></Card.Section>
-        </Card>
-        <Card>
-          <Card.Section>
-            <Heading>Advanced plan</Heading>
-            <p>No more than 999 products.</p>
-            <div style={{ marginTop: "20px" }}>
-              <p>
-                <span
-                  style={{
-                    fontSize: "32px",
-                    color: "#007F60",
-                    fontWeight: "bolder",
-                  }}
-                >
-                  $20
-                </span>
-                USD/month
-              </p>
-            </div>
-            <div
-              style={{ marginTop: "20px", width: "100%", textAlign: "center" }}
-            >
-              <Button size="large" primary>
-                Upgrade
-              </Button>
-            </div>
-          </Card.Section>
-          <Card.Section title="MAIN FEATURES"></Card.Section>
-        </Card>
-        <Card>
-          <Card.Section>
-            <Heading>Enterprise plan</Heading>
-            <TextStyle variation="strong">Unlimited products.</TextStyle>
-            <div style={{ marginTop: "20px" }}>
-              <p>
-                <span
-                  style={{
-                    fontSize: "32px",
-                    color: "#007F60",
-                    fontWeight: "bolder",
-                  }}
-                >
-                  $100
-                </span>
-                USD/month
-              </p>
-            </div>
-            <div
-              style={{ marginTop: "20px", width: "100%", textAlign: "center" }}
-            >
-              <Button size="large" primary>
-                Upgrade
-              </Button>
-            </div>
-          </Card.Section>
-          <Card.Section title="MAIN FEATURES"></Card.Section>
         </Card>
       </div>
     </Page>
