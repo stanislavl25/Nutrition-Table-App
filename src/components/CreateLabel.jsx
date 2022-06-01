@@ -40,7 +40,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     },
     locationPlan: {
       location: "EU",
-      plan: "Basic",
+      plan: "Advanced",
     },
   });
   const [formValues, setFormValues] = useState(

@@ -12,6 +12,7 @@ import {
 } from "@shopify/polaris";
 import { CircleTickMajor } from "@shopify/polaris-icons";
 import React from "react";
+import PricingPlanTable from "./PricingPlanTable";
 
 function PricinPlans() {
   return (
@@ -193,25 +194,7 @@ function PricinPlans() {
           </Card>
         </Layout.Section>
       </Layout>
-      <div
-        style={{
-          marginTop: "20px",
-        }}
-      >
-        <Card title="Plan comparison">
-          <div style={{ margin: "10px 0px 10px 0px" }}>
-            <Stack wrap={false} spacing="fillEvenly">
-              <Heading element="h5">FEATURE</Heading>
-              <Heading>BASIC PLAN</Heading>
-              <Heading>ADVANCED PLAN</Heading>
-              <Heading>ENTERPRISE PLAN</Heading>
-            </Stack>
-          </div>
-          <Card.Section title="Number of products">
-            <p>You can have so many products in your store.</p>
-          </Card.Section>
-        </Card>
-      </div>
+      <PricingPlanTable />
     </Page>
   );
 }

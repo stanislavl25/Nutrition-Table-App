@@ -140,6 +140,7 @@ function RecommendedIntake() {
                       alignItems: "center",
                       marginTop: "10px",
                     }}
+                    key={index}
                   >
                     {elem.name.length ? (
                       <>
