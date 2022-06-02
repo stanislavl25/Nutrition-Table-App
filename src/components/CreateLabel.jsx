@@ -12,7 +12,7 @@ import LegalNotes from "./LegalNotes";
 import { Heading, Card, Button, Page, TextStyle } from "@shopify/polaris";
 import NutritionInfoCheck from "./NutritionInfoCheck";
 import NutritionInfo from "./NutritionInfoEU";
-
+import CheckLocation from "./CheckLocation";
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
 const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
 const formLables = {
@@ -124,6 +124,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
         <div style={{ width: "65%", marginTop: "10px", marginRight: "20px" }}>
+          <CheckLocation />
           <ProductInfo
             productToPrepare={productToPrepare}
             handleproductToPrepare={handleproductToPrepare}
@@ -239,7 +240,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
           </div>
         </div>
         {/* //  Todo right side page */}
-        <div style={{ width: "30%", marginTop: "10px" }}>
+        <div style={{ width: "35%", marginTop: "10px" }}>
           {nonFoodProduct ? (
             <></>
           ) : (

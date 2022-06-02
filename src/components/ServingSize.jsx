@@ -100,84 +100,59 @@ function ServingSize({
           )}
         </Card.Section>
         {productToPrepare ? (
-          <div>
+          <>
             <Card.Section title="Unprepared Calories">
-              <div
-                style={{
-                  display: "flex",
-                }}
-              >
-                <label style={{ minWidth: "150px", marginRight: "10px" }}>
-                  Reference
-                </label>
-                <label style={{ minWidth: "150px", marginRight: "10px" }}>
-                  Bilingual reference
-                </label>
-                <label style={{ minWidth: "100px", marginRight: "10px" }}>
-                  Calories
-                </label>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: "10px",
-                }}
-              >
-                <TextField
-                  size="small"
-                  style={{ minWidth: "150px", marginRight: "10px" }}
-                />
-                <TextField
-                  size="small"
-                  style={{ minWidth: "150px", marginRight: "10px" }}
-                />
-                <TextField
-                  size="small"
-                  style={{ minWidth: "100px", marginRight: "10px" }}
-                />
-              </div>
+              <Stack>
+                <Stack.Item fill>
+                  <TextField
+                    label="Reference"
+                    size="small"
+                    style={{ minWidth: "150px", marginRight: "10px" }}
+                  />
+                </Stack.Item>
+                <Stack.Item fill>
+                  <TextField
+                    label="Bilingual reference"
+                    size="small"
+                    style={{ minWidth: "150px", marginRight: "10px" }}
+                  />
+                </Stack.Item>
+
+                <Stack.Item>
+                  <TextField
+                    label="Calories"
+                    size="small"
+                    style={{ minWidth: "100px", marginRight: "10px" }}
+                  />
+                </Stack.Item>
+              </Stack>
             </Card.Section>
             <Card.Section title="prepared Calories">
-              <div
-                style={{
-                  display: "flex",
-                }}
-              >
-                <label style={{ minWidth: "150px", marginRight: "10px" }}>
-                  Reference
-                </label>
-                <label style={{ minWidth: "150px", marginRight: "10px" }}>
-                  Bilingual reference
-                </label>
-                <label style={{ minWidth: "100px", marginRight: "10px" }}>
-                  Calories
-                </label>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: "10px",
-                }}
-              >
-                <TextField
-                  size="small"
-                  style={{ width: "150px", marginRight: "10px" }}
-                />
-                <TextField
-                  size="small"
-                  style={{ width: "150px", marginRight: "10px" }}
-                />
-                <TextField
-                  size="small"
-                  style={{ width: "100px", marginRight: "10px" }}
-                />
-              </div>
+              <Stack>
+                <Stack.Item fill>
+                  <TextField
+                    label="Reference"
+                    size="small"
+                    style={{ width: "150px", marginRight: "10px" }}
+                  />
+                </Stack.Item>
+                <Stack.Item fill>
+                  <TextField
+                    label="Bilingual reference"
+                    size="small"
+                    style={{ width: "150px", marginRight: "10px" }}
+                  />
+                </Stack.Item>
+                <Stack.Item>
+                  <TextField
+                    label="Calories"
+                    size="small"
+                    style={{ width: "100px", marginRight: "10px" }}
+                  />
+                </Stack.Item>
+              </Stack>
             </Card.Section>
-          </div>
+          </>
         ) : (
           <></>
         )}
