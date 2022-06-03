@@ -69,6 +69,11 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     newData["locationPlan"]["location"] = newlocation;
     setData(newData);
   };
+  const handlePlan = (newPlan) => {
+    let newData = { ...data };
+    newData["locationPlan"]["plan"] = newPlan;
+    setData(newData);
+  };
   const [formValues, setFormValues] = useState(
     data.locationPlan.location === "EU"
       ? formData.length
@@ -150,7 +155,10 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
         <div style={{ width: "65%", marginTop: "10px", marginRight: "20px" }}>
-          <CheckLocation handleLocation={handleLocation} />
+          <CheckLocation
+            handleLocation={handleLocation}
+            handlePlan={handlePlan}
+          />
           <ProductInfo
             productToPrepare={productToPrepare}
             handleproductToPrepare={handleproductToPrepare}

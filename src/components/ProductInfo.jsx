@@ -194,7 +194,7 @@ function ProductInfo({
               <></>
             )}
 
-            {locationPlan.plan === "Basic" ? (
+            {locationPlan.plan === "Basic" && locationPlan.location === "EU" ? (
               <div style={{ marginLeft: "5px" }}>
                 <Button plain>Upgrade your plan to use this feature</Button>
               </div>
