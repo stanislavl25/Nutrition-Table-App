@@ -8,12 +8,12 @@ import {
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
-const SelectElement = ({ val, handleServingSizeCAChange }) => {
+const SelectElement = ({ val, tag, handleServingSizeChange }) => {
   const [selected, setSelected] = useState(val);
 
   const handleSelectChange = useCallback((value) => {
     setSelected(value);
-    handleServingSizeCAChange(value, "unitBasic");
+    handleServingSizeChange(value, tag, "unitBasic");
   }, []);
 
   const options = [
@@ -33,8 +33,8 @@ const SelectElement = ({ val, handleServingSizeCAChange }) => {
 
 function ServingSize({
   productToPrepare,
-  servingSizeCA,
-  handleServingSizeCAChange,
+  servingSize,
+  handleServingSizeChange,
   locationPlan,
 }) {
   return (
@@ -45,42 +45,87 @@ function ServingSize({
     >
       <Card title="Serving Size">
         <Card.Section>
-          <Stack wrap={false}>
-            <Stack.Item fill>
-              <TextField
-                label="Serving size"
-                value={servingSizeCA.servingSizeBasic || ""}
-                onChange={(e) =>
-                  handleServingSizeCAChange(e, "servingSizeBasic")
-                }
-              />
-            </Stack.Item>
-            <Stack.Item>
-              <TextField
-                label="Serving reference"
-                value={servingSizeCA.servingRefBasic || ""}
-                onChange={(e) =>
-                  handleServingSizeCAChange(e, "servingRefBasic")
-                }
-              />
-            </Stack.Item>
-            <Stack.Item fill>
-              <TextField
-                label="Bilingual reference"
-                value={servingSizeCA.bilingualRefBasic || ""}
-                onChange={(e) =>
-                  handleServingSizeCAChange(e, "bilingualRefBasic")
-                }
-              />
-            </Stack.Item>
-            <Stack.Item>
-              <SelectElement
-                val={servingSizeCA.unitBasic || ""}
-                handleServingSizeCAChange={handleServingSizeCAChange}
-              />
-            </Stack.Item>
-          </Stack>
           {locationPlan.location === "CA" ? (
+            <Stack wrap={false}>
+              <Stack.Item fill>
+                <TextField
+                  label="Serving size"
+                  value={servingSize.CA.servingSizeBasic || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "CA", "servingSizeBasic")
+                  }
+                />
+              </Stack.Item>
+              <Stack.Item>
+                <TextField
+                  label="Serving reference"
+                  value={servingSize.CA.servingRefBasic || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "CA", "servingRefBasic")
+                  }
+                />
+              </Stack.Item>
+              <Stack.Item fill>
+                <TextField
+                  label="Bilingual reference"
+                  value={servingSize.CA.bilingualRefBasic || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "CA", "bilingualRefBasic")
+                  }
+                />
+              </Stack.Item>
+              <Stack.Item>
+                <SelectElement
+                  val={servingSize.CA.unitBasic || ""}
+                  handleServingSizeChange={handleServingSizeChange}
+                  tag="CA"
+                />
+              </Stack.Item>
+            </Stack>
+          ) : (
+            <></>
+          )}
+          {locationPlan.location === "EU" ? (
+            <Stack wrap={false}>
+              <Stack.Item fill>
+                <TextField
+                  label="Default Amoount"
+                  value={servingSize.EU.DefaultAmoount || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "EU", "DefaultAmoount")
+                  }
+                  disabled
+                />
+              </Stack.Item>
+              <Stack.Item>
+                <SelectElement
+                  val={servingSize.EU.DefaultAmoountUnit || ""}
+                  handleServingSizeChange={handleServingSizeChange}
+                  tag="EU"
+                />
+              </Stack.Item>
+              <Stack.Item fill>
+                <TextField
+                  label="Portion Size"
+                  value={servingSize.EU.PortionSize || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "EU", "PortionSize")
+                  }
+                  disabled={locationPlan.plan === "Basic" ? true : false}
+                />
+              </Stack.Item>
+              <Stack.Item>
+                <SelectElement
+                  val={servingSize.EU.PortionSizeUnit || ""}
+                  handleServingSizeChange={handleServingSizeChange}
+                  tag="EU"
+                />
+              </Stack.Item>
+            </Stack>
+          ) : (
+            <></>
+          )}
+          {/* {locationPlan.location === "CA" ? (
             <div>
               <label style={{ minWidth: "100px", marginBottom: "30px" }}>
                 Calories per serving
@@ -90,16 +135,16 @@ function ServingSize({
                   size="small"
                   value={servingSizeCA.caloriesPerServingBasic || ""}
                   onChange={(e) =>
-                    handleServingSizeCAChange(e, "caloriesPerServingBasic")
+                    handleServingSizeChange(e, "caloriesPerServingBasic")
                   }
                 />
               </Stack>
             </div>
           ) : (
             <></>
-          )}
+          )} */}
         </Card.Section>
-        {productToPrepare ? (
+        {productToPrepare && locationPlan.location === "CA" ? (
           <>
             <Card.Section title="Unprepared Calories">
               <Stack>

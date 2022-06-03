@@ -12,7 +12,7 @@ function PricingPlanTable() {
       <Card title="Plan comparison">
         <table style={{ width: "100%" }}>
           <thead>
-            <th
+            <tr
               style={{
                 display: "flex",
                 flexDirection: "row",
@@ -32,10 +32,16 @@ function PricingPlanTable() {
               >
                 <Subheading>FEATURE</Subheading>
               </div>
-              <Subheading>BASIC PLAN</Subheading>
-              <Subheading>ADVANCED PLAN</Subheading>
-              <Subheading>ENTERPRISE PLAN</Subheading>
-            </th>
+              <div>
+                <Subheading>BASIC PLAN</Subheading>
+              </div>
+              <div>
+                <Subheading>ADVANCED PLAN</Subheading>
+              </div>
+              <div>
+                <Subheading>ENTERPRISE PLAN</Subheading>
+              </div>
+            </tr>
           </thead>
           <tbody style={{ width: "100%" }}>
             <tr>

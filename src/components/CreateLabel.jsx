@@ -31,18 +31,34 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     lEGALNOTICEText:
       "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
     nutriScore: "",
-    servingSizeCA: {
-      servingSizeBasic: "250",
-      servingRefBasic: "per 1 cup",
-      bilingualRefBasic: "pour 1 tasse",
-      unitBasic: "Milliliters",
-      caloriesPerServingBasic: "110",
+
+    servingSize: {
+      CA: {
+        servingSizeBasic: "250",
+        servingRefBasic: "per 1 cup",
+        bilingualRefBasic: "pour 1 tasse",
+        unitBasic: "Milliliters",
+        caloriesPerServingBasic: "110",
+      },
+      EU: {
+        DefaultAmoount: "100",
+        DefaultAmoountUnit: "Grams",
+        PortionSize: "25",
+        PortionSizeUnit: "Grams",
+      },
+      NA: {},
     },
     locationPlan: {
       location: "EU",
       plan: "Advanced",
     },
   });
+
+  const handleLocation = (newlocation) => {
+    let newData = { ...data };
+    newData["locationPlan"]["location"] = newlocation;
+    setData(newData);
+  };
   const [formValues, setFormValues] = useState(
     data.locationPlan.location === "EU"
       ? formData.length
@@ -83,9 +99,9 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
     console.log(newState);
   };
-  const handleServingSizeCAChange = useCallback((value, name) => {
+  const handleServingSizeChange = useCallback((value, tag, name) => {
     let newData = { ...data };
-    newData["servingSizeCA"][name] = value;
+    newData["servingSize"][tag][name] = value;
     setData(newData), [];
   });
   const handleproductToPrepare = useCallback(
@@ -124,7 +140,7 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
         <div style={{ width: "65%", marginTop: "10px", marginRight: "20px" }}>
-          <CheckLocation />
+          <CheckLocation handleLocation={handleLocation} />
           <ProductInfo
             productToPrepare={productToPrepare}
             handleproductToPrepare={handleproductToPrepare}
@@ -158,8 +174,8 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
             <div>
               <ServingSize
                 productToPrepare={productToPrepare}
-                servingSizeCA={data.servingSizeCA}
-                handleServingSizeCAChange={handleServingSizeCAChange}
+                servingSize={data.servingSize}
+                handleServingSizeChange={handleServingSizeChange}
                 locationPlan={data.locationPlan}
               />
               {data.locationPlan.location === "EU" ? (

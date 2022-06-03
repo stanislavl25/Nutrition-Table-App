@@ -130,39 +130,37 @@ function RecommendedIntake() {
             </tr>
             <tbody>
               {elementData.map((elem, index) => (
-                <>
-                  <tr
-                    style={{
-                      width: "100%",
-                      borderTop: "1px solid #E1E3E5",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginTop: "10px",
-                    }}
-                    key={index}
-                  >
-                    {elem.name.length ? (
-                      <>
-                        <td>{elem.name}</td>
-                        <td>{elem.quantity || 0}</td>
-                        <td>{elem.unit || 0}</td>
-                      </>
-                    ) : (
-                      <>
-                        <td>New Reference</td>
-                      </>
-                    )}
-                    <td>
-                      <Edit
-                        index={index}
-                        element={elem}
-                        handleChange={handleChange}
-                        handleDelete={handleDelete}
-                      />
-                    </td>
-                  </tr>
-                </>
+                <tr
+                  style={{
+                    width: "100%",
+                    borderTop: "1px solid #E1E3E5",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: "10px",
+                  }}
+                  key={index}
+                >
+                  {elem.name.length ? (
+                    <>
+                      <td>{elem.name}</td>
+                      <td>{elem.quantity || 0}</td>
+                      <td>{elem.unit || 0}</td>
+                    </>
+                  ) : (
+                    <>
+                      <td>New Reference</td>
+                    </>
+                  )}
+                  <td>
+                    <Edit
+                      index={index}
+                      element={elem}
+                      handleChange={handleChange}
+                      handleDelete={handleDelete}
+                    />
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>
