@@ -125,6 +125,101 @@ function ServingSize({
           ) : (
             <></>
           )}
+
+          {locationPlan.location === "NA" ? (
+            <Stack wrap={false}>
+              <Stack.Item fill>
+                <TextField
+                  label="Servings per container"
+                  value={servingSize.NA.Servingspercontainer || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "NA", "Servingspercontainer")
+                  }
+                />
+              </Stack.Item>
+              <Stack.Item>
+                <TextField
+                  label="Serving reference"
+                  value={servingSize.NA.Servingreference || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "NA", "Servingreference")
+                  }
+                />
+              </Stack.Item>
+              <Stack.Item fill>
+                <TextField
+                  label="serving size"
+                  value={servingSize.NA.servingsize || ""}
+                  onChange={(e) =>
+                    handleServingSizeChange(e, "NA", "servingsize")
+                  }
+                />
+              </Stack.Item>
+              <Stack.Item>
+                <SelectElement
+                  val={servingSize.NA.unit || ""}
+                  handleServingSizeChange={handleServingSizeChange}
+                  tag="NA"
+                />
+              </Stack.Item>
+            </Stack>
+          ) : (
+            <></>
+          )}
+          {productToPrepare && locationPlan.location === "NA" ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                marginTop: "10px",
+              }}
+            >
+              <Stack>
+                <Stack.Item>
+                  <TextField
+                    label="Unprepared Reference"
+                    onChange={(e) =>
+                      handleServingSizeChange(e, "NA", "UnpreparedReference")
+                    }
+                    value={servingSize.NA.UnpreparedReference || ""}
+                  />
+                </Stack.Item>
+                <Stack.Item>
+                  <TextField
+                    label="Unprepared calories"
+                    onChange={(e) =>
+                      handleServingSizeChange(e, "NA", "Unpreparedcalories")
+                    }
+                    value={servingSize.NA.Unpreparedcalories || ""}
+                  />
+                </Stack.Item>
+              </Stack>
+              <Stack>
+                <Stack.Item>
+                  <TextField
+                    label="Prepared Reference"
+                    onChange={(e) =>
+                      handleServingSizeChange(e, "NA", "PreparedReference")
+                    }
+                    value={servingSize.NA.PreparedReference || ""}
+                  />
+                </Stack.Item>
+                <Stack.Item>
+                  <TextField
+                    label="Prepared calories"
+                    onChange={(e) =>
+                      handleServingSizeChange(e, "NA", "Preparedcalories")
+                    }
+                    value={servingSize.NA.Preparedcalories || ""}
+                  />
+                </Stack.Item>
+              </Stack>
+            </div>
+          ) : (
+            <></>
+          )}
+
           {/* {locationPlan.location === "CA" ? (
             <div>
               <label style={{ minWidth: "100px", marginBottom: "30px" }}>

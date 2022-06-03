@@ -46,7 +46,17 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
         PortionSize: "25",
         PortionSizeUnit: "Grams",
       },
-      NA: {},
+      NA: {
+        Servingspercontainer: "8",
+        Servingreference: "2/3 cup",
+        servingsize: "55",
+        unit: "Grams",
+        Caloriesperserving: "230",
+        UnpreparedReference: "Per 2/3 cup",
+        Unpreparedcalories: "140",
+        PreparedReference: "As prepared",
+        Preparedcalories: "230",
+      },
     },
     locationPlan: {
       location: "EU",
