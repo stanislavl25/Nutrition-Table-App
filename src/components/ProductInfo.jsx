@@ -3,14 +3,16 @@ import {
   Card,
   Checkbox,
   Heading,
+  Icon,
   Select,
   Stack,
   Subheading,
   Tag,
   TextField,
+  Tooltip,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
-
+import { CircleInformationMajor } from "@shopify/polaris-icons";
 const newBadgeFormSet = {
   name: "",
 };
@@ -125,6 +127,8 @@ function ProductInfo({
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              justifyContent: "start",
+              gap: "5px",
             }}
           >
             <Checkbox
@@ -133,37 +137,88 @@ function ProductInfo({
               onChange={handleproductToPrepare}
               disabled={locationPlan.plan === "Basic" ? true : false}
             />
-            <div style={{ marginLeft: "5px" }}>
-              <Button plain>Upgrade your plan to use this feature</Button>
-            </div>
+            <Tooltip
+              dismissOnMouseOut
+              content={
+                <p>
+                  Some products are prepared with other foods and therefore have
+                  different nutrients per serving than per base unit. You can
+                  find more information in our{" "}
+                  <a style={{ textDecoration: "none" }} href="#">
+                    documentation
+                  </a>
+                  .
+                </p>
+              }
+            >
+              <Icon source={CircleInformationMajor} color="base" />
+            </Tooltip>
+            {locationPlan.plan === "Basic" ? (
+              <div style={{ marginLeft: "5px" }}>
+                <Button plain>Upgrade your plan to use this feature</Button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
           <div
             style={{
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              justifyContent: "start",
+              gap: "5px",
             }}
           >
-            <Checkbox
-              label="Show Nutri-Score"
-              checked={nutriScoreCheck}
-              onChange={handleNutriScore}
-              disabled={locationPlan.plan === "Basic" ? true : false}
-            />
-            <div style={{ marginLeft: "5px" }}>
-              <Button plain>Upgrade your plan to use this feature</Button>
-            </div>
+            {locationPlan.location === "EU" ? (
+              <>
+                <Checkbox
+                  label="Show Nutri-Score"
+                  checked={nutriScoreCheck}
+                  onChange={handleNutriScore}
+                  disabled={locationPlan.plan === "Basic" ? true : false}
+                />
+                <Tooltip
+                  dismissOnMouseOut
+                  content={
+                    <p>
+                      In some European countries the use of the Nutri Score is
+                      permitted on a voluntary basis.
+                    </p>
+                  }
+                >
+                  <Icon source={CircleInformationMajor} color="base" />
+                </Tooltip>
+              </>
+            ) : (
+              <></>
+            )}
+
+            {locationPlan.plan === "Basic" ? (
+              <div style={{ marginLeft: "5px" }}>
+                <Button plain>Upgrade your plan to use this feature</Button>
+              </div>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
         {nutriScoreCheck ? (
           <div style={{ marginTop: "10px" }}>
             <Subheading>Nutri-Score Letter</Subheading>
-            <Select
-              label=""
-              options={options}
-              onChange={handleSelectChange}
-              value={selected}
-            />
+            <div style={{ marginTop: "10px" }}>
+              <Stack distribution="fillEvenly">
+                <Select
+                  label=""
+                  options={options}
+                  onChange={handleSelectChange}
+                  value={selected}
+                />
+                <></>
+                <></>
+                <></>
+              </Stack>
+            </div>
           </div>
         ) : (
           <></>

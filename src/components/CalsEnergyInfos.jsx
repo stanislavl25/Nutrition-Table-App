@@ -31,7 +31,16 @@ function CalsEnergyInfos() {
           <Stack>
             <Tooltip
               dismissOnMouseOut
-              content="The RI* percentage is automatically calculated based on your country standard %RI*: you can still edit these valueson <Link url='#'>the Recommended Intake page</Link>."
+              content={
+                <p>
+                  The RI* percentage is automatically calculated based on your
+                  country standard %RI*: you can still edit these valueson{" "}
+                  <a href="#" style={{ textDecoration: "none" }}>
+                    the Recommended Intake page
+                  </a>
+                  .
+                </p>
+              }
             >
               <TextField label="% RI* Recommended intake" value="8" />
             </Tooltip>
