@@ -45,7 +45,7 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-const formData = [
+const formDataEU = [
   {
     name: "Fat",
     per100g: "9.2",
@@ -107,8 +107,99 @@ const formData = [
     RI: "10",
   },
 ];
-
-const formDataCA_NA = [
+const formDataNA = [
+  {
+    name: "Total Fat",
+    quantity: "8",
+    unit: "Grams",
+    dailyValue: "10",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+  },
+  {
+    name: "Saturated Fat",
+    quantity: "1",
+    unit: "Grams",
+    dailyValue: "5",
+    bold: "No",
+    order: "",
+    leftSpacing: "1",
+  },
+  {
+    name: "Trans Fat",
+    quantity: "0",
+    unit: "MilliGrams",
+    dailyValue: "",
+    bold: "No",
+    order: "",
+    leftSpacing: "1",
+  },
+  {
+    name: "Cholesterol",
+    quantity: "0",
+    unit: "MilliGrams",
+    dailyValue: "0",
+    bold: "No",
+    order: "",
+    leftSpacing: "",
+  },
+  {
+    name: "Sodium ",
+    quantity: "160",
+    unit: "Milligrams",
+    dailyValue: "7",
+    bold: "No",
+    order: "",
+    leftSpacing: "",
+  },
+  {
+    name: "Total Carbohydrate",
+    quantity: "37",
+    unit: "Grams",
+    dailyValue: "13",
+    bold: "No",
+    order: "",
+    leftSpacing: "",
+  },
+  {
+    name: "Dietary Fiber",
+    quantity: "4",
+    unit: "Grams",
+    dailyValue: "14",
+    bold: "No",
+    order: "",
+    leftSpacing: "1",
+  },
+  {
+    name: "Total Sugars",
+    quantity: "12",
+    unit: "Grams",
+    dailyValue: "",
+    bold: "No",
+    order: "",
+    leftSpacing: "",
+  },
+  {
+    name: "Includes Added Sugars",
+    quantity: "10",
+    unit: "Grams",
+    dailyValue: "20",
+    bold: "No",
+    order: "",
+    leftSpacing: "2",
+  },
+  {
+    name: "Protein",
+    quantity: "3",
+    unit: "Grams",
+    dailyValue: "10",
+    bold: "Yes",
+    order: "",
+    leftSpacing: "",
+  },
+];
+const formDataCA = [
   {
     name: "Fat / Lipides",
     quantity: "0",
@@ -200,7 +291,7 @@ const formDataCA_NA = [
     preparedProduct: "5",
   },
 ];
-const order = formData.length;
+const order = formDataCA.length;
 const newFormSet = {
   name: "",
   per100g: "",
@@ -211,7 +302,6 @@ const newFormSet = {
   order: order,
 };
 function TabsPage({ host, shop }) {
-  console.log(host);
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
   // const [value, setValue] = React.useState(0);
@@ -333,9 +423,10 @@ function TabsPage({ host, shop }) {
       tab: (
         <CreateLabel
           langState={langState}
-          formData={formData}
           newFormSet={newFormSet}
-          formDataCA_NA={formDataCA_NA}
+          formDataEU={formDataEU}
+          formDataCA={formDataCA}
+          formDataNA={formDataNA}
         />
       ),
     },

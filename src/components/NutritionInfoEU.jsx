@@ -11,7 +11,8 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import PopOverComponent from "./PopOverComponent";
 import SelectComponent from "./SelectComponent";
-import NutritionInfoCANA from "./NutritionInfoCANA";
+import NutritionInfoCA from "./NutritionInfoCA";
+import NutritionInfoNA from "./NutritionInfoNA";
 function NutritionInfo({
   formValues,
   setFormValues,
@@ -24,7 +25,7 @@ function NutritionInfo({
   const handlePopOverOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-
+  console.log(formValues);
   const handlePopOverClose = () => {
     setAnchorEl(null);
   };
@@ -66,8 +67,8 @@ function NutritionInfo({
 
   return (
     <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-      {locationPlan.location === "CA" || locationPlan.location === "NA" ? (
-        <NutritionInfoCANA
+      {locationPlan.location === "CA" ? (
+        <NutritionInfoCA
           formValues={formValues}
           setFormValues={setFormValues}
           formLables={formLables}
@@ -76,6 +77,22 @@ function NutritionInfo({
           locationPlan={locationPlan}
         />
       ) : (
+        <></>
+      )}
+      {locationPlan.location === "NA" ? (
+        <NutritionInfoNA
+          formValues={formValues}
+          setFormValues={setFormValues}
+          formLables={formLables}
+          handleOrderChange={handleOrderChange}
+          newFormSet={newFormSet}
+          locationPlan={locationPlan}
+        />
+      ) : (
+        <></>
+      )}
+
+      {locationPlan.location === "EU" ? (
         <Card Sectioned>
           <Card.Section>
             <Stack distribution="equalSpacing">
@@ -186,6 +203,8 @@ function NutritionInfo({
           </Card.Section>
           <Button onClick={handleSave}>Save</Button>
         </Card>
+      ) : (
+        <></>
       )}
     </div>
   );

@@ -10,7 +10,6 @@ import Ingredients from "./Ingredients";
 import AllergyInfo from "./AllergyInfo";
 import LegalNotes from "./LegalNotes";
 import { Heading, Card, Button, Page, TextStyle } from "@shopify/polaris";
-import NutritionInfoCheck from "./NutritionInfoCheck";
 import NutritionInfo from "./NutritionInfoEU";
 import CheckLocation from "./CheckLocation";
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
@@ -20,7 +19,13 @@ const formLables = {
   formLablesEU,
 };
 
-function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
+function CreateLabel({
+  langState,
+  newFormSet,
+  formDataEU,
+  formDataCA,
+  formDataNA,
+}) {
   const [data, setData] = useState({
     ingredientsText:
       "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
@@ -75,12 +80,16 @@ function CreateLabel({ langState, formData, newFormSet, formDataCA_NA }) {
     setData(newData);
   };
   const [formValues, setFormValues] = useState(
-    data.locationPlan.location === "EU"
-      ? formData.length
-        ? formData
-        : []
-      : formDataCA_NA.length
-      ? formDataCA_NA
+    data.locationPlan.location === "EU" && (formDataEU ? formDataEU.length : "")
+      ? formDataEU
+      : [] ||
+        (data.locationPlan.location === "CA" &&
+          (formDataCA ? formDataCA.length : ""))
+      ? formDataCA
+      : [] ||
+        (data.locationPlan.location === "NA" &&
+          (formDataNA ? formDataNA.length : ""))
+      ? formDataNA
       : []
   );
   const [productToPrepare, setProductToPrepare] = useState(false);
