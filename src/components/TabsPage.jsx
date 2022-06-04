@@ -316,12 +316,19 @@ function TabsPage({ host, shop }) {
     (selectedTabIndex) => setSelected(selectedTabIndex),
     []
   );
+  const [location, setLocation] = useState("CA");
+  const [formData, setFormData] = useState([]);
   //   const handleTabChangeTest=(n)=>{
   // setSelected(n)
   //   }
   /**
    * get language page data from server
    */
+  const checkLocation = () => {
+    if (location === "CA") setFormData(formDataCA);
+    if (location === "NA") setFormData(formDataNA);
+    if (location === "EU") setFormData(formDataEU);
+  };
   const fetchLang = async () => {
     const data = await fetch("/LangData")
       .then((res) => res.json())
@@ -344,6 +351,7 @@ function TabsPage({ host, shop }) {
 
   useEffect(() => {
     fetchLang();
+    checkLocation();
   }, []);
 
   /**
@@ -424,9 +432,9 @@ function TabsPage({ host, shop }) {
         <CreateLabel
           langState={langState}
           newFormSet={newFormSet}
-          formDataEU={formDataEU}
-          formDataCA={formDataCA}
-          formDataNA={formDataNA}
+          formData={formData}
+          location={location}
+          setLocation={setLocation}
         />
       ),
     },

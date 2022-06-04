@@ -25,7 +25,6 @@ function NutritionInfo({
   const handlePopOverOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  console.log(formValues);
   const handlePopOverClose = () => {
     setAnchorEl(null);
   };
@@ -83,7 +82,6 @@ function NutritionInfo({
         <NutritionInfoNA
           formValues={formValues}
           setFormValues={setFormValues}
-          formLables={formLables}
           handleOrderChange={handleOrderChange}
           newFormSet={newFormSet}
           locationPlan={locationPlan}

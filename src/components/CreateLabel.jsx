@@ -22,9 +22,9 @@ const formLables = {
 function CreateLabel({
   langState,
   newFormSet,
-  formDataEU,
-  formDataCA,
-  formDataNA,
+  formData,
+  location,
+  setLocation,
 }) {
   const [data, setData] = useState({
     ingredientsText:
@@ -64,34 +64,23 @@ function CreateLabel({
       },
     },
     locationPlan: {
-      location: "EU",
+      location: location,
       plan: "Advanced",
     },
   });
 
   const handleLocation = (newlocation) => {
-    let newData = { ...data };
-    newData["locationPlan"]["location"] = newlocation;
-    setData(newData);
+    setLocation(newlocation);
   };
   const handlePlan = (newPlan) => {
     let newData = { ...data };
     newData["locationPlan"]["plan"] = newPlan;
     setData(newData);
   };
-  const [formValues, setFormValues] = useState(
-    data.locationPlan.location === "EU" && (formDataEU ? formDataEU.length : "")
-      ? formDataEU
-      : [] ||
-        (data.locationPlan.location === "CA" &&
-          (formDataCA ? formDataCA.length : ""))
-      ? formDataCA
-      : [] ||
-        (data.locationPlan.location === "NA" &&
-          (formDataNA ? formDataNA.length : ""))
-      ? formDataNA
-      : []
-  );
+
+  const [formValues, setFormValues] = useState(formData);
+
+  console.log(formValues);
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [nonFoodProduct, setNonFoodProduct] = useState(false);
   const handleOrderSet = () => {
