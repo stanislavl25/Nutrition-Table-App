@@ -1,4 +1,3 @@
-import { TextField } from "@mui/material";
 import {
   Button,
   Card,
@@ -6,6 +5,7 @@ import {
   Heading,
   Popover,
   Select,
+  TextField,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
@@ -13,7 +13,7 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
   const togglePopoverActive = useCallback(
-    (test) => setPopoverActive((popoverActive) => !popoverActive),
+    () => setPopoverActive((popoverActive) => !popoverActive),
 
     []
   );
@@ -23,76 +23,6 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
       More
     </Button>
   );
-
-  const Label = (text) => {
-    return <label>{text}</label>;
-  };
-  const MoreContent1 = (item) => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {Label("%RI*")}
-        <TextField
-          style={{ marginBottom: "10px" }}
-          size="small"
-          type="text"
-          variant="outlined"
-          name="Name"
-          value={item.RI || ""}
-          onChange={(e) => handleChange(index, e)}
-        />
-      </div>
-    );
-  };
-  const MoreContent2 = (item) => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {Label("Left Spacing (Table)")}
-        <TextField
-          style={{ marginBottom: "10px" }}
-          size="small"
-          type="text"
-          variant="outlined"
-          name="Name"
-          value={item.LeftSpacing || ""}
-          onChange={(e) => handleChange(index, e)}
-        />
-      </div>
-    );
-  };
-  const MoreContent3 = (item) => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {Label("Order")}
-        <TextField
-          size="small"
-          style={{ marginBottom: "10px" }}
-          type="text"
-          variant="outlined"
-          name="Name"
-          value={item.order || ""}
-          onChange={(e) => handleChange(index, e)}
-        />
-      </div>
-    );
-  };
   return (
     <Popover
       sectioned
@@ -102,9 +32,27 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
       onClose={togglePopoverActive}
     >
       <FormLayout>
-        <MoreContent1 item={element} />
-        <MoreContent2 item={element} />
-        <MoreContent3 item={element} />
+        <TextField
+          label="%RI*"
+          type="text"
+          name="RI"
+          value={element.RI || ""}
+          onChange={(e) => handleChange(e, "RI", index)}
+        />{" "}
+        <TextField
+          label="Left Spacing (Table)"
+          type="text"
+          name="LeftSpacing"
+          value={element.LeftSpacing || ""}
+          onChange={(e) => handleChange(e, "LeftSpacing", index)}
+        />
+        <TextField
+          label="Order"
+          type="text"
+          name="Name"
+          value={element.order || ""}
+          onChange={(e) => handleChange(e, "order", index)}
+        />
         <Button
           destructive
           outline
@@ -120,11 +68,7 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
   );
 };
 
-const SelectElement = () => {
-  const [selected, setSelected] = useState("Grams");
-
-  const handleSelectChange = useCallback((value) => setSelected(value), []);
-
+const SelectElement = ({ unit, handleChange, index }) => {
   const options = [
     { label: "Grams", value: "g" },
     { label: "Miligrams", value: "Mg" },
@@ -135,8 +79,8 @@ const SelectElement = () => {
       <Select
         label=""
         options={options}
-        onChange={handleSelectChange}
-        value={selected}
+        onChange={(e) => handleChange(e, "unit", index)}
+        value={unit}
       />
     </div>
   );
@@ -144,17 +88,25 @@ const SelectElement = () => {
 
 function Minerals() {
   const [formValues, setFormValues] = useState([]);
-
-  let handleChange = (i, e) => {
+  let handleChange = useCallback((e, tag, i) => {
+    console.log(e);
     let newFormValues = [...formValues];
-    newFormValues[i][e.target.name] = e.target.value;
+    newFormValues[i][tag] = e;
     setFormValues(newFormValues);
-  };
+  });
 
   let addFormFields = () => {
     setFormValues([
       ...formValues,
-      { Name: "", Per100g: "", Perportion25g: "" },
+      {
+        Name: "",
+        Per100g: "",
+        Perportion25g: "",
+        unit: "Grams",
+        order: "",
+        LeftSpacing: "",
+        RI: "",
+      },
     ]);
   };
 
@@ -241,8 +193,8 @@ function Minerals() {
                 type="text"
                 variant="outlined"
                 name="Name"
-                value={element.title || ""}
-                onChange={(e) => handleChange(index, e)}
+                value={element.Name || ""}
+                onChange={(e) => handleChange(e, "Name", index)}
               />
               <TextField
                 size="small"
@@ -250,8 +202,8 @@ function Minerals() {
                 variant="outlined"
                 type="text"
                 name="Per100g"
-                value={element.Value || ""}
-                onChange={(e) => handleChange(index, e)}
+                value={element.Per100g || ""}
+                onChange={(e) => handleChange(e, "Per100g", index)}
               />
               <TextField
                 style={{ width: "130px", marginRight: "10px" }}
@@ -259,10 +211,14 @@ function Minerals() {
                 variant="outlined"
                 type="text"
                 name="Perportion25g"
-                value={element.Value || ""}
-                onChange={(e) => handleChange(index, e)}
+                value={element.Perportion25g || ""}
+                onChange={(e) => handleChange(e, "Perportion25g", index)}
               />
-              <SelectElement />
+              <SelectElement
+                unit={element.unit}
+                handleChange={handleChange}
+                index={index}
+              />
               <PopoverElement
                 element={element}
                 removeFormFields={removeFormFields}

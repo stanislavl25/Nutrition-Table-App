@@ -27,75 +27,6 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
     </Button>
   );
 
-  const Label = (text) => {
-    return <label>{text}</label>;
-  };
-  const MoreContent1 = (item) => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {Label("%RI*")}
-        <TextField
-          style={{ marginBottom: "10px" }}
-          size="small"
-          type="text"
-          variant="outlined"
-          name="Name"
-          value={item.RI || ""}
-          onChange={(e) => handleChange(index, e)}
-        />
-      </div>
-    );
-  };
-  const MoreContent2 = (item) => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {Label("Left Spacing (Table)")}
-        <TextField
-          style={{ marginBottom: "10px" }}
-          size="small"
-          type="text"
-          variant="outlined"
-          name="Name"
-          value={item.LeftSpacing || ""}
-          onChange={(e) => handleChange(index, e)}
-        />
-      </div>
-    );
-  };
-  const MoreContent3 = (item) => {
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-        }}
-      >
-        {Label("Order")}
-        <TextField
-          size="small"
-          style={{ marginBottom: "10px" }}
-          type="text"
-          variant="outlined"
-          name="Name"
-          value={item.order || ""}
-          onChange={(e) => handleChange(index, e)}
-        />
-      </div>
-    );
-  };
   return (
     <Popover
       sectioned
@@ -105,9 +36,27 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
       onClose={togglePopoverActive}
     >
       <FormLayout>
-        <MoreContent1 item={element} />
-        <MoreContent2 item={element} />
-        <MoreContent3 item={element} />
+        <TextField
+          label="%RI*"
+          type="text"
+          name="Name"
+          value={element.RI || ""}
+          onChange={(e) => handleChange(e, "RI", index)}
+        />
+        <TextField
+          label="Left Spacing (Table)"
+          type="text"
+          name="Name"
+          value={element.LeftSpacing || ""}
+          onChange={(e) => handleChange(e, "LeftSpacing", index)}
+        />
+        <TextField
+          label="Order"
+          type="text"
+          name="Name"
+          value={element.order || ""}
+          onChange={(e) => handleChange(e, "order", index)}
+        />
         <Button
           destructive
           outline
@@ -123,11 +72,7 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
   );
 };
 
-const SelectElement = () => {
-  const [selected, setSelected] = useState("Grams");
-
-  const handleSelectChange = useCallback((value) => setSelected(value), []);
-
+const SelectElement = ({ index, handleChange, unit }) => {
   const options = [
     { label: "Grams", value: "g" },
     { label: "Miligrams", value: "Mg" },
@@ -138,8 +83,8 @@ const SelectElement = () => {
       <Select
         label=""
         options={options}
-        onChange={handleSelectChange}
-        value={selected}
+        onChange={(e) => handleChange(e, "unit", index)}
+        value={unit}
       />
     </div>
   );
@@ -147,20 +92,34 @@ const SelectElement = () => {
 
 function Vitamins() {
   const [formValues, setFormValues] = useState([
-    { name: "Vitamin C", per100g: "14.81", perportion: "4.5" },
+    {
+      name: "Vitamin C",
+      per100g: "14.81",
+      perportion: "4.5",
+      LeftSpacing: "",
+      order: "",
+      RI: "",
+    },
   ]);
 
-  const handleChange = useCallback((e, i, name) => {
-    console.log(e);
-    console.log(i);
-    console.log(name);
+  let handleChange = useCallback((e, tag, i) => {
     let newFormValues = [...formValues];
-    newFormValues[i][name] = e;
+    newFormValues[i][tag] = e;
     setFormValues(newFormValues);
-  }, []);
+  });
 
   let addFormFields = () => {
-    setFormValues([...formValues, { name: "", per100g: "", perportion: "" }]);
+    setFormValues([
+      ...formValues,
+      {
+        name: "",
+        per100g: "",
+        perportion: "",
+        LeftSpacing: "",
+        order: "",
+        RI: "",
+      },
+    ]);
   };
 
   let removeFormFields = (i) => {
@@ -236,7 +195,7 @@ function Vitamins() {
                     type="text"
                     name="name"
                     value={element.name || ""}
-                    onChange={(e) => handleChange(e, index, "name")}
+                    onChange={(e) => handleChange(e, "name", index)}
                   />
                 </Stack.Item>
                 <Stack.Item fill>
@@ -244,20 +203,24 @@ function Vitamins() {
                     type="text"
                     name="per100g"
                     value={element.per100g || ""}
-                    onChange={(e) => handleChange(e, index, "per100g")}
+                    onChange={(e) => handleChange(e, "per100g", index)}
                   />
                 </Stack.Item>
-                <Stack.Item fill></Stack.Item>
+                {/* <Stack.Item fill></Stack.Item> */}
                 <Stack.Item fill>
                   <TextField
                     type="text"
                     name="perportion"
                     value={element.perportion || ""}
-                    onChange={(e) => handleChange(e, index, "perportion")}
+                    onChange={(e) => handleChange(e, "perportion", index)}
                   />
                 </Stack.Item>
-                <Stack.Item fill>
-                  <SelectElement />
+                <Stack.Item>
+                  <SelectElement
+                    index={index}
+                    handleChange={handleChange}
+                    unit={element.unit}
+                  />
                 </Stack.Item>
                 <Stack.Item fill>
                   <PopoverElement
