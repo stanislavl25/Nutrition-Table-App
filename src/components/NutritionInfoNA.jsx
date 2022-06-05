@@ -56,7 +56,6 @@ function NutritionInfoNA({
   newFormSet,
   locationPlan,
 }) {
-  console.log(formValues);
   const handleChange = useCallback((e, i, name) => {
     console.log(e);
     let newFormValues = [...formValues];
@@ -87,7 +86,7 @@ function NutritionInfoNA({
       </Card.Section>
       <Card.Section>
         {formValues.map((elem, index) => (
-          <Stack wrap={false}>
+          <Stack wrap={false} key={index}>
             <Stack.Item>
               <TextField
                 value={elem.name || ""}

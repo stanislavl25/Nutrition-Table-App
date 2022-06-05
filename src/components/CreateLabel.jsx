@@ -80,7 +80,6 @@ function CreateLabel({
 
   const [formValues, setFormValues] = useState(formData);
 
-  console.log(formValues);
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [nonFoodProduct, setNonFoodProduct] = useState(false);
   const handleOrderSet = () => {
