@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   FormLayout,
+  Heading,
   Popover,
   Select,
   Stack,
@@ -10,7 +11,12 @@ import {
 import React, { useCallback, useState } from "react";
 import SelectComponent from "./SelectComponent";
 
-const PopOverComponent = () => {
+const PopOverComponent = ({
+  handleChange,
+  index,
+  element,
+  removeFormFields,
+}) => {
   const [popoverActive, setPopoverActive] = useState(false);
   const [tagValue, setTagValue] = useState("");
 
@@ -26,6 +32,10 @@ const PopOverComponent = () => {
       More
     </Button>
   );
+  const options = [
+    { label: "Yes", value: "Yes" },
+    { label: "No", value: "No" },
+  ];
   return (
     <Popover
       active={popoverActive}
@@ -33,16 +43,64 @@ const PopOverComponent = () => {
       onClose={togglePopoverActive}
       ariaHaspopup={false}
       sectioned
+      autofocusTarget="none"
+      preferredAlignment="center"
     >
       <FormLayout>
-        <Select label="Show all customers where:" options={["Tagged with"]} />
+        <Stack wrap={false}>
+          <Stack.Item fill>
+            <Select
+              label="Bold Name"
+              options={options}
+              value={element.bold}
+              onChange={(e) => handleChange(e, "bold", index)}
+            />
+          </Stack.Item>
+          <Stack.Item>
+            <TextField
+              label="Order"
+              onChange={(e) => handleChange(e, "order", index)}
+              autoComplete="off"
+              value={element.order}
+            />
+          </Stack.Item>
+        </Stack>
         <TextField
-          label="Tags"
-          value={tagValue}
-          onChange={handleTagValueChange}
+          label="Left Spacing (Table)"
+          value={element.leftSpacing}
+          onChange={(e) => handleChange(e, "leftSpacing", index)}
           autoComplete="off"
         />
-        <Button size="slim">Add filter</Button>
+        <Heading>Prepared Product</Heading>
+        <Stack wrap={false}>
+          <Stack.Item fill>
+            <TextField
+              label="Quantity"
+              value={element.preparedProductQuantity}
+              onChange={(e) =>
+                handleChange(e, "preparedProductQuantity", index)
+              }
+              autoComplete="off"
+            />
+          </Stack.Item>
+          <Stack.Item>
+            <TextField
+              label="% DV*"
+              value={element.preparedProductDV}
+              autoComplete="off"
+              onChange={(e) => handleChange(e, "preparedProductDV", index)}
+            />
+          </Stack.Item>
+        </Stack>
+        <TextField
+          label="Prepared Unit"
+          value={element.preparedProductUnit}
+          autoComplete="off"
+          onChange={(e) => handleChange(e, "preparedProductUnit", index)}
+        />
+        <Button destructive outline onClick={() => removeFormFields(index)}>
+          Delete
+        </Button>
       </FormLayout>
     </Popover>
   );
@@ -56,7 +114,7 @@ function NutritionInfoNA({
   newFormSet,
   locationPlan,
 }) {
-  const handleChange = useCallback((e, i, name) => {
+  const handleChange = useCallback((e, name, i) => {
     console.log(e);
     let newFormValues = [...formValues];
     newFormValues[i][name] = e;
@@ -66,7 +124,11 @@ function NutritionInfoNA({
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
   ];
-
+  let removeFormFields = (i) => {
+    let newFormValues = [...formValues];
+    newFormValues.splice(i, 1);
+    setFormValues(newFormValues);
+  };
   return (
     <Card>
       <Card.Section>
@@ -90,32 +152,35 @@ function NutritionInfoNA({
             <Stack.Item>
               <TextField
                 value={elem.name || ""}
-                onChange={(e) => handleChange(e, index, "name")}
+                onChange={(e) => handleChange(e, "name")}
               />
             </Stack.Item>
             <Stack.Item fill>
               <TextField
                 value={elem.quantity || ""}
-                onChange={(e) => handleChange(e, index, "quantity")}
+                onChange={(e) => handleChange(e, "quantity", index)}
               />
             </Stack.Item>
             <Stack.Item>
-              <SelectComponent
-                index={index}
-                unit={elem.unit}
-                handleChange={handleChange}
+              <Select
                 options={options}
-                name="unit"
+                value={elem.unit || ""}
+                onChange={(e) => handleChange(e, "unit", index)}
               />
             </Stack.Item>
             <Stack.Item fill>
               <TextField
                 value={elem.dailyValue || ""}
-                onChange={(e) => handleChange(e, index, "dailyValue")}
+                onChange={(e) => handleChange(e, "dailyValue", index)}
               />
             </Stack.Item>
             <Stack.Item>
-              <PopOverComponent />
+              <PopOverComponent
+                element={elem}
+                index={index}
+                handleChange={handleChange}
+                removeFormFields={removeFormFields}
+              />
             </Stack.Item>
           </Stack>
         ))}

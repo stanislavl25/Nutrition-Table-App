@@ -1,4 +1,3 @@
-import { Popover } from "@mui/material";
 import {
   Select,
   Button,
@@ -7,12 +6,104 @@ import {
   Heading,
   TextField,
   Stack,
+  Popover,
 } from "@shopify/polaris";
 import React, { useCallback, useEffect, useState } from "react";
-import PopOverComponent from "./PopOverComponent";
 import SelectComponent from "./SelectComponent";
 import NutritionInfoCA from "./NutritionInfoCA";
 import NutritionInfoNA from "./NutritionInfoNA";
+
+const PopOverComponent = ({
+  handleChange,
+  index,
+  element,
+  removeFormFields,
+}) => {
+  const [popoverActive, setPopoverActive] = useState(false);
+
+  const togglePopoverActive = useCallback(
+    () => setPopoverActive((popoverActive) => !popoverActive),
+    []
+  );
+
+  const activator = (
+    <Button onClick={togglePopoverActive} disclosure>
+      More
+    </Button>
+  );
+  const options = [
+    { label: "Yes", value: "Yes" },
+    { label: "No", value: "No" },
+  ];
+  return (
+    <Popover
+      active={popoverActive}
+      activator={activator}
+      onClose={togglePopoverActive}
+      ariaHaspopup={false}
+      sectioned
+      autofocusTarget="none"
+      preferredAlignment="center"
+    >
+      <FormLayout>
+        <Stack>
+          <Stack.Item fill>
+            <Select
+              onChange={(e) => handleChange(e, "bold", index)}
+              value={element.bold || ""}
+              options={options}
+              name="bold"
+              label="Bold Name"
+            />
+          </Stack.Item>
+          <Stack.Item>
+            <TextField
+              label="Order"
+              type="number"
+              name="order"
+              min={0}
+              value={element.order || ""}
+              onChange={(e) => {
+                handleChange(e, "order", index);
+              }}
+              multiline={false}
+            />
+          </Stack.Item>
+        </Stack>
+        <TextField
+          label="Left Spacing (Table)"
+          type="number"
+          value={element.leftSpacing || ""}
+          min={0}
+          name="leftSpacing"
+          onChange={(e) => handleChange(e, "leftSpacing", index)}
+          multiline={false}
+        />
+        <TextField
+          label="% RI*"
+          type="number"
+          value={element.RI || ""}
+          min={0}
+          name="% RI*"
+          onChange={(e) => handleChange(e, "RI", index)}
+          multiline={false}
+        />
+
+        <Button
+          destructive
+          outline
+          style={{ margin: "4px" }}
+          type="button"
+          className="button remove"
+          onClick={() => removeFormFields(index)}
+        >
+          Delete
+        </Button>
+      </FormLayout>
+    </Popover>
+  );
+};
+
 function NutritionInfo({
   formValues,
   setFormValues,
@@ -21,17 +112,6 @@ function NutritionInfo({
   newFormSet,
   locationPlan,
 }) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const handlePopOverOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handlePopOverClose = () => {
-    setAnchorEl(null);
-  };
-
-  const openPopOver = Boolean(anchorEl);
-  const id = openPopOver ? "simple-popover" : undefined;
-
   let addFormFields = () => {
     setFormValues([...formValues, newFormSet]);
   };
@@ -46,18 +126,12 @@ function NutritionInfo({
     event.preventDefault();
     console.log(JSON.stringify(formValues));
   };
-  const handleChange = useCallback((e, i, name) => {
+  const handleChange = useCallback((e, name, i) => {
     console.log(e);
     let newFormValues = [...formValues];
     newFormValues[i][name] = e;
     setFormValues(newFormValues);
   }, []);
-
-  const handleUnitChange = (i, val) => {
-    let newFormValues = [...formValues];
-    newFormValues[i]["Unit"] = val;
-    setFormValues(newFormValues);
-  };
 
   const options = [
     { label: "Grams", value: "Grams" },
@@ -148,7 +222,7 @@ function NutritionInfo({
                       style={{ width: "130px", marginRight: "10px" }}
                       value={element.name}
                       name="Name"
-                      onChange={(e) => handleChange(e, index, "name")}
+                      onChange={(e) => handleChange(e, "name", index)}
                       label=""
                       autoComplete="off"
                     />
@@ -156,7 +230,7 @@ function NutritionInfo({
                       style={{ width: "80px", marginRight: "10px" }}
                       value={element.per100g || 0}
                       name="Per100g"
-                      onChange={(e) => handleChange(e, index, "per100g")}
+                      onChange={(e) => handleChange(e, "per100g", index)}
                       inputMode="number"
                       autoComplete="off"
                     />
@@ -164,31 +238,20 @@ function NutritionInfo({
                       style={{ width: "120px", marginRight: "10px" }}
                       value={element.perportion || 0}
                       name="Perportion"
-                      onChange={(e) => handleChange(e, index, "perportion")}
+                      onChange={(e) => handleChange(e, "perportion", index)}
                       autoComplete="off"
                       inputMode="number"
                       disabled={locationPlan.plan === "Basic" ? true : false}
                     />
                     <div style={{ width: "100px", marginRight: "10px" }}>
-                      <SelectComponent
-                        index={index}
-                        unit={element.unit}
-                        handleChange={handleChange}
+                      <Select
+                        value={element.unit}
+                        onChange={(e) => handleChange(e, "unit", index)}
                         options={options}
                         name="unit"
                       />
                     </div>
-
-                    <Button onClick={handlePopOverOpen} aria-describedby={id}>
-                      More
-                    </Button>
                     <PopOverComponent
-                      // handleOrderChange={handleOrderChange}
-                      openPopOver={openPopOver}
-                      handleOrderChange={handleOrderChange}
-                      id={id}
-                      anchorEl={anchorEl}
-                      handlePopOverClose={handlePopOverClose}
                       element={element}
                       handleChange={handleChange}
                       removeFormFields={removeFormFields}

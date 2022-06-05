@@ -57,14 +57,7 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
           value={element.order || ""}
           onChange={(e) => handleChange(e, "order", index)}
         />
-        <Button
-          destructive
-          outline
-          style={{ margin: "4px" }}
-          type="button"
-          className="button remove"
-          onClick={() => removeFormFields(index)}
-        >
+        <Button destructive outline onClick={() => removeFormFields(index)}>
           Delete
         </Button>
       </FormLayout>

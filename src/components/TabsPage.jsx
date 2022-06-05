@@ -116,6 +116,9 @@ const formDataNA = [
     bold: "Yes",
     order: "",
     leftSpacing: "",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Saturated Fat",
@@ -125,6 +128,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "1",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Trans Fat",
@@ -134,6 +140,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "1",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Cholesterol",
@@ -143,6 +152,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Sodium ",
@@ -152,6 +164,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Total Carbohydrate",
@@ -161,6 +176,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Dietary Fiber",
@@ -170,6 +188,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "1",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Total Sugars",
@@ -179,6 +200,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Includes Added Sugars",
@@ -188,6 +212,9 @@ const formDataNA = [
     bold: "No",
     order: "",
     leftSpacing: "2",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
   {
     name: "Protein",
@@ -197,6 +224,9 @@ const formDataNA = [
     bold: "Yes",
     order: "",
     leftSpacing: "",
+    preparedProductQuantity: "",
+    preparedProductDV: "",
+    preparedProductUnit: "Grams",
   },
 ];
 const formDataCA = [
@@ -316,7 +346,7 @@ function TabsPage({ host, shop }) {
     (selectedTabIndex) => setSelected(selectedTabIndex),
     []
   );
-  const [location, setLocation] = useState("NA");
+  const [location, setLocation] = useState("EU");
   const [formData, setFormData] = useState([]);
   //   const handleTabChangeTest=(n)=>{
   // setSelected(n)
@@ -417,6 +447,7 @@ function TabsPage({ host, shop }) {
       langState={langState}
       setLangState={setLangState}
       fetchLang={fetchLangChanges}
+      location={location}
     />
   );
   const tabs = [

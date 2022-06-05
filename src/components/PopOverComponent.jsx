@@ -1,87 +1,11 @@
-import { Button, TextField } from "@shopify/polaris";
+import { Button, Select, Stack, TextField } from "@shopify/polaris";
 import React from "react";
-import SlectComponent from "./SelectComponent";
 import { Popover } from "@mui/material";
 
-const Label = (text) => {
-  return <label>{text}</label>;
-};
-
-const BoldName = ({ data, index, handleChange }) => {
-  const options = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
-  ];
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-      }}
-    >
-      {Label("Bold Name")}
-      <SlectComponent
-        handleChange={handleChange}
-        index={index}
-        unit={data.bolean}
-        options={options}
-        name="bold"
-      />
-    </div>
-  );
-};
-const LeftSpacing = ({ data, index, handleChange }) => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        marginBottom: "10px",
-      }}
-    >
-      {Label("Left Spacing (Table)")}
-      <TextField
-        // size="small"
-        label=""
-        type="number"
-        value={data.leftSpacing || ""}
-        min={0}
-        name="leftSpacing"
-        onChange={(e) => handleChange(e, index, "leftSpacing")}
-        multiline={false}
-      />
-    </div>
-  );
-};
-const Order = ({ data, handleChange, index, handleOrderChange }) => {
-  let order = data.order;
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        marginBottom: "10px",
-      }}
-    >
-      {Label("Order")}
-      <TextField
-        type="number"
-        name="order"
-        min={0}
-        value={order}
-        onChange={(e) => {
-          handleChange(e, index, "order");
-          handleOrderChange(e, index);
-        }}
-        multiline={false}
-      />
-    </div>
-  );
-};
+const options = [
+  { label: "Yes", value: "Yes" },
+  { label: "No", value: "No" },
+];
 
 const PopOverComponent = ({
   element,
@@ -92,7 +16,6 @@ const PopOverComponent = ({
   handlePopOverClose,
   openPopOver,
   anchorEl,
-  handleOrderChange,
 }) => {
   return (
     <Popover
@@ -104,21 +27,40 @@ const PopOverComponent = ({
         vertical: "center",
         horizontal: "left",
       }}
-      sx={{ boxShadow: "none" }}
     >
       <div style={{ padding: "10px" }}>
-        <BoldName data={element} handleChange={handleChange} index={index} />
-        <LeftSpacing
-          data={element}
-          handleChange={handleChange}
-          index={index}
-          //   handleOrderChange={handleOrderChange}
+        <Stack>
+          <Stack.Item fill>
+            <Select
+              handleChange={(e) => handleChange(e, "bold", index)}
+              value={element.bolean}
+              options={options}
+              name="bold"
+              label="Bold Name"
+            />
+          </Stack.Item>
+        </Stack>
+
+        <TextField
+          label="Left Spacing (Table)"
+          type="number"
+          value={element.leftSpacing || ""}
+          min={0}
+          name="leftSpacing"
+          onChange={(e) => handleChange(e, "leftSpacing", index)}
+          multiline={false}
         />
-        <Order
-          data={element}
-          handleChange={handleChange}
-          index={index}
-          handleOrderChange={handleOrderChange}
+
+        <TextField
+          label="Order"
+          type="number"
+          name="order"
+          min={0}
+          value={element.order}
+          onChange={(e) => {
+            handleChange(e, "order", index);
+          }}
+          multiline={false}
         />
         <Button
           destructive
