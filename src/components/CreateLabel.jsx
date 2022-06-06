@@ -218,8 +218,14 @@ function CreateLabel({
                     : formLables.formLablesCA_NA
                 }
               />
-              <Vitamins />
-              <Minerals />
+              {data.locationPlan.plan === "Basic" ? (
+                <></>
+              ) : (
+                <>
+                  <Vitamins />
+                  <Minerals />
+                </>
+              )}
               <Notes
                 notesText={data.notesText}
                 handleTextChange={handleNotesTextChange}

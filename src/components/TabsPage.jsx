@@ -346,7 +346,7 @@ function TabsPage({ host, shop }) {
     (selectedTabIndex) => setSelected(selectedTabIndex),
     []
   );
-  const [location, setLocation] = useState("CA");
+  const [location, setLocation] = useState("EU");
   const [formData, setFormData] = useState([]);
   //   const handleTabChangeTest=(n)=>{
   // setSelected(n)
