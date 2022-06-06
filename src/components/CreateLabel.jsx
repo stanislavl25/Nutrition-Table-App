@@ -12,6 +12,7 @@ import LegalNotes from "./LegalNotes";
 import { Heading, Card, Button, Page, TextStyle } from "@shopify/polaris";
 import NutritionInfo from "./NutritionInfoEU";
 import CheckLocation from "./CheckLocation";
+import EmptyVitaminsMineralsPage from "./EmptyVitaminsMineralsPage";
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
 const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
 const formLables = {
@@ -36,7 +37,6 @@ function CreateLabel({
     lEGALNOTICEText:
       "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
     nutriScore: "",
-
     servingSize: {
       CA: {
         servingSizeBasic: "250",
@@ -219,7 +219,7 @@ function CreateLabel({
                 }
               />
               {data.locationPlan.plan === "Basic" ? (
-                <></>
+                <EmptyVitaminsMineralsPage />
               ) : (
                 <>
                   <Vitamins />
