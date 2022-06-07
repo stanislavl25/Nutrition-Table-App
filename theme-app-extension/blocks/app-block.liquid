@@ -178,25 +178,24 @@
     "stylesheet": "germanStyleTable.css",
     "javascript": "nutritionTable.js",
     "templates": ["product"],
-    "settings": [
-    {
+    "settings": 
+    [
+      {
       "type": "header",
-      "content": "Label Block"
-    },
-
+      "content": "Label Block",
+      },
       {
         "type": "checkbox",
         "id": "checkbox1",
         "label": "Open accordion by default",
-        "default": false
+        "default": false,
       },
       {
         "type": "checkbox",
         "id": "checkBox2",
         "label": "Use custom width",
-        "default": false
+        "default": false,
       },
- 
       {
         "type": "select",
         "id": "vertical_alignment",
@@ -204,18 +203,18 @@
         "options": [
           {
             "value": "left",
-            "label": "Left"
+            "label": "Left",
           },
           {
             "value": "center",
-            "label": "Center"
+            "label": "Center",
           },
           {
             "value": "right",
-            "label": "Right"
+            "label": "Right",
           }
         ],
-        "default": "center"
+        "default": "center",
       },
       {
         "type": "range",
@@ -225,13 +224,64 @@
         "step": 1,
         "unit": "%",
         "label": "Width",
-        "default": 30
+        "default": 30,
       },
       {
-        "type": "page",
-        "id": "MAINTABLE",
-        "label": "MAIN TABLE"
-      }
-    ]
+        "type": "header",
+        "content": "MAIN TABLE",
+      },
+      {
+        "type": "paragraph",
+        "content": "These settings affect the main table or section.",
+      },
+      {
+        "type": "checkbox",
+        "id": "checkbox3",
+        "label": "Show Border",
+        "default": false,
+      },
+      {
+        "type": "color",
+        "id": "primaryBorder",
+        "label": "Primary Border color",
+        "default": "#CECECE",
+      },
+      {
+        "type": "color",
+        "id": "secondaryBorder",
+        "label": "Secondary Border color",
+        "default": "#222222",
+      },
+      {
+        "type": "range",
+        "id": "primaryBorderThickness",
+        "min": -1,
+        "max": 1,
+        "step": 1,
+        "unit": "px",
+        "label": "Primary Border Thickness",
+        "default": 1,
+      },
+      {
+        "type": "range",
+        "id": "secondaryBorderThickness",
+        "min": -2,
+        "max": 2,
+        "step": 1,
+        "unit": "px",
+        "label": "Secondary Border Thickness",
+        "default": 2,
+      },
+      {
+        "type": "range",
+        "id": "borderRadius",
+        "min": -1,
+        "max": 1,
+        "step": 1,
+        "unit": "px",
+        "label": "Border Radius",
+        "default": 1,
+      },
+    ],
   }
 {% endschema %}

@@ -11,7 +11,7 @@ import React from "react";
 import star from "../assets/nta_star_for_plan_banner.png";
 
 const formLables = ["Name", "Per 100 g", "Per portion 25 g", "Unit"];
-function EmptyVitaminsMineralsPage() {
+function BasicVitaminsMineralsPage() {
   return (
     <div>
       <div
@@ -154,4 +154,4 @@ function EmptyVitaminsMineralsPage() {
   );
 }
 
-export default EmptyVitaminsMineralsPage;
+export default BasicVitaminsMineralsPage;
