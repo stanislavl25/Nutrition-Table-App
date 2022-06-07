@@ -114,53 +114,14 @@ export async function createServer(
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const store = session.shop;
     try {
-      if (name === "NutritionInformation") {
-        const update = { NutritionInformation: value };
-        const updateData = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          update,
-          { returnOriginal: false }
-        );
-        // console.log(updateData);
-        res.status(200).send({
-          success: true,
-          message: "Changes Saved!",
-        });
-      }
-      if (name === "Ingredients") {
-        const update = { Ingredients: value };
-        const updateData = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          update,
-          { returnOriginal: false }
-        );
-        // console.log(updateData);
-        res.status(200).send({
-          success: true,
-          message: "Changes Saved!",
-        });
-      }
-      if (name === "AllergyInformation") {
-        const update = { AllergyInformation: value };
-        const updateData = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          update,
-          { returnOriginal: false }
-        );
-        // console.log(updateData);
-        res.status(200).send({
-          success: true,
-          message: "Changes Saved!",
-        });
-      }
-      if (name === "LEGALNOTICE") {
-        const update = { LEGALNOTICE: value };
-        const updateData = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          update,
-          { returnOriginal: false }
-        );
-        // console.log(updateData);
+      const update = { [name]: value };
+      const updateData = await StoreModel.findOneAndUpdate(
+        { shop_id: store },
+        update,
+        { returnOriginal: false }
+      );
+      // console.log(updateData);
+      if (updateData) {
         res.status(200).send({
           success: true,
           message: "Changes Saved!",

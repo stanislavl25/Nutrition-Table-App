@@ -5,6 +5,7 @@ import {
   Stack,
   TextField,
   TextStyle,
+  Heading,
 } from "@shopify/polaris";
 import React from "react";
 import star from "../assets/nta_star_for_plan_banner.png";
@@ -24,11 +25,11 @@ function EmptyVitaminsMineralsPage() {
       >
         <div
           style={{
-            marginLeft: "120px",
+            marginLeft: "190px",
             marginTop: "80px",
           }}
         >
-          <div style={{ marginLeft: "160px" }}>
+          <div style={{ marginLeft: "190px" }}>
             <img
               src={star}
               alt=""
@@ -49,31 +50,30 @@ function EmptyVitaminsMineralsPage() {
               Take advantage of the priceless benefits of the Advanced Plan.
             </TextStyle>
           </div>
-          <div style={{ marginLeft: "100px", marginTop: "10px" }}>
+          <div style={{ marginLeft: "115px", marginTop: "10px" }}>
             <Button primary>Get the Advanced plan</Button>
           </div>
         </div>
       </div>
       <div
         style={{
-          opacity: ".5",
-          filter: "alpha(opacity=50)",
+          filter: "blur(2px)",
           marginBottom: "20px",
         }}
       >
         <Card>
-          <Card.Section
-            title="Vitamins"
-            actions={[
-              {
-                content: (
-                  <>
-                    <Button primary>Add</Button>
-                  </>
-                ),
-              },
-            ]}
-          >
+          <Card.Section>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Heading>Vitamins</Heading>
+              <Button primary>Add</Button>
+            </div>
             <Stack wrap={false}>
               {formLables.map((name, index) => (
                 <label style={{ marginRight: "80px" }} key={index}>
@@ -105,18 +105,18 @@ function EmptyVitaminsMineralsPage() {
               <Button>More</Button>
             </Stack>
           </Card.Section>
-          <Card.Section
-            title="Minerals"
-            actions={[
-              {
-                content: (
-                  <>
-                    <Button primary>Add</Button>
-                  </>
-                ),
-              },
-            ]}
-          >
+          <Card.Section>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Heading>Minerals</Heading>
+              <Button primary>Add</Button>
+            </div>
             <Stack wrap={false}>
               {formLables.map((name, index) => (
                 <label style={{ marginRight: "80px" }} key={index}>

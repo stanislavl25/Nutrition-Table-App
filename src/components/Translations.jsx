@@ -39,6 +39,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                   label="Nutrition Facts"
                   value={langState.values.nutritionFacts || "Nutrition Facts"}
                   onChange={(e) => handleChange(e, "nutritionFacts")}
+                  onBlur={(e) => handleFetch(e, "nutritionFacts")}
                 />
               </div>
             ) : (
@@ -57,6 +58,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                     "servings per container"
                   }
                   onChange={(e) => handleChange(e, "servingsPerContainer")}
+                  onBlur={(e) => handleFetch(e, "servingsPerContainer")}
                 />
               </div>
             ) : (
@@ -74,6 +76,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                     label="per"
                     value={langState.values.per || "per"}
                     onChange={(e) => handleChange(e, "per")}
+                    onBlur={(e) => handleFetch(e, "per")}
                   />
                 </div>
                 <div
@@ -85,6 +88,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                     label="portion"
                     value={langState.values.portion || "portion"}
                     onChange={(e) => handleChange(e, "portion")}
+                    onBlur={(e) => handleFetch(e, "portion")}
                   />
                 </div>
                 <div
@@ -96,6 +100,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                     label="energy"
                     value={langState.values.energy || "energy"}
                     onChange={(e) => handleChange(e, "energy")}
+                    onBlur={(e) => handleFetch(e, "energy")}
                   />
                 </div>
                 <div
@@ -106,7 +111,10 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                   <TextField
                     label="Nutrition Information"
                     name="NutritionInformation"
-                    value={langState.values.NutritionInformation || ""}
+                    value={
+                      langState.values.NutritionInformation ||
+                      "Nutrition Information"
+                    }
                     onChange={(e) => handleChange(e, "NutritionInformation")}
                     onBlur={(e) => handleFetch(e, "NutritionInformation")}
                     fullWidth
@@ -124,8 +132,9 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
               >
                 <TextField
                   label="Serving size"
-                  value={langState.values.per || "Serving size"}
+                  value={langState.values.servingSize || "Serving size"}
                   onChange={(e) => handleChange(e, "servingSize")}
+                  onBlur={(e) => handleFetch(e, "servingSize")}
                 />
               </div>
             ) : (
@@ -144,6 +153,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                       langState.values.preparedPortion || "Prepared portion"
                     }
                     onChange={(e) => handleChange(e, "preparedPortion")}
+                    onBlur={(e) => handleFetch(e, "preparedPortion")}
                   />
                 </div>
                 <div
@@ -159,6 +169,9 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                     }
                     onChange={(e) =>
                       handleChange(e, "aPreparedPortionIsEquivalentTo")
+                    }
+                    onBlur={(e) =>
+                      handleFetch(e, "aPreparedPortionIsEquivalentTo")
                     }
                   />
                 </div>
@@ -176,6 +189,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                     onChange={(e) =>
                       handleChange(e, "referenceIntakeDisclaimer")
                     }
+                    onBlur={(e) => handleFetch(e, "referenceIntakeDisclaimer")}
                   />
                 </div>
               </>
@@ -195,6 +209,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                     langState.values.amountPerServing || "Amount per serving"
                   }
                   onChange={(e) => handleChange(e, "amountPerServing")}
+                  onBlur={(e) => handleFetch(e, "amountPerServing")}
                 />
               </div>
             ) : (
@@ -214,6 +229,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                       langState.values.valeurNutritive || "Valeur nutritive"
                     }
                     onChange={(e) => handleChange(e, "valeurNutritive")}
+                    onBlur={(e) => handleFetch(e, "valeurNutritive")}
                   />
                 </div>
                 <div
@@ -223,8 +239,9 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                 >
                   <TextField
                     label="% Daily Value*"
-                    value={langState.values.calories || "% Daily Value*"}
+                    value={langState.values.dailyValue || "% Daily Value*"}
                     onChange={(e) => handleChange(e, "dailyValue")}
+                    onBlur={(e) => handleFetch(e, "dailyValue")}
                   />
                 </div>
                 <div
@@ -239,6 +256,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                       "% valeur quotidienne*"
                     }
                     onChange={(e) => handleChange(e, "valeurQuotidienne")}
+                    onBlur={(e) => handleFetch(e, "valeurQuotidienne")}
                   />
                 </div>
               </>
@@ -256,6 +274,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
                   label="Calories"
                   value={langState.values.calories || "Calories"}
                   onChange={(e) => handleChange(e, "calories")}
+                  onBlur={(e) => handleFetch(e, "calories")}
                 />
               </div>
             ) : (
@@ -269,7 +288,7 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
               <TextField
                 label="Ingredients"
                 name="Ingredients"
-                value={langState.values.Ingredients || ""}
+                value={langState.values.Ingredients || "Ingredients"}
                 onChange={(e) => handleChange(e, "Ingredients")}
                 onBlur={(e) => handleFetch(e, "Ingredients")}
                 fullWidth
@@ -283,7 +302,9 @@ function Translatins({ langState, setLangState, fetchLang, location }) {
               <TextField
                 label="Allergy Information"
                 name="AllergyInformation"
-                value={langState.values.AllergyInformation || ""}
+                value={
+                  langState.values.AllergyInformation || "Allergy Information"
+                }
                 onChange={(e) => handleChange(e, "AllergyInformation")}
                 onBlur={(e) => handleFetch(e, "AllergyInformation")}
                 fullWidth

@@ -179,6 +179,10 @@
     "javascript": "nutritionTable.js",
     "templates": ["product"],
     "settings": [
+    {
+      "type": "header",
+      "content": "Label Block"
+    },
 
       {
         "type": "checkbox",
@@ -196,18 +200,37 @@
       {
         "type": "select",
         "id": "vertical_alignment",
-        "label": "Vertical alignment",
+        "label": "Align",
         "options": [
           {
-            "value": "germanStyleTable",
-            "label": "european Style Table"
+            "value": "left",
+            "label": "Left"
           },
           {
-            "value": "AmericanStyleTable",
-            "label": "American Style Table"
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
           }
         ],
-        "default": "germanStyleTable"
+        "default": "center"
+      },
+      {
+        "type": "range",
+        "id": "width",
+        "min": 12,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Width",
+        "default": 30
+      },
+      {
+        "type": "page",
+        "id": "MAINTABLE",
+        "label": "MAIN TABLE"
       }
     ]
   }

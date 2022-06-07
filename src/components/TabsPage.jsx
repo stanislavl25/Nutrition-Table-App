@@ -404,12 +404,12 @@ function TabsPage({ host, shop }) {
       },
       body: JSON.stringify(formValues),
     };
+    console.log(langState.checked[name] !== value);
     if (langState.checked[name] !== value) {
       const data = await fetch("/LangFieldsSave", fetchOptions)
         .then((res) => res.json())
         .then((messages) => {
           console.log(messages);
-          fetchLang();
           // handleSnackToggle(messages.message);
         })
         .catch((err) => {
