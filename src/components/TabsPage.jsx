@@ -341,7 +341,7 @@ function TabsPage({ host, shop }) {
     checked: {},
   });
   const [selected, setSelected] = useState(0);
-  const [selectedData, setSelectedData] = useState(["d", "s"]);
+  const [selectedProducts, setSelectedProducts] = useState();
   const handleTabChange = useCallback(
     (selectedTabIndex) => setSelected(selectedTabIndex),
     []
@@ -419,6 +419,11 @@ function TabsPage({ host, shop }) {
     }
   };
 
+  const handleSelectedProducts = (selectedPro) => {
+    setSelected(1);
+    setSelectedProducts(selectedPro);
+  };
+
   const handleSnackClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -454,7 +459,12 @@ function TabsPage({ host, shop }) {
     {
       id: "Prodcuts",
       content: "Prodcuts",
-      tab: <MyLables handleTabChange={handleTabChange} />,
+      tab: (
+        <MyLables
+          handleTabChange={handleTabChange}
+          handleSelectedProducts={handleSelectedProducts}
+        />
+      ),
     },
     {
       id: "Customize Label",
@@ -466,6 +476,7 @@ function TabsPage({ host, shop }) {
           formData={formData}
           location={location}
           setLocation={setLocation}
+          selectedProducts={selectedProducts}
         />
       ),
     },

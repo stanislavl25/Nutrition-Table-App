@@ -16,7 +16,7 @@ import {
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
-const PopOverElem = ({ index }) => {
+const PopOverElem = ({ index, productId, removeFormFields }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
   const togglePopoverActive = useCallback(
@@ -28,6 +28,27 @@ const PopOverElem = ({ index }) => {
       More
     </Button>
   );
+  const handleProductRemove = async () => {
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productId),
+    };
+    removeFormFields(index);
+    console.log(productId, index);
+    // const data = await fetch("/product_delete", fetchOptions)
+    //   .then((res) => res.json())
+    //   .then((messages) => {
+    //     console.log(messages);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+  };
   return (
     <div style={{ marginLeft: "15px" }}>
       <Popover
@@ -39,7 +60,7 @@ const PopOverElem = ({ index }) => {
         ariaHaspopup={false}
       >
         <FormLayout>
-          <Button plain destructive>
+          <Button plain destructive onClick={handleProductRemove}>
             Delete Label
           </Button>
         </FormLayout>
@@ -48,7 +69,12 @@ const PopOverElem = ({ index }) => {
   );
 };
 
-function MyLablesTable({ products }) {
+function MyLablesTable({
+  products,
+  setProductobj,
+  handleSelectedProducts,
+  categories,
+}) {
   const resourceName = {
     singular: "product",
     plural: "products",
@@ -56,9 +82,9 @@ function MyLablesTable({ products }) {
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(products);
-  const [taggedWith, setTaggedWith] = useState("VIP");
+  const [taggedWith, setTaggedWith] = useState("");
   const [queryValue, setQueryValue] = useState(null);
-  const [sortValue, setSortValue] = useState("today");
+  const [sortValue, setSortValue] = useState("");
 
   const handleTaggedWithChange = useCallback(
     (value) => setTaggedWith(value),
@@ -70,40 +96,33 @@ function MyLablesTable({ products }) {
     handleTaggedWithRemove();
     handleQueryValueRemove();
   }, [handleQueryValueRemove, handleTaggedWithRemove]);
-  const handleSortChange = useCallback((value) => setSortValue(value), []);
+  const handleSortChange = useCallback((value) => {
+    setSortValue(value);
+    selectedResources.splice(0, selectedResources.length);
+    for (var i = 0; i < products.length; i++) {
+      if (products[i].product_type === value) {
+        selectedResources.push(products[i].id);
+      }
+    }
+  }, []);
+  let removeFormFields = (i) => {
+    let newproductsValues = [...products];
+    newproductsValues.splice(i, 1);
+    setProductobj(newproductsValues);
+  };
+  const filters = [];
 
-  //   const filters = [
-  //     {
-  //       key: "taggedWith",
-  //       label: "Tagged with",
-  //       filter: (
-  //         <TextField
-  //           label="Tagged with"
-  //           value={taggedWith}
-  //           onChange={handleTaggedWithChange}
-  //           autoComplete="off"
-  //           labelHidden
-  //         />
-  //       ),
-  //       shortcut: true,
-  //     },
-  //   ];
+  const appliedFilters = !isEmpty(taggedWith)
+    ? [
+        {
+          key: "taggedWith",
+          label: disambiguateLabel("taggedWith", taggedWith),
+          onRemove: handleTaggedWithRemove,
+        },
+      ]
+    : [];
 
-  //   const appliedFilters = !isEmpty(taggedWith)
-  //     ? [
-  //         {
-  //           key: "taggedWith",
-  //           label: disambiguateLabel("taggedWith", taggedWith),
-  //           onRemove: handleTaggedWithRemove,
-  //         },
-  //       ]
-  //     : [];
-
-  const categorieOptions = [
-    { label: "Today", value: "today" },
-    { label: "Yesterday", value: "yesterday" },
-    { label: "Last 7 days", value: "lastWeek" },
-  ];
+  const categorieOptions = categories;
 
   const rowMarkup =
     products !== "none" ? (
@@ -150,8 +169,17 @@ function MyLablesTable({ products }) {
                   alignItems: "center",
                 }}
               >
-                <Button primary>Edit</Button>
-                <PopOverElem index={index} />
+                <Button
+                  primary
+                  onClick={() => handleSelectedProducts(selectedResources)}
+                >
+                  Edit
+                </Button>
+                <PopOverElem
+                  index={index}
+                  productId={id}
+                  removeFormFields={removeFormFields}
+                />
               </div>
             </IndexTable.Cell>
           </IndexTable.Row>
@@ -178,17 +206,17 @@ function MyLablesTable({ products }) {
       ) : (
         <div>
           <div style={{ padding: "16px", display: "flex" }}>
-            {/* <div style={{ flex: 1 }}>
-          <Filters
-          queryValue={queryValue}
-          // filters={filters}
-          appliedFilters={appliedFilters}
-            onQueryChange={setQueryValue}
-            onQueryClear={handleQueryValueRemove}
-            onClearAll={handleClearAll}
-          />
-        </div> */}
-            <div style={{ paddingLeft: "0.25rem" }}>
+            <div style={{ flex: 1 }}>
+              <Filters
+                queryValue={queryValue}
+                filters={filters}
+                appliedFilters={appliedFilters}
+                onQueryChange={setQueryValue}
+                onQueryClear={handleQueryValueRemove}
+                onClearAll={handleClearAll}
+              />
+            </div>
+            <div style={{ paddingLeft: "0.25rem", maxWidth: "150px" }}>
               <Select
                 labelInline
                 label="Categories"

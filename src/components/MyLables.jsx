@@ -13,20 +13,39 @@ import {
 } from "@shopify/polaris";
 import MyLablesTable from "./MyLablesTable";
 import star from "../assets/nta_star_for_plan_banner.png";
-function MyLables({ handleTabChange }) {
+function MyLables({ handleTabChange, handleSelectedProducts }) {
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
   const [checkPlan, setCheckPlan] = useState(true);
   const [productobj, setProductobj] = useState();
   const [emptyStore, setEmptyStore] = useState(false);
   const [locationObj, setlocationObj] = useState({});
+  const [categories, setCategories] = useState([]);
   const fetchProducts = async () => {
     try {
       const data = await fetch("/products-list").then((res) => res.json());
       // setEmptyStore(true);
       if (data.length) {
         setProductobj(data);
-        console.log(data);
+        var array = [];
+        var uniqueValues = [];
+        const handlecategories = (element) => {
+          var newCategorie = { label: "", value: "" };
+          newCategorie.label = element.product_type;
+          newCategorie.value = element.product_type;
+          array.push(newCategorie);
+        };
+        data.forEach((elem) => handlecategories(elem));
+
+        const unique = array.filter((element) => {
+          const isDuplicate = uniqueValues.includes(element.label);
+          if (!isDuplicate) {
+            uniqueValues.push(element.label);
+            return true;
+          }
+          return false;
+        });
+        setCategories(unique);
       } else {
         //Todo
         setEmptyStore(true);
@@ -132,6 +151,9 @@ function MyLables({ handleTabChange }) {
             ) : (
               <MyLablesTable
                 products={productobj === undefined ? "none" : productobj}
+                setProductobj={setProductobj}
+                handleSelectedProducts={handleSelectedProducts}
+                categories={categories}
               />
             )}
           </Card>

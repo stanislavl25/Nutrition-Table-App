@@ -26,7 +26,9 @@ function CreateLabel({
   formData,
   location,
   setLocation,
+  selectedProducts,
 }) {
+  console.log(selectedProducts);
   const [data, setData] = useState({
     ingredientsText:
       "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
