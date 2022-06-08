@@ -133,6 +133,15 @@ function MyLablesTable({
       ]
     : [];
 
+  const handleBulkDelete = () => {
+    for (var j = 0; j < products.length; j++) {
+      for (var i = 0; i < selectedResources.length; i++) {
+        console.log(products[j].id, "id");
+        console.log(products[j].id === selectedResources[i], "check");
+        if (products[j].id === selectedResources[i]) removeFormFields(j);
+      }
+    }
+  };
   const categorieOptions = categories;
   const bulkActions = [];
   const promotedBulkActions = [
@@ -145,11 +154,13 @@ function MyLablesTable({
       actions: [
         {
           content: (
-            <Button plain destructive>
-              Delete
-            </Button>
+            <div style={{ width: "164px" }}>
+              <Button plain destructive>
+                Delete
+              </Button>
+            </div>
           ),
-          onAction: () => console.log("Todo: implement deleting customers"),
+          onAction: () => handleBulkDelete(),
         },
       ],
     },
