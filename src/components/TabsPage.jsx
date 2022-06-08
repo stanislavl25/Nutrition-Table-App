@@ -423,7 +423,13 @@ function TabsPage({ host, shop }) {
     setSelected(1);
     setSelectedProducts(selectedPro);
   };
-
+  const handleEditProduct = (id) => {
+    setSelected(1);
+    setSelectedProducts(id);
+  };
+  const navigateToProducts = () => {
+    setSelected(0);
+  };
   const handleSnackClose = (event, reason) => {
     if (reason === "clickaway") {
       return;
@@ -463,6 +469,7 @@ function TabsPage({ host, shop }) {
         <MyLables
           handleTabChange={handleTabChange}
           handleSelectedProducts={handleSelectedProducts}
+          handleEditProduct={handleEditProduct}
         />
       ),
     },
@@ -477,6 +484,7 @@ function TabsPage({ host, shop }) {
           location={location}
           setLocation={setLocation}
           selectedProducts={selectedProducts}
+          navigateToProducts={navigateToProducts}
         />
       ),
     },

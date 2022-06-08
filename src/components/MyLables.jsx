@@ -13,7 +13,11 @@ import {
 } from "@shopify/polaris";
 import MyLablesTable from "./MyLablesTable";
 import star from "../assets/nta_star_for_plan_banner.png";
-function MyLables({ handleTabChange, handleSelectedProducts }) {
+function MyLables({
+  handleTabChange,
+  handleSelectedProducts,
+  handleEditProduct,
+}) {
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
   const [checkPlan, setCheckPlan] = useState(true);
@@ -154,6 +158,7 @@ function MyLables({ handleTabChange, handleSelectedProducts }) {
                 setProductobj={setProductobj}
                 handleSelectedProducts={handleSelectedProducts}
                 categories={categories}
+                handleEditProduct={handleEditProduct}
               />
             )}
           </Card>

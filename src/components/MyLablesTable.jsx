@@ -76,6 +76,7 @@ function MyLablesTable({
   setProductobj,
   handleSelectedProducts,
   categories,
+  handleEditProduct,
 }) {
   const resourceName = {
     singular: "product",
@@ -87,18 +88,7 @@ function MyLablesTable({
   const [taggedWith, setTaggedWith] = useState("");
   const [queryValue, setQueryValue] = useState(null);
   const [sortValue, setSortValue] = useState("");
-  const [popoverActive, setPopoverActive] = useState(true);
 
-  const togglePopoverActive = useCallback(
-    () => setPopoverActive((popoverActive) => !popoverActive),
-    []
-  );
-
-  const activator = (
-    <Button onClick={togglePopoverActive} disclosure>
-      More
-    </Button>
-  );
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
   const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
   const handleClearAll = useCallback(() => {
@@ -136,9 +126,7 @@ function MyLablesTable({
   const handleBulkDelete = () => {
     for (var j = 0; j < products.length; j++) {
       for (var i = 0; i < selectedResources.length; i++) {
-        console.log(products[j].id, "id");
-        console.log(products[j].id === selectedResources[i], "check");
-        if (products[j].id === selectedResources[i]) removeFormFields(j);
+        if (selectedResources.includes(products[j].id)) removeFormFields(j);
       }
     }
   };
@@ -210,10 +198,7 @@ function MyLablesTable({
                   alignItems: "center",
                 }}
               >
-                <Button
-                  primary
-                  onClick={() => handleSelectedProducts(selectedResources)}
-                >
+                <Button primary onClick={() => handleEditProduct(id)}>
                   Edit
                 </Button>
                 <PopOverElem

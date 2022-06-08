@@ -27,6 +27,7 @@ function CreateLabel({
   location,
   setLocation,
   selectedProducts,
+  navigateToProducts,
 }) {
   console.log(selectedProducts);
   const [data, setData] = useState({
@@ -148,8 +149,21 @@ function CreateLabel({
   return (
     <Page
       title="Create Label"
-      primaryAction={{ content: "Save Label" }}
+      primaryAction={{
+        content: "Save Label",
+        onAction: () => {
+          console.log("clicked");
+        },
+      }}
       fullWidth
+      subtitle=""
+      compactTitle
+      secondaryActions={[]}
+      actionGroups={[]}
+      pagination={{
+        hasPrevious: true,
+        hasNext: true,
+      }}
     >
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
