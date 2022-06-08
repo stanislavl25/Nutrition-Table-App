@@ -87,48 +87,25 @@ function MyLablesTable({
   const [taggedWith, setTaggedWith] = useState("");
   const [queryValue, setQueryValue] = useState(null);
   const [sortValue, setSortValue] = useState("");
-  const [moneySpent, setMoneySpent] = useState(null);
-  const [accountStatus, setAccountStatus] = useState(null);
+  const [popoverActive, setPopoverActive] = useState(true);
 
-  const handleTaggedWithChange = useCallback(
-    (value) => setTaggedWith(value),
-    []
-  );
-  const handleAccountStatusChange = useCallback(
-    (value) => setAccountStatus(value),
-    []
-  );
-  const handleMoneySpentChange = useCallback(
-    (value) => setMoneySpent(value),
+  const togglePopoverActive = useCallback(
+    () => setPopoverActive((popoverActive) => !popoverActive),
     []
   );
 
-  const handleFiltersQueryChange = useCallback(
-    (value) => setQueryValue(value),
-    []
+  const activator = (
+    <Button onClick={togglePopoverActive} disclosure>
+      More
+    </Button>
   );
-  const handleAccountStatusRemove = useCallback(
-    () => setAccountStatus(null),
-    []
-  );
-  const handleMoneySpentRemove = useCallback(() => setMoneySpent(null), []);
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
   const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
   const handleClearAll = useCallback(() => {
     handleTaggedWithRemove();
     handleQueryValueRemove();
   }, [handleQueryValueRemove, handleTaggedWithRemove]);
-  const handleFiltersClearAll = useCallback(() => {
-    handleAccountStatusRemove();
-    handleMoneySpentRemove();
-    handleTaggedWithRemove();
-    handleQueryValueRemove();
-  }, [
-    handleAccountStatusRemove,
-    handleMoneySpentRemove,
-    handleQueryValueRemove,
-    handleTaggedWithRemove,
-  ]);
+
   const handleSortChange = useCallback((value) => {
     setSortValue(value);
     selectedResources.splice(0, selectedResources.length);
@@ -143,60 +120,8 @@ function MyLablesTable({
     newproductsValues.splice(i, 1);
     setProductobj(newproductsValues);
   };
-  const filters = [
-    {
-      key: "accountStatus",
-      label: "Account status",
-      filter: (
-        <ChoiceList
-          title="Account status"
-          titleHidden
-          choices={[
-            { label: "Enabled", value: "enabled" },
-            { label: "Not invited", value: "not invited" },
-            { label: "Invited", value: "invited" },
-            { label: "Declined", value: "declined" },
-          ]}
-          selected={accountStatus || []}
-          onChange={handleAccountStatusChange}
-          allowMultiple
-        />
-      ),
-      shortcut: true,
-    },
-    {
-      key: "taggedWith",
-      label: "Tagged with",
-      filter: (
-        <TextField
-          label="Tagged with"
-          value={taggedWith}
-          onChange={handleTaggedWithChange}
-          autoComplete="off"
-          labelHidden
-        />
-      ),
-      shortcut: true,
-    },
-    {
-      key: "moneySpent",
-      label: "Money spent",
-      filter: (
-        <RangeSlider
-          label="Money spent is between"
-          labelHidden
-          value={moneySpent || [0, 500]}
-          prefix="$"
-          output
-          min={0}
-          max={2000}
-          step={1}
-          onChange={handleMoneySpentChange}
-        />
-      ),
-    },
-  ];
-  const firstFilters = [];
+
+  const filters = [];
 
   const appliedFilters = !isEmpty(taggedWith)
     ? [
@@ -209,7 +134,26 @@ function MyLablesTable({
     : [];
 
   const categorieOptions = categories;
-
+  const bulkActions = [];
+  const promotedBulkActions = [
+    {
+      content: "Edit Labels",
+      onAction: () => handleSelectedProducts(selectedResources),
+    },
+    {
+      title: "More actions",
+      actions: [
+        {
+          content: (
+            <Button plain destructive>
+              Delete
+            </Button>
+          ),
+          onAction: () => console.log("Todo: implement deleting customers"),
+        },
+      ],
+    },
+  ];
   const rowMarkup =
     products !== "none" ? (
       products.map(
@@ -295,7 +239,7 @@ function MyLablesTable({
             <div style={{ flex: 1 }}>
               <Filters
                 queryValue={queryValue}
-                filters={firstFilters}
+                filters={filters}
                 appliedFilters={appliedFilters}
                 onQueryChange={setQueryValue}
                 onQueryClear={handleQueryValueRemove}
@@ -312,21 +256,15 @@ function MyLablesTable({
               />
             </div>
           </div>
-          <Filters
-            queryValue={queryValue}
-            filters={filters}
-            appliedFilters={appliedFilters}
-            onQueryChange={handleFiltersQueryChange}
-            onQueryClear={handleQueryValueRemove}
-            onClearAll={handleFiltersClearAll}
-            hideQueryField
-          />
+
           <IndexTable
             resourceName={resourceName}
             itemCount={products.length}
             selectedItemsCount={
               allResourcesSelected ? "All" : selectedResources.length
             }
+            bulkActions={bulkActions}
+            promotedBulkActions={promotedBulkActions}
             onSelectionChange={handleSelectionChange}
             headings={[
               { title: "" },
