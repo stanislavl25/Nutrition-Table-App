@@ -153,17 +153,10 @@ function CreateLabel({
         content: "Save Label",
         onAction: () => {
           console.log("clicked");
+          // todo save
         },
       }}
       fullWidth
-      subtitle=""
-      compactTitle
-      secondaryActions={[]}
-      actionGroups={[]}
-      pagination={{
-        hasPrevious: true,
-        hasNext: true,
-      }}
     >
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}

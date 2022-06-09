@@ -7,10 +7,10 @@ import "dotenv/config";
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import db from "./db.js";
-import Products from "./models/productModel.js";
-import CustomFields from "./models/CustomFieldsModel.js";
+import ProductsModel from "./models/productModel.js";
+import ProductsLabels from "./models/productsLabels.js";
 import StoreModel from "./models/storeModel.js";
-
+import Products from "./models/productModel.js";
 const USE_ONLINE_TOKENS = true;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 
@@ -62,48 +62,6 @@ export async function createServer(
     }
   });
 
-  /***
-   * return list of custom fields for a certain shopify store
-   */
-  app.get("/costum-fields", verifyRequest(app), async (req, res) => {
-    try {
-      const fields = await CustomFields.find({});
-      // res.status(200).send(all);
-      console.log(fields);
-
-      if (fields.length) {
-        res.status(200).send({
-          success: true,
-          message: "all custom fields related to this product",
-          data: fields,
-        });
-      } else {
-        res.status(200).send({
-          success: false,
-          message: "No custom fields related to this product",
-        });
-      }
-    } catch {
-      res.status(500).send();
-    }
-  });
-
-  /**
-   * handle product and it's nutritions save / update
-   */
-
-  app.post("/nutrition-save", verifyRequest(app), async (req, res) => {
-    const reqBody = req.body;
-    for (var i = 0; i < reqBody.length; i++) {
-      let check = checkExistedProduct(reqBody[i].id);
-      if (check) {
-        // Todo update Product here using product id
-      } else {
-        // Todo save product here using store id
-      }
-    }
-  });
-
   /**
    * handle Language page changes
    */
@@ -136,14 +94,9 @@ export async function createServer(
    * handle Language page data response
    */
   app.get("/LangData", verifyRequest(app), async (req, res) => {
-    console.log("data back");
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const store = session.shop;
-    // console.log(session.shop);
-    const shopData = await StoreModel.find(
-      { shop_id: store },
-      "NutritionInformation Ingredients AllergyInformation LEGALNOTICE"
-    ).exec();
+    const shopData = await StoreModel.find({ shop_id: store }).exec();
     if (shopData) {
       res
         .status(200)
@@ -156,22 +109,6 @@ export async function createServer(
   });
 
   /**
-   * handle custom fields save / update
-   */
-
-  app.post("customFields-save", verifyRequest(app), async (req, res) => {
-    const reqBody = req.body;
-    for (var i = 0; i < reqBody.length; i++) {
-      let check = checkExistedCustomField(reqBody[i].id);
-      if (check) {
-        //Todo update custom field using product id
-      } else {
-        //Todo save custom field using product id
-      }
-    }
-  });
-
-  /**
    * returns the list of products on that specific shopify store
    */
 
@@ -180,17 +117,46 @@ export async function createServer(
     const { Product } = await import(
       `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
     );
-    const products = await Product.all({
-      session,
-      fields: "id,title,product_type,images",
-    });
-    for (var i = 0; i < products.length; i++) {
-      delete products[i]["session"];
-    }
+    try {
+      const storeProducts = await Product.all({
+        session,
+        fields: "id,title,product_type,images",
+      });
+      const shopId = await checkShopExist(storeProducts[0]["session"].shop);
+      for (var i = 0; i < storeProducts.length; i++) {
+        delete storeProducts[i]["session"];
+        checkProductsExist(storeProducts[i], shopId);
+      }
+      const products = await Products.find({ store_id: shopId }).exec();
 
-    // console.log(products);
-    res.status(200).send(products);
+      res.status(200).send(products);
+    } catch (err) {
+      res.status(400).send("Something wrong happend");
+    }
   });
+  /**check if the store exist */
+  const checkShopExist = async (storeId) => {
+    const check = await StoreModel.findOne({ shop_id: storeId })
+      .select("shop_id")
+      .exec();
+    const id = check.shop_id;
+    if (check) return id;
+    else return false;
+  };
+  /** check if the products exist */
+  const checkProductsExist = async (product, shopId) => {
+    const check = await ProductsModel.exists({ productId: product.id });
+    if (check === null) {
+      const productCreation = new ProductsModel({
+        name: product.title,
+        store_id: shopId,
+        productId: product.id,
+        images: product.images,
+        product_type: product.product_type,
+      });
+      await productCreation.save();
+    }
+  };
 
   /**return the locations object */
 
@@ -198,94 +164,19 @@ export async function createServer(
     const { Location } = await import(
       "@shopify/shopify-api/dist/rest-resources/2022-04/index.js"
     );
-    const test_session = await Shopify.Utils.loadCurrentSession(req, res);
+    const session = await Shopify.Utils.loadCurrentSession(req, res);
     const locations = await Location.all({
-      session: test_session,
+      session: session,
     });
-    console.log(locations);
     res.status(200).send(locations);
   });
 
-  /**
-   *
-   * @param {'productId'} itemId
-   * check if product exist in database
-   */
+  app.post("/product_delete", verifyRequest(app), async (req, res) => {
+    console.log(req.body);
+    const session = await Shopify.Utils.loadCurrentSession(req, res);
 
-  const checkExistedProduct = async (itemId) => {
-    const item = await Products.exists({ id: itemId }, function (err, data) {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log("Result :", data); // true / false
-        return data;
-      }
-    });
-  };
-
-  const checkExistedCustomField = async (itemId) => {
-    const customField = await CustomFields.exists(
-      { id: itemId },
-      function (err, data) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Result :", data); // true / false
-          return data;
-        }
-      }
-    );
-  };
-
-  const addCustomFields = async (reqBody) => {
-    // const title = reqBody.title;
-    // const value = reqBody.value;
-    const field = new CustomFields({
-      id: "2131q3d21qs23dq32sd1",
-      properties: {
-        weight: 2.3,
-        talktime: "8 hours",
-        "battery type": "lithium",
-      },
-    });
-    await field.save();
-    // const customField = await CustomFields.set(title, value);
-  };
-
-  /*
-   * add custom fields to every product data
-   */
-
-  app.post("/addCustomFields", verifyRequest(app), async (req, res) => {
-    addCustomFields(req.body);
+    res.status(200).send("hsy");
   });
-
-  /**
-   * test db
-   *
-   */
-
-  // app.post("/createPlan", verifyRequest(app), async (req, res) => {
-  //   const obj1 = req.body;
-  //   try {
-  //     let plan = new Plans(obj1);
-  //     await plan.save();
-  //     let response = {
-  //       success: true,
-  //       message: "Plan created successfully!",
-  //     };
-  //     res.json(response);
-  //     // res.status(200).send(response);
-  //   } catch (error) {
-  //     let response = {
-  //       success: false,
-  //       message: "Plan is not created !",
-  //       error,
-  //     };
-  //     console.log(error);
-  //     res.json(response);
-  //   }
-  // });
 
   app.post("/graphql", verifyRequest(app), async (req, res) => {
     try {
@@ -318,14 +209,13 @@ export async function createServer(
     // include a shop in the query parameters.
     if (app.get("active-shopify-shops")[shop] === undefined && shop) {
       res.redirect(`/auth?shop=${shop}`);
-      console.log(shop);
       const check = await StoreModel.findOne({ shop_id: shop }).exec();
       if (check) {
         //do nothing
         // console.log(check);
       } else {
         let store = new StoreModel({ shop_id: shop });
-        let storeCreated = await store.save();
+        await store.save();
         // console.log("check false");
       }
     } else {

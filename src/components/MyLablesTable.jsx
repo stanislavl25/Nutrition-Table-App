@@ -16,10 +16,14 @@ import {
   ChoiceList,
   RangeSlider,
 } from "@shopify/polaris";
+import { Toast, useAppBridge } from "@shopify/app-bridge-react";
+import { userLoggedInFetch } from "../App";
 import React, { useCallback, useState } from "react";
 
 const PopOverElem = ({ index, productId, removeFormFields }) => {
   const [popoverActive, setPopoverActive] = useState(false);
+  const app = useAppBridge();
+  const fetch = userLoggedInFetch(app);
 
   const togglePopoverActive = useCallback(
     () => setPopoverActive((popoverActive) => !popoverActive),
@@ -38,18 +42,18 @@ const PopOverElem = ({ index, productId, removeFormFields }) => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(productId),
+      body: JSON.stringify({ productId }),
     };
     removeFormFields(index);
     console.log(productId, index);
-    // const data = await fetch("/product_delete", fetchOptions)
-    //   .then((res) => res.json())
-    //   .then((messages) => {
-    //     console.log(messages);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
+    const data = await fetch("/product_delete", fetchOptions)
+      .then((res) => res.text())
+      .then((messages) => {
+        console.log(messages);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   return (
     <div style={{ marginLeft: "15px" }}>
@@ -124,11 +128,12 @@ function MyLablesTable({
     : [];
 
   const handleBulkDelete = () => {
-    for (var j = 0; j < products.length; j++) {
-      for (var i = 0; i < selectedResources.length; i++) {
-        if (selectedResources.includes(products[j].id)) removeFormFields(j);
+    products.forEach((element, index) => {
+      console.log(selectedResources.includes(element.id));
+      if (selectedResources.includes(element.id)) {
+        removeFormFields(index);
       }
-    }
+    });
   };
   const categorieOptions = categories;
   const bulkActions = [];
@@ -143,9 +148,7 @@ function MyLablesTable({
         {
           content: (
             <div style={{ width: "164px" }}>
-              <Button plain destructive>
-                Delete
-              </Button>
+              <TextStyle variation="negative">Delete</TextStyle>
             </div>
           ),
           onAction: () => handleBulkDelete(),
@@ -158,29 +161,29 @@ function MyLablesTable({
       products.map(
         (
           {
-            id,
-            title,
+            _id,
+            name,
             Calories,
             totalFat,
             Carbohydrate,
             Protein,
             Salt,
-            foodProduct,
+            food_product,
             images,
           },
           index
         ) => (
           <IndexTable.Row
-            id={id}
-            key={id}
-            selected={selectedResources.includes(id)}
+            id={_id}
+            key={_id}
+            selected={selectedResources.includes(_id)}
             position={index}
           >
             <IndexTable.Cell>
               <Thumbnail source={images[0] ? images[0].src : ""} alt="" />
             </IndexTable.Cell>
             <IndexTable.Cell>
-              <TextStyle variation="strong">{title}</TextStyle>
+              <TextStyle variation="strong">{name}</TextStyle>
             </IndexTable.Cell>
             <IndexTable.Cell>{Calories ? Calories : "0"} g</IndexTable.Cell>
             <IndexTable.Cell>{totalFat ? totalFat : "0"} g</IndexTable.Cell>
@@ -189,7 +192,9 @@ function MyLablesTable({
             </IndexTable.Cell>
             <IndexTable.Cell>{Protein ? Protein : "0"} g</IndexTable.Cell>
             <IndexTable.Cell>{Salt ? Salt : "0"} g</IndexTable.Cell>
-            <IndexTable.Cell>{foodProduct ? foodProduct : "@"}</IndexTable.Cell>
+            <IndexTable.Cell>
+              {food_product === true ? "Yes" : "No"}
+            </IndexTable.Cell>
             <IndexTable.Cell>
               <div
                 style={{
@@ -198,12 +203,12 @@ function MyLablesTable({
                   alignItems: "center",
                 }}
               >
-                <Button primary onClick={() => handleEditProduct(id)}>
+                <Button primary onClick={() => handleEditProduct(_id)}>
                   Edit
                 </Button>
                 <PopOverElem
                   index={index}
-                  productId={id}
+                  productId={_id}
                   removeFormFields={removeFormFields}
                 />
               </div>
@@ -242,7 +247,13 @@ function MyLablesTable({
                 onClearAll={handleClearAll}
               />
             </div>
-            <div style={{ paddingLeft: "0.25rem", maxWidth: "150px" }}>
+            <div
+              style={{
+                paddingLeft: "0.25rem",
+                maxWidth: "130px",
+                marginLeft: "10px",
+              }}
+            >
               <Select
                 labelInline
                 label="Categories"

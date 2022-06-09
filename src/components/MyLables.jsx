@@ -28,9 +28,9 @@ function MyLables({
   const fetchProducts = async () => {
     try {
       const data = await fetch("/products-list").then((res) => res.json());
-      // setEmptyStore(true);
       if (data.length) {
         setProductobj(data);
+        console.log(data);
         var array = [];
         var uniqueValues = [];
         const handlecategories = (element) => {
@@ -63,7 +63,6 @@ function MyLables({
   const fetchLocations = async () => {
     const data = await fetch("/locations").then((res) => res.json());
     setlocationObj(data);
-    console.log(data);
     if (data.length) {
     } else {
       //Todo
