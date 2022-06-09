@@ -105,7 +105,7 @@ function MyLablesTable({
     selectedResources.splice(0, selectedResources.length);
     for (var i = 0; i < products.length; i++) {
       if (products[i].product_type === value) {
-        selectedResources.push(products[i].id);
+        selectedResources.push(products[i]._id);
       }
     }
   }, []);
