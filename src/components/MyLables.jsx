@@ -25,12 +25,27 @@ function MyLables({
   const [emptyStore, setEmptyStore] = useState(false);
   const [locationObj, setlocationObj] = useState({});
   const [categories, setCategories] = useState([]);
+  const saveProducts = async () => {
+    const data = await fetch("/products-save").then((res) => res.text());
+    // console.log(data);
+  };
+  const fetchLocations = async () => {
+    const data = await fetch("/locations").then((res) => res.json());
+    setlocationObj(data);
+    if (data.length) {
+    } else {
+      //Todo
+      // setEmptyStore(true);
+      console.log("No products found!");
+    }
+  };
   const fetchProducts = async () => {
     try {
-      const data = await fetch("/products-list").then((res) => res.json());
+      const data = await fetch("products-list").then((res) => res.json());
+      console.log(data);
       if (data.length) {
         setProductobj(data);
-        console.log(data);
+        // console.log(data);
         var array = [];
         var uniqueValues = [];
         const handlecategories = (element) => {
@@ -60,20 +75,15 @@ function MyLables({
       setEmptyStore(true);
     }
   };
-  const fetchLocations = async () => {
-    const data = await fetch("/locations").then((res) => res.json());
-    setlocationObj(data);
-    if (data.length) {
-    } else {
-      //Todo
-      // setEmptyStore(true);
-      console.log("No products found!");
-    }
-  };
+
   // todo clean up after the use effect
-  useEffect(() => {
-    fetchProducts();
-    fetchLocations();
+
+  useEffect(async () => {
+    await saveProducts();
+    await fetchLocations();
+    setTimeout(async () => {
+      await fetchProducts();
+    }, 1000);
   }, []);
 
   return (

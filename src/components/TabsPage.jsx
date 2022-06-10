@@ -463,8 +463,8 @@ function TabsPage({ host, shop }) {
   );
   const tabs = [
     {
-      id: "Prodcuts",
-      content: "Prodcuts",
+      id: "Products",
+      content: "Products",
       tab: (
         <MyLables
           handleTabChange={handleTabChange}

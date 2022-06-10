@@ -12,6 +12,53 @@ const productSchema = new Schema(
     is_deleted: { type: Boolean, default: false },
     images: {},
     product_type: { type: String },
+    nutriScore: { type: String, default: "A" },
+    ingredientsText: {
+      type: String,
+      default:
+        "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
+    },
+    allergyInfoText: {
+      type: String,
+      default:
+        "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
+    },
+    lEGALNOTICEText: {
+      type: String,
+      default:
+        "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
+    },
+    notesText: {
+      type: String,
+      default:
+        "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving ofafood contributs toadaily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>",
+    },
+    servingSize: {
+      CA: {
+        servingSizeBasic: { type: String, default: "250" },
+        servingRefBasic: { type: String, default: "per 1 cup" },
+        bilingualRefBasic: { type: String, default: "pour 1 tasse" },
+        unitBasic: { type: String, default: "Milliliters" },
+        caloriesPerServingBasic: { type: String, default: "110" },
+      },
+      EU: {
+        DefaultAmoount: { type: String, default: "100" },
+        DefaultAmoountUnit: { type: String, default: "Grams" },
+        PortionSize: { type: String, default: "25" },
+        PortionSizeUnit: { type: String, default: "Grams" },
+      },
+      NA: {
+        Servingspercontainer: { type: String, default: "8" },
+        Servingreference: { type: String, default: "2/3 cup" },
+        servingsize: { type: String, default: "55" },
+        unit: { type: String, default: "Grams" },
+        Caloriesperserving: { type: String, default: "230" },
+        UnpreparedReference: { type: String, default: "Per 2/3 cup" },
+        Unpreparedcalories: { type: String, default: "140" },
+        PreparedReference: { type: String, default: "As prepared" },
+        Preparedcalories: { type: String, default: "230" },
+      },
+    },
   },
   {
     timestamps: true,

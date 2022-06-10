@@ -7,7 +7,6 @@ import "dotenv/config";
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import db from "./db.js";
-import ProductsModel from "./models/productModel.js";
 import ProductsLabels from "./models/productsLabels.js";
 import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
@@ -112,7 +111,8 @@ export async function createServer(
    * returns the list of products on that specific shopify store
    */
 
-  app.get("/products-list", verifyRequest(app), async (req, res) => {
+  app.get("/products-save", verifyRequest(app), async (req, res) => {
+    console.log("save products");
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const { Product } = await import(
       `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
@@ -124,16 +124,23 @@ export async function createServer(
       });
       const shopId = await checkShopExist(storeProducts[0]["session"].shop);
       for (var i = 0; i < storeProducts.length; i++) {
-        delete storeProducts[i]["session"];
         checkProductsExist(storeProducts[i], shopId);
       }
-      const products = await Products.find({ store_id: shopId }).exec();
-
-      res.status(200).send(products);
+      res.status(200).send("Saving products done!");
     } catch (err) {
       res.status(400).send("Something wrong happend");
     }
   });
+  /***
+   * get all products with the same shop_id
+   */
+  app.get("/products-list", verifyRequest(app), async (req, res) => {
+    console.log("get products");
+    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+    const products = await Products.find({ store_id: session.shop }).lean();
+    res.status(200).send(products);
+  });
+
   /**check if the store exist */
   const checkShopExist = async (storeId) => {
     const check = await StoreModel.findOne({ shop_id: storeId })
@@ -145,16 +152,15 @@ export async function createServer(
   };
   /** check if the products exist */
   const checkProductsExist = async (product, shopId) => {
-    const check = await ProductsModel.exists({ productId: product.id });
+    const check = await Products.exists({ productId: product.id });
     if (check === null) {
-      const productCreation = new ProductsModel({
+      const productCreation = await Products.create({
         name: product.title,
         store_id: shopId,
         productId: product.id,
         images: product.images,
         product_type: product.product_type,
       });
-      await productCreation.save();
     }
   };
 

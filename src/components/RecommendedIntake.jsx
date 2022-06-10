@@ -114,20 +114,22 @@ function RecommendedIntake() {
       >
         <Card sectioned>
           <table style={{ width: "100%" }}>
-            <tr
-              style={{
-                width: "100%",
-                textAlign: "left",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <th>Nutrient</th>
-              <th>Quantity</th>
-              <th>Unit</th>
-              <th></th>
-            </tr>
+            <thead>
+              <tr
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <th>Nutrient</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th></th>
+              </tr>
+            </thead>
             <tbody>
               {elementData.map((elem, index) => (
                 <tr
