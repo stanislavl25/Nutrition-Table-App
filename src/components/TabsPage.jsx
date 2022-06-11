@@ -383,10 +383,11 @@ function TabsPage({ host, shop }) {
                 "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
             if (location === "NA")
               elem.richText.notesText =
-                "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>";
-            if (location === "CA")
+                "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
+            if (location === "CA") {
               elem.richText.notesText =
-                "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong>  <br/> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
+                "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
+            }
           }
         });
 

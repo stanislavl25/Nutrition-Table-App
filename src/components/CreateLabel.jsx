@@ -103,38 +103,41 @@ function CreateLabel({
     }
   };
   const handleSelectedProducts = () => {
-    // console.log(selectedProducts);
-    if (selectedProducts) {
-      console.log(selectedProducts);
-      productsArray.forEach((element) => {
-        if (selectedProducts.includes(element._id)) {
-          setProductExist(true);
-          setData(element);
+    if (selectedProducts && selectedProducts.length > 0) {
+      for (var i = 0; i < productsArray.length; i++) {
+        if (selectedProducts.includes(productsArray[i]._id)) {
+          console.log(true);
+          setData(productsArray[i]);
           return;
         }
-      });
-    } else if (!selectedProducts) {
+      }
+    }
+    console.log("!selectedProducts");
+    if (!selectedProducts) {
       console.log("no products");
       if (location === "CA") {
         const valueCA =
-          "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong>  <br/> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
+          "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong>   *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
         let newData = { ...data };
         newData["richText"]["notesText"] = valueCA;
         setData(newData);
+        return;
       }
       if (location === "NA") {
         const valueNA =
-          "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>";
+          "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
         let newData = { ...data };
         newData["richText"]["notesText"] = valueNA;
         setData(newData);
+        return;
       }
       if (location === "EU") {
-        const value =
+        const valueEU =
           "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
         let newData = { ...data };
-        newData["richText"]["notesText"] = value;
+        newData["richText"]["notesText"] = valueEU;
         setData(newData);
+        return;
       }
     }
   };
@@ -264,7 +267,7 @@ function CreateLabel({
                 </>
               )}
               <Notes
-                data={data.richText.notesText}
+                notesText={data.richText.notesText}
                 handleTextChange={handleNotesTextChange}
               />
               <Ingredients
