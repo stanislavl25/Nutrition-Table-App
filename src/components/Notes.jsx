@@ -1,7 +1,7 @@
 import { Card, Subheading, TextStyle } from "@shopify/polaris";
-import React, { useState } from "react";
+import React from "react";
 import RichTextEditor from "./RichTextEditor";
-function Notes({ notesText, handleTextChange }) {
+function Notes({ data, handleTextChange }) {
   return (
     <Card sectioned title="Notes">
       <div
@@ -15,7 +15,7 @@ function Notes({ notesText, handleTextChange }) {
         <Subheading>Nutrition notes </Subheading>
         <TextStyle variation="subdued">(leave empty for none)</TextStyle>
       </div>
-      <RichTextEditor text={notesText} handleTextChange={handleTextChange} />
+      <RichTextEditor text={data} handleTextChange={handleTextChange} />
     </Card>
   );
 }

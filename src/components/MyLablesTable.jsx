@@ -76,8 +76,8 @@ const PopOverElem = ({ index, productId, removeFormFields }) => {
 };
 
 function MyLablesTable({
-  products,
-  setProductobj,
+  productsArray,
+  setProductArray,
   handleSelectedProducts,
   categories,
   handleEditProduct,
@@ -87,12 +87,16 @@ function MyLablesTable({
     plural: "products",
   };
 
+  const resourceIDResolver = (products) => {
+    return products._id;
+  };
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(products);
+    useIndexResourceState(productsArray, {
+      resourceIDResolver,
+    });
   const [taggedWith, setTaggedWith] = useState("");
   const [queryValue, setQueryValue] = useState(null);
   const [sortValue, setSortValue] = useState("");
-
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
   const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
   const handleClearAll = useCallback(() => {
@@ -103,16 +107,16 @@ function MyLablesTable({
   const handleSortChange = useCallback((value) => {
     setSortValue(value);
     selectedResources.splice(0, selectedResources.length);
-    for (var i = 0; i < products.length; i++) {
-      if (products[i].product_type === value) {
-        selectedResources.push(products[i]._id);
+    for (var i = 0; i < productsArray.length; i++) {
+      if (productsArray[i].product_type === value) {
+        selectedResources.push(productsArray[i]._id);
       }
     }
   }, []);
   let removeFormFields = (i) => {
-    let newproductsValues = [...products];
+    let newproductsValues = [...productsArray];
     newproductsValues.splice(i, 1);
-    setProductobj(newproductsValues);
+    setProductArray(newproductsValues);
   };
 
   const filters = [];
@@ -128,9 +132,9 @@ function MyLablesTable({
     : [];
 
   const handleBulkDelete = () => {
-    products.forEach((element, index) => {
-      console.log(selectedResources.includes(element.id));
-      if (selectedResources.includes(element.id)) {
+    productsArray.forEach((element, index) => {
+      console.log(selectedResources.includes(element._id));
+      if (selectedResources.includes(element._id)) {
         removeFormFields(index);
       }
     });
@@ -157,8 +161,8 @@ function MyLablesTable({
     },
   ];
   const rowMarkup =
-    products !== "none" ? (
-      products.map(
+    productsArray !== "none" ? (
+      productsArray.map(
         (
           {
             _id,
@@ -222,7 +226,7 @@ function MyLablesTable({
 
   return (
     <div>
-      {products === "none" ? (
+      {productsArray === "none" ? (
         <div
           style={{
             paddingTop: "40px",
@@ -266,7 +270,7 @@ function MyLablesTable({
 
           <IndexTable
             resourceName={resourceName}
-            itemCount={products.length}
+            itemCount={productsArray.length}
             selectedItemsCount={
               allResourcesSelected ? "All" : selectedResources.length
             }

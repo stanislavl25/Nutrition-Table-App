@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const customFieldSchema = new Schema(
   {
     name: { type: String, trim: true },
-    product_id: { type: Schema.Types.ObjectId, ref: "Products" },
+    product_id: { type: String },
     unit: { type: String, default: "Grams" },
     dailyValue: { type: String },
     bold: { type: String },
@@ -20,8 +20,6 @@ const customFieldSchema = new Schema(
     per100g: { type: String },
     perportion: { type: String },
     RI: { type: String },
-    vitamins: [],
-    minerals: [],
   },
   {
     timestamps: true,

@@ -15,9 +15,6 @@ import { AppProvider as PolarisProvider } from "@shopify/polaris";
 import translations from "@shopify/polaris/locales/en.json";
 import "@shopify/polaris/build/esm/styles.css";
 import TabsPage from "./components/TabsPage";
-// import Routes from "./Routes.jsx";
-// import MyLables from "./components/MyLables";
-// import CustomFieldsPage from "./components/CustomFieldsPage";
 export default function App() {
   return (
     <PolarisProvider i18n={translations}>
@@ -29,9 +26,7 @@ export default function App() {
         }}
       >
         <MyProvider>
-          {/* <Routes /> */}
           <TabsPage />
-          {/* <CustomFieldsPage /> */}
         </MyProvider>
       </AppBridgeProvider>
     </PolarisProvider>

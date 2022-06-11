@@ -13,26 +13,27 @@ const productSchema = new Schema(
     images: {},
     product_type: { type: String },
     nutriScore: { type: String, default: "A" },
-    ingredientsText: {
-      type: String,
-      default:
-        "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
+    richText: {
+      ingredientsText: {
+        type: String,
+        default:
+          "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
+      },
+      allergyInfoText: {
+        type: String,
+        default:
+          "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
+      },
+      lEGALNOTICEText: {
+        type: String,
+        default:
+          "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
+      },
+      notesText: {
+        type: String,
+      },
     },
-    allergyInfoText: {
-      type: String,
-      default:
-        "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
-    },
-    lEGALNOTICEText: {
-      type: String,
-      default:
-        "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
-    },
-    notesText: {
-      type: String,
-      default:
-        "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving ofafood contributs toadaily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>",
-    },
+
     servingSize: {
       CA: {
         servingSizeBasic: { type: String, default: "250" },
@@ -59,6 +60,8 @@ const productSchema = new Schema(
         Preparedcalories: { type: String, default: "230" },
       },
     },
+    minerals: [],
+    vitamins: [],
   },
   {
     timestamps: true,

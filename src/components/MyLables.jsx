@@ -17,75 +17,12 @@ function MyLables({
   handleTabChange,
   handleSelectedProducts,
   handleEditProduct,
+  productsArray,
+  setProductsArray,
+  emptyStore,
+  categories,
+  checkPlan,
 }) {
-  const app = useAppBridge();
-  const fetch = userLoggedInFetch(app);
-  const [checkPlan, setCheckPlan] = useState(true);
-  const [productobj, setProductobj] = useState();
-  const [emptyStore, setEmptyStore] = useState(false);
-  const [locationObj, setlocationObj] = useState({});
-  const [categories, setCategories] = useState([]);
-  const saveProducts = async () => {
-    const data = await fetch("/products-save").then((res) => res.text());
-    // console.log(data);
-  };
-  const fetchLocations = async () => {
-    const data = await fetch("/locations").then((res) => res.json());
-    setlocationObj(data);
-    if (data.length) {
-    } else {
-      //Todo
-      // setEmptyStore(true);
-      console.log("No products found!");
-    }
-  };
-  const fetchProducts = async () => {
-    try {
-      const data = await fetch("products-list").then((res) => res.json());
-      console.log(data);
-      if (data.length) {
-        setProductobj(data);
-        // console.log(data);
-        var array = [];
-        var uniqueValues = [];
-        const handlecategories = (element) => {
-          var newCategorie = { label: "", value: "" };
-          newCategorie.label = element.product_type;
-          newCategorie.value = element.product_type;
-          array.push(newCategorie);
-        };
-        data.forEach((elem) => handlecategories(elem));
-
-        const unique = array.filter((element) => {
-          const isDuplicate = uniqueValues.includes(element.label);
-          if (!isDuplicate) {
-            uniqueValues.push(element.label);
-            return true;
-          }
-          return false;
-        });
-        setCategories(unique);
-      } else {
-        //Todo
-        setEmptyStore(true);
-        console.log("No products found!");
-      }
-    } catch (err) {
-      console.log(err);
-      setEmptyStore(true);
-    }
-  };
-
-  // todo clean up after the use effect
-
-  useEffect(async () => {
-    await saveProducts();
-    await fetchLocations();
-    setTimeout(async () => {
-      await fetchProducts();
-    }, 1000);
-  }, []);
-
   return (
     <div>
       {checkPlan ? (
@@ -163,8 +100,10 @@ function MyLables({
               </EmptyState>
             ) : (
               <MyLablesTable
-                products={productobj === undefined ? "none" : productobj}
-                setProductobj={setProductobj}
+                productsArray={
+                  productsArray === undefined ? "none" : productsArray
+                }
+                setProductsArray={setProductsArray}
                 handleSelectedProducts={handleSelectedProducts}
                 categories={categories}
                 handleEditProduct={handleEditProduct}

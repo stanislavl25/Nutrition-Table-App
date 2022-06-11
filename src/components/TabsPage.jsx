@@ -340,17 +340,88 @@ function TabsPage({ host, shop }) {
     values: {},
     checked: {},
   });
+
   const [selected, setSelected] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState();
   const handleTabChange = useCallback(
     (selectedTabIndex) => setSelected(selectedTabIndex),
     []
   );
-  const [location, setLocation] = useState("EU");
+  const [productsArray, setProductsArray] = useState();
+  const [location, setLocation] = useState("CA");
   const [formData, setFormData] = useState([]);
-  //   const handleTabChangeTest=(n)=>{
-  // setSelected(n)
-  //   }
+  const [locationObj, setlocationObj] = useState({});
+  const [emptyStore, setEmptyStore] = useState(false);
+  const [checkPlan, setCheckPlan] = useState(true);
+  const [categories, setCategories] = useState([]);
+  /*** save store products if not saved */
+  const saveProducts = async () => {
+    const data = await fetch("/products-save").then((res) => res.text());
+    // console.log(data);
+  };
+  /*** get store location */
+  const fetchLocations = async () => {
+    const data = await fetch("/locations").then((res) => res.json());
+    setlocationObj(data);
+    if (data.length) {
+    } else {
+      //Todo
+      // setEmptyStore(true);
+      console.log("No products found!");
+    }
+  };
+  /*** get store products */
+  const fetchProducts = async () => {
+    try {
+      const data = await fetch("products-list").then((res) => res.json());
+      // console.log(data);
+      if (data.length) {
+        data.forEach((elem) => {
+          if (elem.richText.notesText === undefined) {
+            if (location === "EU")
+              elem.richText.notesText =
+                "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
+            if (location === "NA")
+              elem.richText.notesText =
+                "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>";
+            if (location === "CA")
+              elem.richText.notesText =
+                "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong>  <br/> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
+          }
+        });
+
+        setProductsArray(data);
+        // console.log(data);
+        var array = [];
+        var uniqueValues = [];
+        const handlecategories = (element) => {
+          var newCategorie = { label: "", value: "" };
+          newCategorie.label = element.product_type;
+          newCategorie.value = element.product_type;
+          array.push(newCategorie);
+        };
+        data.forEach((elem) => handlecategories(elem));
+
+        const unique = array.filter((element) => {
+          const isDuplicate = uniqueValues.includes(element.label);
+          if (!isDuplicate) {
+            uniqueValues.push(element.label);
+            return true;
+          }
+          return false;
+        });
+        setCategories(unique);
+      } else {
+        //Todo
+        setEmptyStore(true);
+        console.log("No products found!");
+      }
+    } catch (err) {
+      console.log(err);
+      setEmptyStore(true);
+    }
+  };
+
   /**
    * get language page data from server
    */
@@ -378,10 +449,15 @@ function TabsPage({ host, shop }) {
         console.log(err);
       });
   };
-
-  useEffect(() => {
+  // todo clean up after the use effect
+  useEffect(async () => {
     fetchLang();
     checkLocation();
+    await saveProducts();
+    await fetchLocations();
+    setTimeout(async () => {
+      await fetchProducts();
+    }, 500);
   }, []);
 
   /**
@@ -404,12 +480,11 @@ function TabsPage({ host, shop }) {
       },
       body: JSON.stringify(formValues),
     };
-    console.log(langState.checked[name] !== value);
     if (langState.checked[name] !== value) {
       const data = await fetch("/LangFieldsSave", fetchOptions)
         .then((res) => res.json())
-        .then((messages) => {
-          console.log(messages);
+        .then((response) => {
+          console.log(response);
           // handleSnackToggle(messages.message);
         })
         .catch((err) => {
@@ -470,6 +545,11 @@ function TabsPage({ host, shop }) {
           handleTabChange={handleTabChange}
           handleSelectedProducts={handleSelectedProducts}
           handleEditProduct={handleEditProduct}
+          productsArray={productsArray}
+          setProductsArray={setProductsArray}
+          emptyStore={emptyStore}
+          categories={categories}
+          checkPlan={checkPlan}
         />
       ),
     },
@@ -485,6 +565,7 @@ function TabsPage({ host, shop }) {
           setLocation={setLocation}
           selectedProducts={selectedProducts}
           navigateToProducts={navigateToProducts}
+          productsArray={productsArray}
         />
       ),
     },

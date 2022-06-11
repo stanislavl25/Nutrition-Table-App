@@ -28,18 +28,19 @@ function CreateLabel({
   setLocation,
   selectedProducts,
   navigateToProducts,
+  productsArray,
 }) {
-  console.log(selectedProducts);
+  const [productExist, setProductExist] = useState(false);
   const [data, setData] = useState({
-    ingredientsText:
-      "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
-    notesText:
-      "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving ofafood contributs toadaily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>",
-    allergyInfoText:
-      "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
-    lEGALNOTICEText:
-      "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
-    nutriScore: "",
+    richText: {
+      ingredientsText:
+        "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
+      allergyInfoText:
+        "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
+      lEGALNOTICEText:
+        "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
+      nutriScore: "",
+    },
     servingSize: {
       CA: {
         servingSizeBasic: "250",
@@ -66,19 +67,19 @@ function CreateLabel({
         Preparedcalories: "230",
       },
     },
-    locationPlan: {
-      location: location,
-      plan: "Advanced",
-    },
   });
 
+  const [locationPlan, setLocationPlan] = useState({
+    location: location,
+    plan: "Advanced",
+  });
   const handleLocation = (newlocation) => {
     setLocation(newlocation);
   };
   const handlePlan = (newPlan) => {
-    let newData = { ...data };
-    newData["locationPlan"]["plan"] = newPlan;
-    setData(newData);
+    let newData = { ...locationPlan };
+    locationPlan["plan"] = newPlan;
+    setLocationPlan(newData);
   };
 
   const [formValues, setFormValues] = useState(formData);
@@ -93,7 +94,7 @@ function CreateLabel({
     }
   };
   const SetBasicPlanEUPerPortion = () => {
-    if (data.locationPlan.plan === "Basic") {
+    if (locationPlan.plan === "Basic") {
       for (var i = 0; i < formValues.length; i++) {
         let newFormValues = [...formValues];
         newFormValues[i]["perportion"] = "";
@@ -101,9 +102,47 @@ function CreateLabel({
       }
     }
   };
+  const handleSelectedProducts = () => {
+    // console.log(selectedProducts);
+    if (selectedProducts) {
+      console.log(selectedProducts);
+      productsArray.forEach((element) => {
+        if (selectedProducts.includes(element._id)) {
+          setProductExist(true);
+          setData(element);
+          return;
+        }
+      });
+    } else if (!selectedProducts) {
+      console.log("no products");
+      if (location === "CA") {
+        const valueCA =
+          "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong>  <br/> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
+        let newData = { ...data };
+        newData["richText"]["notesText"] = valueCA;
+        setData(newData);
+      }
+      if (location === "NA") {
+        const valueNA =
+          "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr/> 2,000 caloriesaday is used for general nutrition advice.</p>";
+        let newData = { ...data };
+        newData["richText"]["notesText"] = valueNA;
+        setData(newData);
+      }
+      if (location === "EU") {
+        const value =
+          "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
+        let newData = { ...data };
+        newData["richText"]["notesText"] = value;
+        setData(newData);
+      }
+    }
+  };
   useEffect(() => {
+    handleSelectedProducts();
     handleOrderSet();
     SetBasicPlanEUPerPortion();
+    console.log(data.richText.notesText);
   }, []);
   const handleOrderChange = (toIndex, prevIndex) => {
     const element = formValues.splice(prevIndex, 1)[0];
@@ -171,7 +210,7 @@ function CreateLabel({
             nonFoodProduct={nonFoodProduct}
             handleNonFoodProduct={handleNonFoodProduct}
             handleNutriScoreCheckElem={handleNutriScoreCheckElem}
-            locationPlan={data.locationPlan}
+            locationPlan={locationPlan}
           />
           {nonFoodProduct ? (
             <Card sectioned>
@@ -200,34 +239,23 @@ function CreateLabel({
                 productToPrepare={productToPrepare}
                 servingSize={data.servingSize}
                 handleServingSizeChange={handleServingSizeChange}
-                locationPlan={data.locationPlan}
+                locationPlan={locationPlan}
               />
-              {data.locationPlan.location === "EU" ? (
-                <CalsEnergyInfos />
-              ) : (
-                <></>
-              )}
-              {/* <NutritionInfoCheck
-            locationPlan={data.locationPlan}
-            formValues={formValues}
-            setFormValues={setFormValues}
-            formLables={formLables}
-            handleOrderChange={handleOrderChange}
-            newFormSet={newFormSet}
-          /> */}
+              {locationPlan.location === "EU" ? <CalsEnergyInfos /> : <></>}
+
               <NutritionInfo
-                locationPlan={data.locationPlan}
+                locationPlan={locationPlan}
                 formValues={formValues}
                 setFormValues={setFormValues}
                 handleOrderChange={handleOrderChange}
                 newFormSet={newFormSet}
                 formLables={
-                  data.locationPlan.location === "EU"
+                  locationPlan.location === "EU"
                     ? formLables.formLablesEU
                     : formLables.formLablesCA_NA
                 }
               />
-              {data.locationPlan.plan === "Basic" ? (
+              {locationPlan.plan === "Basic" ? (
                 <BasicVitaminsMineralsPage />
               ) : (
                 <>
@@ -236,22 +264,22 @@ function CreateLabel({
                 </>
               )}
               <Notes
-                notesText={data.notesText}
+                data={data.richText.notesText}
                 handleTextChange={handleNotesTextChange}
               />
               <Ingredients
                 data={langState.values.Ingredients}
-                ingredientsText={data.ingredientsText}
+                ingredientsText={data.richText.ingredientsText}
                 handleTextChange={handleIngredientsTextChange}
               />
               <AllergyInfo
                 data={langState.values.AllergyInformation}
-                allergyInfoText={data.allergyInfoText}
+                allergyInfoText={data.richText.allergyInfoText}
                 handleTextChange={handleAllergyInfoTextChange}
               />
               <LegalNotes
                 data={langState.values.LEGALNOTICE}
-                lEGALNOTICEText={data.lEGALNOTICEText}
+                lEGALNOTICEText={data.richText.lEGALNOTICEText}
                 handleTextChange={handleLEGALNOTICETextChange}
               />
             </div>
