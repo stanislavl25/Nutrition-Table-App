@@ -11,7 +11,6 @@ import AllergyInfo from "./AllergyInfo";
 import LegalNotes from "./LegalNotes";
 import { Heading, Card, Button, Page, TextStyle } from "@shopify/polaris";
 import NutritionInfo from "./NutritionInfoEU";
-import CheckLocation from "./CheckLocation";
 import BasicVitaminsMineralsPage from "./BasicVitaminsMineralsPage";
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
 const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
@@ -83,6 +82,7 @@ function CreateLabel({
   };
 
   const [formValues, setFormValues] = useState(formData);
+  const [badgesFormValue, setBadgeFormValue] = useState([]);
 
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [nonFoodProduct, setNonFoodProduct] = useState(false);
@@ -103,10 +103,18 @@ function CreateLabel({
     }
   };
   const handleSelectedProducts = () => {
+    let newBadges = [];
+    productsArray.forEach((element) => {
+      if (selectedProducts) {
+        if (selectedProducts.includes(element._id)) {
+          newBadges.push(element);
+        }
+      }
+    });
+    setBadgeFormValue(newBadges);
     if (selectedProducts && selectedProducts.length > 0) {
       for (var i = 0; i < productsArray.length; i++) {
         if (selectedProducts.includes(productsArray[i]._id)) {
-          console.log(true);
           setData(productsArray[i]);
           return;
         }
@@ -145,7 +153,6 @@ function CreateLabel({
     handleSelectedProducts();
     handleOrderSet();
     SetBasicPlanEUPerPortion();
-    console.log(data.richText.notesText);
   }, []);
   const handleOrderChange = (toIndex, prevIndex) => {
     const element = formValues.splice(prevIndex, 1)[0];
@@ -203,10 +210,6 @@ function CreateLabel({
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
         <div style={{ width: "65%", marginTop: "10px", marginRight: "20px" }}>
-          <CheckLocation
-            handleLocation={handleLocation}
-            handlePlan={handlePlan}
-          />
           <ProductInfo
             productToPrepare={productToPrepare}
             handleproductToPrepare={handleproductToPrepare}
@@ -214,6 +217,9 @@ function CreateLabel({
             handleNonFoodProduct={handleNonFoodProduct}
             handleNutriScoreCheckElem={handleNutriScoreCheckElem}
             locationPlan={locationPlan}
+            badgesFormValue={badgesFormValue}
+            setBadgeFormValue={setBadgeFormValue}
+            productsArray={productsArray}
           />
           {nonFoodProduct ? (
             <Card sectioned>

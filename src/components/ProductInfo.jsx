@@ -2,17 +2,20 @@ import {
   Button,
   Card,
   Checkbox,
+  Combobox,
   Heading,
   Icon,
+  Listbox,
   Select,
   Stack,
   Subheading,
   Tag,
+  TextContainer,
   TextField,
   Tooltip,
 } from "@shopify/polaris";
-import React, { useCallback, useState } from "react";
-import { CircleInformationMajor } from "@shopify/polaris-icons";
+import React, { useCallback, useMemo, useState } from "react";
+import { CircleInformationMajor, SearchMinor } from "@shopify/polaris-icons";
 const newBadgeFormSet = {
   name: "",
 };
@@ -24,24 +27,61 @@ function ProductInfo({
   nonFoodProduct,
   handleNonFoodProduct,
   locationPlan,
+  badgesFormValue,
+  setBadgeFormValue,
+  productsArray,
 }) {
+  const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
   const [selected, setSelected] = useState("");
-  const [badgesFormValue, setBadgeFormValue] = useState([]);
-  const [badgeName, setBadgeName] = useState("");
-  const handleBadgeAdding = useCallback((name) => {
-    setBadgeName(name);
-  });
-  const handleSettingNewBadge = useCallback(() => {
-    try {
-      if (badgeName.length) {
-        newBadgeFormSet.name = badgeName;
-        setBadgeFormValue([...badgesFormValue, newBadgeFormSet]);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const handleMemo = () => {
+    let array = [];
+    if (productsArray.length === 0) return array;
+    productsArray.forEach((element) => {
+      const name = element.name;
+      array.push({ value: name, label: name });
+    });
+    return array;
+  };
+  const deselectedOptions = useMemo(handleMemo);
+  const [memoOptions, setMemoOptions] = useState(deselectedOptions);
+
+  const updateText = useCallback(
+    (value) => {
+      setInputValue(value);
+
+      if (value === "") {
+        setMemoOptions(deselectedOptions);
+        return;
       }
-    } catch (err) {
-      console.log(err);
-    }
-  });
+      const filterRegex = new RegExp(value, "i");
+      const resultOptions = deselectedOptions.filter((option) =>
+        option.label.match(filterRegex)
+      );
+      setMemoOptions(resultOptions);
+    },
+    [deselectedOptions]
+  );
+  const updateSelection = useCallback(
+    (selected) => {
+      if (selectedOptions.includes(selected)) {
+        setSelectedOptions(
+          selectedOptions.filter((option) => option !== selected)
+        );
+      } else {
+        setSelectedOptions([...selectedOptions, selected]);
+      }
+
+      const matchedOption = memoOptions.find((option) => {
+        return option.value.match(selected);
+      });
+
+      updateText("");
+    },
+    [memoOptions, selectedOptions]
+  );
+
   const handleSelectChange = useCallback((value) => {
     handleNutriScoreCheckElem(value);
     setSelected(value);
@@ -60,18 +100,34 @@ function ProductInfo({
   ];
   const removeTag = useCallback(
     (tag) => () => {
-      setBadgeFormValue((previousTags) =>
-        previousTags.filter((previousTag) => previousTag !== tag)
-      );
+      const options = [...selectedOptions];
+      options.splice(options.indexOf(tag), 1);
+      setSelectedOptions(options);
     },
-    []
+    [selectedOptions]
   );
-  const tagMarkup = badgesFormValue.map((option, index) => (
-    <Tag key={index} onRemove={removeTag(option)}>
-      {option.name}
+
+  const optionsMarkup =
+    memoOptions.length > 0
+      ? memoOptions.map((option) => {
+          const { label, value } = option;
+          return (
+            <Listbox.Option
+              key={`${value}`}
+              value={value}
+              selected={selectedOptions.includes(value)}
+              accessibilityLabel={label}
+            >
+              {label}
+            </Listbox.Option>
+          );
+        })
+      : null;
+  const tagsMarkup = selectedOptions.map((option) => (
+    <Tag key={`option-${option}`} onRemove={removeTag(option)}>
+      {option}
     </Tag>
   ));
-
   return (
     <Card sectioned title="Product Info">
       <div
@@ -104,19 +160,31 @@ function ProductInfo({
             marginTop: "10px",
           }}
         >
-          <TextField
-            inputMode="text"
-            placeholder="Assign products to this label"
-            autoComplete="false"
-            autoFocus={false}
-            onChange={handleBadgeAdding}
-            onBlur={handleSettingNewBadge}
-            value={badgeName}
-          />
-
-          <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-            <Stack>{tagMarkup}</Stack>
-          </div>
+          <Combobox
+            activator={
+              <Combobox.TextField
+                prefix={<Icon source={SearchMinor} />}
+                onChange={updateText}
+                label="Assign products to this label"
+                labelHidden
+                value={inputValue}
+                placeholder="Assign products to this label"
+              />
+            }
+          >
+            {memoOptions.length > 0 ? (
+              <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
+            ) : null}
+          </Combobox>
+          {nonFoodProduct ? (
+            <></>
+          ) : (
+            <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+              <TextContainer>
+                <Stack>{tagsMarkup}</Stack>
+              </TextContainer>
+            </div>
+          )}
           <Checkbox
             label="This is a non-food product"
             checked={nonFoodProduct}

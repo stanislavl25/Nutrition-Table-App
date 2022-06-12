@@ -15,10 +15,16 @@ import {
   Popover,
   ChoiceList,
   RangeSlider,
+  Combobox,
+  Listbox,
+  Icon,
+  TextContainer,
+  Tag,
 } from "@shopify/polaris";
 import { Toast, useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../App";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import { SearchMinor } from "@shopify/polaris-icons";
 
 const PopOverElem = ({ index, productId, removeFormFields }) => {
   const [popoverActive, setPopoverActive] = useState(false);
@@ -99,6 +105,87 @@ function MyLablesTable({
   const [sortValue, setSortValue] = useState("");
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
   const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
+  const [inputValue, setInputValue] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const handleMemo = () => {
+    let array = [];
+    if (productsArray.length === 0) return array;
+    if (productsArray != "none") {
+      productsArray.forEach((element) => {
+        const name = element.name;
+        array.push({ value: name, label: name });
+      });
+    }
+    return array;
+  };
+  const deselectedOptions = useMemo(handleMemo);
+  const [memoOptions, setMemoOptions] = useState(deselectedOptions);
+
+  const updateText = useCallback(
+    (value) => {
+      setInputValue(value);
+
+      if (value === "") {
+        setMemoOptions(deselectedOptions);
+        return;
+      }
+      const filterRegex = new RegExp(value, "i");
+      const resultOptions = deselectedOptions.filter((option) =>
+        option.label.match(filterRegex)
+      );
+      setMemoOptions(resultOptions);
+    },
+    [deselectedOptions]
+  );
+  const updateSelection = useCallback(
+    (selected) => {
+      if (selectedOptions.includes(selected)) {
+        setSelectedOptions(
+          selectedOptions.filter((option) => option !== selected)
+        );
+      } else {
+        setSelectedOptions([...selectedOptions, selected]);
+      }
+
+      const matchedOption = memoOptions.find((option) => {
+        return option.value.match(selected);
+      });
+
+      updateText("");
+    },
+    [memoOptions, selectedOptions]
+  );
+  const removeTag = useCallback(
+    (tag) => () => {
+      const options = [...selectedOptions];
+      options.splice(options.indexOf(tag), 1);
+      setSelectedOptions(options);
+    },
+    [selectedOptions]
+  );
+
+  const optionsMarkup =
+    memoOptions.length > 0
+      ? memoOptions.map((option) => {
+          const { label, value } = option;
+          return (
+            <Listbox.Option
+              key={`${value}`}
+              value={value}
+              selected={selectedOptions.includes(value)}
+              accessibilityLabel={label}
+            >
+              {label}
+            </Listbox.Option>
+          );
+        })
+      : null;
+  const tagsMarkup = selectedOptions.map((option) => (
+    <Tag key={`option-${option}`} onRemove={removeTag(option)}>
+      {option}
+    </Tag>
+  ));
+
   const handleClearAll = useCallback(() => {
     handleTaggedWithRemove();
     handleQueryValueRemove();
@@ -242,14 +329,27 @@ function MyLablesTable({
         <div>
           <div style={{ padding: "16px", display: "flex" }}>
             <div style={{ flex: 1 }}>
-              <Filters
-                queryValue={queryValue}
-                filters={filters}
-                appliedFilters={appliedFilters}
-                onQueryChange={setQueryValue}
-                onQueryClear={handleQueryValueRemove}
-                onClearAll={handleClearAll}
-              />
+              <Combobox
+                activator={
+                  <Combobox.TextField
+                    prefix={<Icon source={SearchMinor} />}
+                    onChange={updateText}
+                    label="Assign products to this label"
+                    labelHidden
+                    value={inputValue}
+                    placeholder="Assign products to this label"
+                  />
+                }
+              >
+                {memoOptions.length > 0 ? (
+                  <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
+                ) : null}
+              </Combobox>
+              <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+                <TextContainer>
+                  <Stack>{tagsMarkup}</Stack>
+                </TextContainer>
+              </div>
             </div>
             <div
               style={{
