@@ -321,6 +321,16 @@ const formDataCA = [
     preparedProduct: "5",
   },
 ];
+const recommendedIntakeRows = [
+  { name: "Energy", quantity: "2000", unit: "Grams" },
+  { name: "Fat", quantity: "44", unit: "Grams" },
+  { name: "Of which Saturates", quantity: "", unit: "Grams" },
+  { name: "Carbohydrates", quantity: "00", unit: "Grams" },
+  { name: "Of which Sugars", quantity: "00", unit: "Grams" },
+  { name: "Protein", quantity: "00", unit: "Grams" },
+  { name: "Salt", quantity: "00", unit: "Grams" },
+  { name: "Vitamin C", quantity: "00", unit: "Grams" },
+];
 const order = formDataCA.length;
 const newFormSet = {
   name: "",
@@ -348,17 +358,37 @@ function TabsPage({ host, shop }) {
     []
   );
   const [productsArray, setProductsArray] = useState();
-  const [location, setLocation] = useState("CA");
+  const [location, setLocation] = useState("EU");
   const [formData, setFormData] = useState([]);
   const [locationObj, setlocationObj] = useState({});
   const [emptyStore, setEmptyStore] = useState(false);
   const [checkPlan, setCheckPlan] = useState(true);
   const [categories, setCategories] = useState([]);
+  const [storeData, setStoreData] = useState([]);
+  const [recommendedIntakeData, setRecommendedIntakeData] = useState(
+    storeData.recommendedIntake
+  );
+
+  // ! fix recommended intake late update for useState
+  useEffect(async () => {
+    console.log(storeData.recommendedIntake !== recommendedIntakeData);
+    if (storeData.recommendedIntake !== recommendedIntakeData) {
+      setTimeout(async () => {
+        await setRecommendedIntakeData(storeData.recommendedIntake);
+        console.log(recommendedIntakeData);
+      }, 1000);
+    }
+  }, [storeData]);
+
   /*** save store products if not saved */
-  const saveProducts = async () => {
-    const data = await fetch("/products-save").then((res) => res.text());
-    // console.log(data);
+  const saveProductsGetStoreData = async () => {
+    const shopData = await fetch("/products-save").then((res) => res.json());
+    if (shopData.recommendedIntake.length === 0) {
+      shopData.recommendedIntake = recommendedIntakeRows;
+    }
+    setStoreData(shopData);
   };
+
   /*** get store location */
   const fetchLocations = async () => {
     const data = await fetch("/locations").then((res) => res.json());
@@ -454,7 +484,7 @@ function TabsPage({ host, shop }) {
   useEffect(async () => {
     fetchLang();
     checkLocation();
-    await saveProducts();
+    await saveProductsGetStoreData();
     await fetchLocations();
     setTimeout(async () => {
       await fetchProducts();
@@ -462,12 +492,32 @@ function TabsPage({ host, shop }) {
   }, []);
 
   /**
-   * Handle tab change
+   * Handle recommended intake save to backend
    *
-   * @param {*}
+   * @param {recommendedIntake data, store id}
    */
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
+
+  const saveRecomIntake = async (formVal, storeId) => {
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ formVal, storeId }),
+    };
+    console.log(formVal, storeId);
+    // const data = await fetch("/recommendedIntake_save", fetchOptions)
+    //   .then((res) => res.json())
+    //   .then((response) => {
+    //     console.log(response);
+    //     // handleSnackToggle(messages.message);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //     // handleSnackToggle("Something wrong happend!");
+    //   });
   };
 
   const fetchLangChanges = async (name, value) => {
@@ -573,7 +623,15 @@ function TabsPage({ host, shop }) {
     {
       id: "Recommended Intake",
       content: "Recommended Intake",
-      tab: <RecommendedIntake />,
+      tab: (
+        <RecommendedIntake
+          saveRecomIntake={saveRecomIntake}
+          rows={storeData.recommendedIntake}
+          setStoreData={setStoreData}
+          storeData={storeData}
+          recommendedIntakeData={recommendedIntakeData}
+        />
+      ),
     },
     {
       id: "Translations",

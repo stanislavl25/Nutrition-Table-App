@@ -122,15 +122,36 @@ export async function createServer(
         session,
         fields: "id,title,product_type,images",
       });
-      const shopId = await checkShopExist(storeProducts[0]["session"].shop);
+      const shop = await checkShopExist(storeProducts[0]["session"].shop);
       for (var i = 0; i < storeProducts.length; i++) {
-        checkProductsExist(storeProducts[i], shopId);
+        checkProductsExist(storeProducts[i], shop.shop_id);
       }
-      res.status(200).send("Saving products done!");
+      res.status(200).send(shop);
     } catch (err) {
       res.status(400).send("Something wrong happend");
     }
   });
+  /***
+   * handle recommended intake save
+   */
+  app.post("/recommendedIntake_save", verifyRequest(app), async (req, res) => {
+    console.log(req.body);
+    try {
+      const update = await StoreModel.findOneAndUpdate(
+        {
+          shop_id: req.body.storeId,
+        },
+        {
+          recommendedIntake: req.body.formVal,
+        }
+      );
+      res.status(200).send({ message: "data updated" });
+    } catch (err) {
+      console.log(err);
+      res.status(400).send({ message: "something wrong happened" });
+    }
+  });
+
   /***
    * get all products with the same shop_id
    */
@@ -143,11 +164,9 @@ export async function createServer(
 
   /**check if the store exist */
   const checkShopExist = async (storeId) => {
-    const check = await StoreModel.findOne({ shop_id: storeId })
-      .select("shop_id")
-      .exec();
-    const id = check.shop_id;
-    if (check) return id;
+    const check = await StoreModel.findOne({ shop_id: storeId }).exec();
+    const data = check;
+    if (check) return data;
     else return false;
   };
   /** check if the products exist */

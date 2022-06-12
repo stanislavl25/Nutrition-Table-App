@@ -6,7 +6,7 @@
   {%- if block.settings.description -%}
     <p>{{ block.settings.description }}</p>
   {%- endif -%}
-  {% if block.settings.vertical_alignment == "germanStyleTable" %}
+ 
 
   <section class="performance-facts">
     <header class="performance-facts__header">
@@ -158,130 +158,255 @@
     </table>
     <p class="small-info">*The % Daily Value (DV) tells you how much a nutrient in a serving of food contributes to a daily diet. 2,000 calories a day is used for general nutrition advice.</p>
   </section>
-  {% elsif block.settings.vertical_alignment == "AmericanStyleTable"  %}
-  <section>
-    <h1>
-      Hello again!!
-    </h1>
-  </section>
-{% endif %}
-  
-
-
-
 </nutrition-Table>
 
 {% schema %}
-  {
-    "name": "Nutrition Table",
-    "target": "section",
-    "stylesheet": "germanStyleTable.css",
-    "javascript": "nutritionTable.js",
-    "templates": ["product"],
-    "settings": 
+{
+  "name":"Nutrition Table",
+  "target":"section",
+  "stylesheet":"germanStyleTable.css",
+  "javascript":"nutritionTable.js",
+  "templates":["product"],
+  "settings":[
+    {
+      "type":"header",
+      "content":"Label Block"
+    },
+    {
+      "type":"checkbox",
+      "id":"checkbox1",
+      "label":"Open accordion by default",
+      "default":false
+   },
+   {
+    "type":"checkbox",
+    "id":"checkBox2",
+    "label":"Use custom width",
+    "default":false
+   },
+   {
+    "type":"select",
+    "id":"vertical_alignment",
+    "label":"Align",
+    "options":
     [
-      {
-      "type": "header",
-      "content": "Label Block",
-      },
-      {
-        "type": "checkbox",
-        "id": "checkbox1",
-        "label": "Open accordion by default",
-        "default": false,
-      },
-      {
-        "type": "checkbox",
-        "id": "checkBox2",
-        "label": "Use custom width",
-        "default": false,
-      },
-      {
-        "type": "select",
-        "id": "vertical_alignment",
-        "label": "Align",
-        "options": [
-          {
-            "value": "left",
-            "label": "Left",
-          },
-          {
-            "value": "center",
-            "label": "Center",
-          },
-          {
-            "value": "right",
-            "label": "Right",
-          }
-        ],
-        "default": "center",
-      },
-      {
-        "type": "range",
-        "id": "width",
-        "min": 12,
-        "max": 100,
-        "step": 1,
-        "unit": "%",
-        "label": "Width",
-        "default": 30,
-      },
-      {
-        "type": "header",
-        "content": "MAIN TABLE",
-      },
-      {
-        "type": "paragraph",
-        "content": "These settings affect the main table or section.",
-      },
-      {
-        "type": "checkbox",
-        "id": "checkbox3",
-        "label": "Show Border",
-        "default": false,
-      },
-      {
-        "type": "color",
-        "id": "primaryBorder",
-        "label": "Primary Border color",
-        "default": "#CECECE",
-      },
-      {
-        "type": "color",
-        "id": "secondaryBorder",
-        "label": "Secondary Border color",
-        "default": "#222222",
-      },
-      {
-        "type": "range",
-        "id": "primaryBorderThickness",
-        "min": -1,
-        "max": 1,
-        "step": 1,
-        "unit": "px",
-        "label": "Primary Border Thickness",
-        "default": 1,
-      },
-      {
-        "type": "range",
-        "id": "secondaryBorderThickness",
-        "min": -2,
-        "max": 2,
-        "step": 1,
-        "unit": "px",
-        "label": "Secondary Border Thickness",
-        "default": 2,
-      },
-      {
-        "type": "range",
-        "id": "borderRadius",
-        "min": -1,
-        "max": 1,
-        "step": 1,
-        "unit": "px",
-        "label": "Border Radius",
-        "default": 1,
-      },
+       {
+          "value":"left",
+          "label":"Left"
+       },
+       {
+          "value":"center",
+          "label":"Center"
+       },
+       {
+          "value":"right",
+          "label":"Right"
+       }
     ],
+    "default":"center"
+   },
+   {
+    "type":"range",
+    "id":"width",
+    "min":12,
+    "max":100,
+    "step":1,
+    "unit":"%",
+    "label":"Width",
+    "default":30
+   },
+   {
+    "type":"header",
+    "content":"MAIN TABLE"
+   },
+   {
+    "type":"paragraph",
+    "content":"These settings affect the main table or section."
+   },
+   {
+    "type":"checkbox",
+    "id":"checkbox3",
+    "label":"Show Border",
+    "default":false
+   },
+   {
+    "type":"color",
+    "id":"primaryBorder",
+    "label":"Primary Border color",
+    "default":"#CECECE"
+   },
+   {
+    "type":"color",
+    "id":"secondaryBorder",
+    "label":"Secondary Border color",
+    "default":"#222222"
+   },
+   {
+    "type":"range",
+    "id":"primaryBorderThickness",
+    "min":-1,
+    "max":1,
+    "step":1,
+    "unit":"px",
+    "label":"Primary Border Thickness",
+    "default":1
+   },
+   {
+    "type":"range",
+    "id":"secondaryBorderThickness",
+    "min":-2,
+    "max":2,
+    "step":1,
+    "unit":"px",
+    "label":"Secondary Border Thickness",
+    "default":2
+   },
+   {
+    "type":"range",
+    "id":"borderRadius",
+    "min":-1,
+    "max":1,
+    "step":1,
+    "unit":"px",
+    "label":"Border Radius",
+    "default":1
+   },
+   {
+    "type": "color_background",
+    "id": "background",
+    "label": "Table background color",
+    "default": "linear-gradient(#ffffff, #000000)"
+   },
+   {
+    "type": "image_picker",
+    "id": "BackGroundImage",
+    "label": "Table Background"
+  },
+  {
+    "type": "image_picker",
+    "id": "MobileView",
+    "label": "Mobile Table Background"
+  },
+  {
+    "type":"header",
+    "content":"FONT STYLE"
+   },
+   {
+    "type":"paragraph",
+    "content":"These settings affect the text on the whole section."
+   },
+   {
+    "type": "font_picker",
+    "id": "body_font",
+    "label": "Body Font",
+    "default": "helvetica_n4"
+  },
+  {
+    "type": "color",
+    "id": "body_fontColor",
+    "label": "Body font color",
+    "default": "#000000"
+  },
+  {
+    "type": "range",
+    "id": "body_font_size",
+    "min": 2,
+    "max": 14,
+    "step": 1,
+    "unit": "px",
+    "label": "Body font size",
+    "default": 12
+  },
+  {
+    "type": "font_picker",
+    "id": "acorddions_font",
+    "label": "Acorddions Font",
+    "default": "helvetica_n4"
+  },
+  {
+    "type": "color",
+    "id": "acorddions_font_color",
+    "label": "Acorddions font color",
+    "default": "#000000"
+  },
+  {
+    "type": "range",
+    "id": "acorddions_headings_font_size",
+    "min": 4,
+    "max": 18,
+    "step": 1,
+    "unit": "px",
+    "label": "Acorddions headings font size",
+    "default": 16
+  },
+  {
+    "type":"header",
+    "content":"CELLS STYLE"
+   },
+   {
+    "type": "color",
+    "id": "cells_background_color",
+    "label": "Cells Background Color",
+    "default": "#000000"
+  },
+  {
+    "type": "range",
+    "id": "cell_border_radius",
+    "min": 0,
+    "max": 5,
+    "step": 1,
+    "unit": "px",
+    "label": "Cell border radius",
+    "default": 4
+  },
+  {
+    "type": "range",
+    "id": "vertical_cell_padding",
+    "min": 0,
+    "max": 4,
+    "step": 1,
+    "unit": "px",
+    "label": "Vertical cell padding",
+    "default": 3
+  },
+  {
+    "type": "range",
+    "id": "horizontal_cell_padding",
+    "min": 0,
+    "max": 1,
+    "step": 0.1,
+    "unit": "px",
+    "label": "Horizontal cell padding",
+    "default": 0.9
+  },
+  {
+    "type":"checkbox",
+    "id":"checkbox4",
+    "label":"Show tick icon before each ingredient",
+    "default":false
+   },
+   {
+    "type": "color",
+    "id": "tick_icon_color",
+    "label": "Tick icon color",
+    "default": "#000000"
+  },
+  {
+    "type": "color",
+    "id": "ingredients_text_color",
+    "label": "Ingredients text color",
+    "default": "#000000"
+  },
+  {
+    "type": "image_picker",
+    "id": "custom_ingredient_icon",
+    "label": "Custom ingredient icon"
   }
+  ]
+}
 {% endschema %}
+<!-- {
+  "type":"header",
+  "content":"ICONS AND DETAILS"
+ } -->
+ 

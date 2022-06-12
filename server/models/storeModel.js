@@ -31,6 +31,7 @@ const storeSchema = new Schema(
     dailyValue: { type: String, default: "% Daily Value*" },
     valeurQuotidienne: { type: String, default: "% valeur quotidienne*" },
     calories: { type: String, default: "calories" },
+    recommendedIntake: [],
   },
   {
     timestamps: true,

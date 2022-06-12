@@ -8,9 +8,18 @@ import {
   Select,
   TextField,
 } from "@shopify/polaris";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
-const Edit = ({ index, element, handleChange, handleDelete }) => {
+const Edit = ({
+  index,
+  element,
+  handleChange,
+  handleDelete,
+  storeId,
+  saveRecomIntake,
+  recommendedIntake,
+  recommendedIntakeData,
+}) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
   const togglePopoverActive = useCallback(
@@ -39,6 +48,7 @@ const Edit = ({ index, element, handleChange, handleDelete }) => {
           label="Name"
           value={element.name}
           onChange={(e) => handleChange(e, index, "name")}
+          onBlur={(e) => saveRecomIntake(recommendedIntake, storeId)}
           autoComplete="off"
           inputMode="text"
         />
@@ -46,16 +56,27 @@ const Edit = ({ index, element, handleChange, handleDelete }) => {
           label="Quantity"
           value={element.quantity}
           onChange={(e) => handleChange(e, index, "quantity")}
+          onBlur={(e) => saveRecomIntake(recommendedIntake, storeId)}
           autoComplete="off"
           inputMode="number"
+          type="number"
         />
         <Select
           label="Show all customers where:"
           value={element.unit}
           onChange={(e) => handleChange(e, index, "unit")}
-          options={["Grams", "Milligrams"]}
+          onBlur={(e) => saveRecomIntake(recommendedIntake, storeId)}
+          options={["Grams", "Milligrams", "Micrograms"]}
         />
-        <Button destructive outline onClick={() => handleDelete(index)}>
+        <Button
+          destructive
+          outline
+          onClick={() => {
+            handleDelete(index);
+            console.log(recommendedIntakeData);
+            // saveRecomIntake(rows, storeId);
+          }}
+        >
           Delete
         </Button>
       </FormLayout>
@@ -63,33 +84,27 @@ const Edit = ({ index, element, handleChange, handleDelete }) => {
   );
 };
 
-const rows = [
-  { name: "Energy", quantity: "2000", unit: "Grams" },
-  { name: "Fat", quantity: "44", unit: "Grams" },
-  { name: "Of which Saturates", quantity: "", unit: "Grams" },
-  { name: "Carbohydrates", quantity: "00", unit: "Grams" },
-  { name: "Of which Sugars", quantity: "00", unit: "Grams" },
-  { name: "Protein", quantity: "00", unit: "Grams" },
-  { name: "Salt", quantity: "00", unit: "Grams" },
-  { name: "Vitamin C", quantity: "00", unit: "Grams" },
-];
 const newRow = { name: "", quantity: "", unit: "Grams" };
-function RecommendedIntake() {
-  const [elementData, setElementData] = useState(rows);
-
+function RecommendedIntake({
+  rows,
+  setStoreData,
+  storeData,
+  saveRecomIntake,
+  recommendedIntakeData,
+}) {
   const handleChange = useCallback((value, i, tag) => {
-    let newValues = [...elementData];
-    newValues[i][tag] = value;
-    setElementData(newValues);
+    let newValues = { ...storeData };
+    newValues["recommendedIntake"][i][tag] = value;
+    setStoreData(newValues);
   }, []);
 
   const handleAddNewRow = () => {
-    setElementData([...elementData, newRow]);
+    setStoreData([...storeData.recommendedIntake, newRow]);
   };
-  const handleDelete = (i) => {
-    let newValues = [...elementData];
+  const handleDelete = async (i) => {
+    let newValues = [...storeData.recommendedIntake];
     newValues.splice(i, 1);
-    setElementData(newValues);
+    setStoreData(() => ({ ...storeData, recommendedIntake: newValues }));
   };
   return (
     <div>
@@ -113,53 +128,68 @@ function RecommendedIntake() {
         }
       >
         <Card sectioned>
-          <table style={{ width: "100%" }}>
-            <thead>
-              <tr
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <th>Nutrient</th>
-                <th>Quantity</th>
-                <th>Unit</th>
-                <th></th>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              borderSpacing: "0 1em",
+            }}
+          >
+            <thead style={{ width: "100%" }}>
+              <tr style={{ width: "100%" }}>
+                <th style={{ verticalAlign: "bottom", textAlign: "start" }}>
+                  Nutrient
+                </th>
+                <th style={{ verticalAlign: "bottom", textAlign: "start" }}>
+                  Quantity
+                </th>
+                <th
+                  style={{
+                    verticalAlign: "bottom",
+                  }}
+                >
+                  Unit
+                </th>
               </tr>
             </thead>
             <tbody>
-              {elementData.map((elem, index) => (
+              {rows.map((elem, index) => (
                 <tr
                   style={{
-                    width: "100%",
                     borderTop: "1px solid #E1E3E5",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginTop: "10px",
+                    lineHeight: "50px",
                   }}
                   key={index}
                 >
                   {elem.name.length ? (
                     <>
-                      <td>{elem.name}</td>
-                      <td>{elem.quantity || 0}</td>
-                      <td>{elem.unit || 0}</td>
+                      <td style={{ verticalAlign: "top" }}>{elem.name}</td>
+                      <td style={{ verticalAlign: "top" }}>
+                        {elem.quantity || 0}
+                      </td>
+                      <td style={{ verticalAlign: "top", textAlign: "center" }}>
+                        {elem.unit || 0}
+                      </td>
                     </>
                   ) : (
                     <>
                       <td>New Reference</td>
                     </>
                   )}
-                  <td>
+                  <td
+                    style={{
+                      textAlign: "end",
+                    }}
+                  >
                     <Edit
                       index={index}
                       element={elem}
                       handleChange={handleChange}
                       handleDelete={handleDelete}
+                      storeId={storeData.shop_id}
+                      saveRecomIntake={saveRecomIntake}
+                      recommendedIntake={storeData.recommendedIntake}
+                      recommendedIntakeData={recommendedIntakeData}
                     />
                   </td>
                 </tr>
