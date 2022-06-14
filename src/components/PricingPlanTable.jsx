@@ -10,7 +10,13 @@ function PricingPlanTable() {
       }}
     >
       <Card title="Plan comparison">
-        <table style={{ width: "100%" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            borderSpacing: "5em",
+          }}
+        >
           <thead>
             <tr
               style={{
@@ -21,9 +27,10 @@ function PricingPlanTable() {
                 paddingRight: "40px",
                 width: "100%",
                 marginTop: "30px",
+                marginBottom: "10px",
               }}
             >
-              <div
+              <td
                 style={{
                   marginLeft: "18px",
                   textAlign: "start",
@@ -31,27 +38,21 @@ function PricingPlanTable() {
                 }}
               >
                 <Subheading>FEATURE</Subheading>
-              </div>
-              <div>
+              </td>
+              <td>
                 <Subheading>BASIC PLAN</Subheading>
-              </div>
-              <div>
+              </td>
+              <td>
                 <Subheading>ADVANCED PLAN</Subheading>
-              </div>
-              <div>
+              </td>
+              <td>
                 <Subheading>ENTERPRISE PLAN</Subheading>
-              </div>
+              </td>
             </tr>
           </thead>
           <tbody style={{ width: "100%" }}>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -96,16 +97,10 @@ function PricingPlanTable() {
                   {" "}
                   <TextStyle variation="positive">Unlimited</TextStyle>
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -156,16 +151,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -216,16 +205,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -276,16 +259,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -336,16 +313,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -393,16 +364,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -451,16 +416,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -511,16 +470,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -570,16 +523,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -627,16 +574,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -684,16 +625,10 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
-            <tr>
-              <hr
-                style={{
-                  borderColor: "#E1E3E5",
-                  border: "1px solid #E1E3E5",
-                }}
-              />
-              <div
+            <tr style={{ borderTop: "2px solid #E1E3E5" }}>
+              <td
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -743,7 +678,7 @@ function PricingPlanTable() {
                   {" "}
                   <Icon source={CircleTickMajor} color="primary" />{" "}
                 </div>
-              </div>
+              </td>
             </tr>
           </tbody>
         </table>

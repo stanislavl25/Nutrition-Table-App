@@ -94,7 +94,7 @@ function MyLablesTable({
   };
 
   const resourceIDResolver = (products) => {
-    return products._id;
+    return products.name;
   };
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(productsArray, {
@@ -106,7 +106,7 @@ function MyLablesTable({
   const handleTaggedWithRemove = useCallback(() => setTaggedWith(null), []);
   const handleQueryValueRemove = useCallback(() => setQueryValue(null), []);
   const [inputValue, setInputValue] = useState("");
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  // const [selectedOptions, setSelectedOptions] = useState([]);
   const handleMemo = () => {
     let array = [];
     if (productsArray.length === 0) return array;
@@ -139,12 +139,23 @@ function MyLablesTable({
   );
   const updateSelection = useCallback(
     (selected) => {
-      if (selectedOptions.includes(selected)) {
-        setSelectedOptions(
-          selectedOptions.filter((option) => option !== selected)
+      if (selectedResources.includes(selected)) {
+        // setSelectedOptions(
+        // selectedResources.filter((option) => option !== selected)
+        // selectedResources.push(
+        //   selectedResources.filter((option) => option !== selected)
+        // );
+        // );
+        const options = selectedResources.filter(
+          (option) => option != selected
         );
+        selectedResources.splice(0, selectedResources.length);
+        options.forEach((elem) => {
+          selectedResources.push(elem);
+        });
       } else {
-        setSelectedOptions([...selectedOptions, selected]);
+        selectedResources.push(selected);
+        // setSelectedOptions([...selectedResources, selected]);
       }
 
       const matchedOption = memoOptions.find((option) => {
@@ -153,15 +164,15 @@ function MyLablesTable({
 
       updateText("");
     },
-    [memoOptions, selectedOptions]
+    [memoOptions, selectedResources]
   );
   const removeTag = useCallback(
     (tag) => () => {
-      const options = [...selectedOptions];
-      options.splice(options.indexOf(tag), 1);
-      setSelectedOptions(options);
+      const index = selectedResources.indexOf(tag);
+      console.log(index);
+      selectedResources.splice(index, 1);
     },
-    [selectedOptions]
+    [selectedResources]
   );
 
   const optionsMarkup =
@@ -172,7 +183,7 @@ function MyLablesTable({
             <Listbox.Option
               key={`${value}`}
               value={value}
-              selected={selectedOptions.includes(value)}
+              selected={selectedResources.includes(value)}
               accessibilityLabel={label}
             >
               {label}
@@ -180,23 +191,18 @@ function MyLablesTable({
           );
         })
       : null;
-  const tagsMarkup = selectedOptions.map((option) => (
+  const tagsMarkup = selectedResources.map((option) => (
     <Tag key={`option-${option}`} onRemove={removeTag(option)}>
       {option}
     </Tag>
   ));
-
-  const handleClearAll = useCallback(() => {
-    handleTaggedWithRemove();
-    handleQueryValueRemove();
-  }, [handleQueryValueRemove, handleTaggedWithRemove]);
 
   const handleSortChange = useCallback((value) => {
     setSortValue(value);
     selectedResources.splice(0, selectedResources.length);
     for (var i = 0; i < productsArray.length; i++) {
       if (productsArray[i].product_type === value) {
-        selectedResources.push(productsArray[i]._id);
+        selectedResources.push(productsArray[i].name);
       }
     }
   }, []);
@@ -205,23 +211,10 @@ function MyLablesTable({
     newproductsValues.splice(i, 1);
     setProductArray(newproductsValues);
   };
-
-  const filters = [];
-
-  const appliedFilters = !isEmpty(taggedWith)
-    ? [
-        {
-          key: "taggedWith",
-          label: disambiguateLabel("taggedWith", taggedWith),
-          onRemove: handleTaggedWithRemove,
-        },
-      ]
-    : [];
-
   const handleBulkDelete = () => {
     productsArray.forEach((element, index) => {
-      console.log(selectedResources.includes(element._id));
-      if (selectedResources.includes(element._id)) {
+      console.log(selectedResources.includes(element.name));
+      if (selectedResources.includes(element.name)) {
         removeFormFields(index);
       }
     });
@@ -265,9 +258,9 @@ function MyLablesTable({
           index
         ) => (
           <IndexTable.Row
-            id={_id}
+            id={name}
             key={_id}
-            selected={selectedResources.includes(_id)}
+            selected={selectedResources.includes(name)}
             position={index}
           >
             <IndexTable.Cell>
@@ -394,23 +387,6 @@ function MyLablesTable({
       )}
     </div>
   );
-
-  function disambiguateLabel(key, value) {
-    switch (key) {
-      case "taggedWith":
-        return `Tagged with ${value}`;
-      default:
-        return value;
-    }
-  }
-
-  function isEmpty(value) {
-    if (Array.isArray(value)) {
-      return value.length === 0;
-    } else {
-      return value === "" || value == null;
-    }
-  }
 }
 
 export default MyLablesTable;

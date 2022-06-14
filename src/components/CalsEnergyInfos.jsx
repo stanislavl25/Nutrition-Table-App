@@ -6,7 +6,9 @@ import {
   Stack,
   Tooltip,
   Link,
+  Icon,
 } from "@shopify/polaris";
+import { CircleInformationMajor } from "@shopify/polaris-icons";
 function CalsEnergyInfos() {
   return (
     <div style={{ marginTop: "20px" }}>
@@ -28,7 +30,15 @@ function CalsEnergyInfos() {
           </Stack>
         </div>
         <div style={{ marginTop: "10px" }}>
-          <Stack>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "start",
+              justifyContent: "start",
+            }}
+          >
+            <TextField label="% RI* Recommended intake" value="8" />
             <Tooltip
               dismissOnMouseOut
               content={
@@ -42,9 +52,9 @@ function CalsEnergyInfos() {
                 </p>
               }
             >
-              <TextField label="% RI* Recommended intake" value="8" />
+              <Icon source={CircleInformationMajor} color="base" />
             </Tooltip>
-          </Stack>
+          </div>
         </div>
         <div>
           <div></div>

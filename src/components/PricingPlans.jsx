@@ -66,7 +66,9 @@ function PricinPlans() {
                   </Stack>
                   <Stack wrap={false}>
                     <Icon source={CircleTickMajor} color="primary" />{" "}
-                    <p>European, American, and Canadian labels</p>
+                    <p>
+                      European, American, and Canadian <br /> labels
+                    </p>
                   </Stack>
                   <Stack wrap={false}>
                     <Icon source={CircleTickMajor} color="primary" />{" "}
@@ -117,7 +119,7 @@ function PricinPlans() {
               </div>
             </Card.Section>
             <Card.Section title="MAIN FEATURES">
-              <div style={{ marginTop: "10px" }}>
+              <div style={{ marginTop: "10px", paddingBottom: "18px" }}>
                 <TextContainer>
                   <TextStyle variation="strong">
                     Everything included on Basic Plan.
@@ -179,7 +181,7 @@ function PricinPlans() {
               </div>
             </Card.Section>
             <Card.Section title="MAIN FEATURES">
-              <div style={{ paddingBottom: "207px", marginTop: "10px" }}>
+              <div style={{ paddingBottom: "225px", marginTop: "10px" }}>
                 <TextContainer>
                   <TextStyle variation="strong">
                     Everything included on Advanced Plan.

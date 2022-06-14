@@ -1,19 +1,12 @@
 import {
-  Button,
   Card,
-  DataTable,
-  DisplayText,
-  FormLayout,
   Heading,
   List,
   Page,
-  Popover,
-  Select,
   TextContainer,
-  TextField,
   TextStyle,
 } from "@shopify/polaris";
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
 
 function Documentation() {
   return (
@@ -86,48 +79,54 @@ function Documentation() {
           <div style={{ margin: "0px 20px 20px 20px" }}>
             <Heading>Label creation steps</Heading>
           </div>
-          <TextContainer spacing="loose">
-            <div style={{ margin: "20px 20px 0px 20px" }}>
-              {" "}
-              <TextStyle variation="strong">
-                Duis luctus nibh quis lorem ullamcorper faucibus. Vivamus
-                molestie dolor id cursus ultrices. Pellentesque vitae turpis ac
-                lectus cursus auctor. Maecenas massa mauris, ultrices quis
-                semper et.
-              </TextStyle>
-            </div>
-            <div style={{ margin: "20px 20px 0px 20px" }}>
-              {" "}
-              <TextStyle variation="strong">
-                Pellentesque vitae turpis ac lectus cursus auctor. Maecenas
-                massa mauris, ultrices quis semper et.
-              </TextStyle>
-            </div>
-          </TextContainer>
+          <div
+            style={{
+              margin: "20px 20px 0px 20px",
+            }}
+          >
+            <TextStyle variation="strong">
+              How to create nutrition tables and add data to your products.
+            </TextStyle>
+          </div>
           <div style={{ marginTop: "10px" }}>
             <List type="number">
-              <TextContainer spacing="loose">
-                <List.Item>
-                  <TextStyle variation="strong">
-                    Pellentesque vitae turpis ac lectus cursus auctor.
-                  </TextStyle>
-                </List.Item>
-                <List.Item>
-                  <TextStyle variation="strong">
-                    Maecenas massa mauris.
-                  </TextStyle>
-                </List.Item>
-                <List.Item>
-                  <TextStyle variation="strong">
-                    Pellentesque vitae turpis.
-                  </TextStyle>
-                </List.Item>
-                <List.Item>
-                  <TextStyle variation="strong">
-                    Pellentesque vitae turpis ac lectus cursus auctor.
-                  </TextStyle>
-                </List.Item>
-              </TextContainer>
+              <List.Item>
+                <TextStyle variation="strong">
+                  Start by going to the products tab of our app and selecting
+                  the products you want to add information for. You can select a
+                  single product or edit multiple products at the same time in
+                  bulk action. Here you can filter by products and categories
+                  and flexibly put together the selection of your products that
+                  you want to edit. Of course you can also select and edit all
+                  products.
+                </TextStyle>
+              </List.Item>
+              <List.Item>
+                <TextStyle variation="strong">
+                  Once you have selected one or more products, the 'Create
+                  Label' button will take you to the page where you can add and
+                  edit the information for this/these product/s. Depending on
+                  your country and pricing plan, you have various options for
+                  selecting and entering nutritional information. For help,
+                  click on the small tooltips next to the input fields. You can
+                  recognize them by the small ‘i’ symbols.
+                </TextStyle>
+              </List.Item>
+              <List.Item>
+                <TextStyle variation="strong">
+                  Check the preview of your data on the right as you type. This
+                  shows you how the information will later be displayed for
+                  this/s product/s in your shop (Note: You can still adjust the
+                  visual appearance of the table in the theme editor).
+                </TextStyle>
+              </List.Item>
+              <List.Item>
+                <TextStyle variation="strong">
+                  When you are done and have entered all the information, save
+                  the information using the 'safe label' button in the top
+                  right.
+                </TextStyle>
+              </List.Item>
             </List>
           </div>
         </div>

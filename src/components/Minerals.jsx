@@ -75,7 +75,7 @@ const SelectElement = ({ unit, handleChange, index }) => {
   ];
 
   return (
-    <div style={{ marginRight: "10px" }}>
+    <div>
       <Select
         label=""
         options={options}
@@ -136,13 +136,14 @@ function Minerals() {
   };
 
   return (
-    <Card sectioned>
+    <Card>
       <div
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
+          padding: "20px 20px 10px 20px",
         }}
       >
         <Heading>Minerals</Heading>
@@ -159,20 +160,16 @@ function Minerals() {
       </div>
 
       {formValues.length === 0 ? (
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", paddingBottom: "20px" }}>
           <p>Click add to create a new Mineral</p>
         </div>
       ) : (
         <form onSubmit={handleSave}>
-          <div style={{ display: "flex" }}>
-            <label style={{ width: "150px", marginRight: "10px" }}>Name</label>
-            <label style={{ width: "90px", marginRight: "10px" }}>
-              Per 100 g
-            </label>
-            <label style={{ width: "130px", marginRight: "10px" }}>
-              Per portion 25 g
-            </label>
-            <label style={{ width: "100px", marginRight: "10px" }}>Unit</label>
+          <div style={{ display: "flex", padding: "0px 20px 0px 20px " }}>
+            <label style={{ marginRight: "170px" }}>Name</label>
+            <label style={{ marginRight: "110px" }}>Per 100 g</label>
+            <label style={{ marginRight: "70px" }}>Per portion 25 g</label>
+            <label style={{ marginRight: "20px" }}>Unit</label>
           </div>
           <hr style={{ borderTop: "1px solid #cecece" }} />
 
@@ -184,41 +181,49 @@ function Minerals() {
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: "10px",
+                padding: "20px 20px 10px 20px",
               }}
             >
-              <TextField
-                size="small"
-                style={{ width: "150px", marginRight: "10px" }}
-                type="text"
-                variant="outlined"
-                name="Name"
-                value={element.Name || ""}
-                onChange={(e) => handleChange(e, "Name", index)}
-              />
-              <TextField
-                size="small"
-                style={{ width: "90px", marginRight: "10px" }}
-                variant="outlined"
-                type="text"
-                name="Per100g"
-                value={element.Per100g || ""}
-                onChange={(e) => handleChange(e, "Per100g", index)}
-              />
-              <TextField
-                style={{ width: "130px", marginRight: "10px" }}
-                size="small"
-                variant="outlined"
-                type="text"
-                name="Perportion25g"
-                value={element.Perportion25g || ""}
-                onChange={(e) => handleChange(e, "Perportion25g", index)}
-              />
-              <SelectElement
-                unit={element.unit}
-                handleChange={handleChange}
-                index={index}
-              />
+              <div style={{ maxWidth: "200px", marginRight: "20px" }}>
+                <TextField
+                  size="small"
+                  style={{ width: "150px", marginRight: "10px" }}
+                  type="text"
+                  variant="outlined"
+                  name="Name"
+                  value={element.Name || ""}
+                  onChange={(e) => handleChange(e, "Name", index)}
+                />
+              </div>
+              <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                <TextField
+                  size="small"
+                  style={{ width: "90px", marginRight: "10px" }}
+                  variant="outlined"
+                  type="text"
+                  name="Per100g"
+                  value={element.Per100g || ""}
+                  onChange={(e) => handleChange(e, "Per100g", index)}
+                />
+              </div>
+              <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                <TextField
+                  style={{ width: "130px", marginRight: "10px" }}
+                  size="small"
+                  variant="outlined"
+                  type="text"
+                  name="Perportion25g"
+                  value={element.Perportion25g || ""}
+                  onChange={(e) => handleChange(e, "Perportion25g", index)}
+                />
+              </div>
+              <div style={{ maxWidth: "75px", marginRight: "20px" }}>
+                <SelectElement
+                  unit={element.unit}
+                  handleChange={handleChange}
+                  index={index}
+                />
+              </div>
               <PopoverElement
                 element={element}
                 removeFormFields={removeFormFields}

@@ -9,7 +9,6 @@ import {
   Popover,
 } from "@shopify/polaris";
 import React, { useCallback, useEffect, useState } from "react";
-import SelectComponent from "./SelectComponent";
 import NutritionInfoCA from "./NutritionInfoCA";
 import NutritionInfoNA from "./NutritionInfoNA";
 
@@ -165,8 +164,8 @@ function NutritionInfo({
       )}
 
       {locationPlan.location === "EU" ? (
-        <Card Sectioned>
-          <Card.Section>
+        <Card>
+          <div style={{ padding: "20px 20px 0px 20px" }}>
             <Stack distribution="equalSpacing">
               <Heading>Nutrition Informaion</Heading>
               <Button
@@ -180,70 +179,79 @@ function NutritionInfo({
                 Add
               </Button>
             </Stack>
-          </Card.Section>
-          <Card.Section>
+          </div>
+
+          <div>
             <form onSubmit={handleSave}>
               <div
                 style={{
                   display: "flex",
                   flexDirection: "row",
+                  padding: "0px 20px 0px 20px ",
+                  width: "100%",
                 }}
               >
-                {formLables.map((lableTitle, index) => (
-                  <label
-                    key={index}
-                    style={{
-                      width: "130px",
-                      marginRight: "10px",
-                      color:
-                        locationPlan.plan == "Basic" &&
-                        lableTitle == "Per portion"
-                          ? "#8c9196"
-                          : "black",
-                    }}
-                  >
-                    {lableTitle}
-                  </label>
-                ))}
+                <label style={{ marginRight: "170px" }}>Name</label>
+                <label style={{ marginRight: "110px" }}>Per 100 g</label>
+                <label
+                  style={{
+                    color: locationPlan.plan == "Basic" ? "#8c9196" : "black",
+                    maxWidth: "123px",
+                    marginRight: "100px",
+                  }}
+                >
+                  Per portion
+                </label>
+                <label style={{ marginRight: "20px" }}>Unit</label>
               </div>
-              <div>
+              <hr
+                style={{
+                  borderTop: "1px solid #cecece",
+                  width: "100%",
+                  padding: "0px",
+                }}
+              />
+
+              <div style={{ padding: "0px 20px 20px 20px", width: "100%" }}>
                 {formValues.map((element, index) => (
                   <div
                     key={index}
                     style={{
                       display: "flex",
                       flexDirection: "row",
-                      justifyContent: "stretch",
-                      alignItems: "center",
-                      marginTop: "10px",
+                      marginTop: "20px",
                     }}
                   >
-                    <TextField
-                      style={{ width: "130px", marginRight: "10px" }}
-                      value={element.name}
-                      name="Name"
-                      onChange={(e) => handleChange(e, "name", index)}
-                      label=""
-                      autoComplete="off"
-                    />
-                    <TextField
-                      style={{ width: "80px", marginRight: "10px" }}
-                      value={element.per100g || 0}
-                      name="Per100g"
-                      onChange={(e) => handleChange(e, "per100g", index)}
-                      inputMode="number"
-                      autoComplete="off"
-                    />
-                    <TextField
-                      style={{ width: "120px", marginRight: "10px" }}
-                      value={element.perportion || 0}
-                      name="Perportion"
-                      onChange={(e) => handleChange(e, "perportion", index)}
-                      autoComplete="off"
-                      inputMode="number"
-                      disabled={locationPlan.plan === "Basic" ? true : false}
-                    />
-                    <div style={{ width: "100px", marginRight: "10px" }}>
+                    <div style={{ maxWidth: "200px", marginRight: "20px" }}>
+                      <TextField
+                        value={element.name}
+                        name="Name"
+                        onChange={(e) => handleChange(e, "name", index)}
+                        label=""
+                        autoComplete="off"
+                      />
+                    </div>
+                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                      <TextField
+                        value={element.per100g || 0}
+                        name="Per100g"
+                        onChange={(e) => handleChange(e, "per100g", index)}
+                        inputMode="number"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                      <TextField
+                        value={element.perportion || 0}
+                        name="Perportion"
+                        onChange={(e) => handleChange(e, "perportion", index)}
+                        autoComplete="off"
+                        inputMode="number"
+                        disabled={locationPlan.plan === "Basic" ? true : false}
+                      />
+                    </div>
+
+                    <div style={{ maxWidth: "75px", marginRight: "20px" }}>
                       <Select
                         value={element.unit}
                         onChange={(e) => handleChange(e, "unit", index)}
@@ -251,18 +259,20 @@ function NutritionInfo({
                         name="unit"
                       />
                     </div>
-                    <PopOverComponent
-                      element={element}
-                      handleChange={handleChange}
-                      removeFormFields={removeFormFields}
-                      index={index}
-                    />
+
+                    <div style={{ maxWidth: "100px" }}>
+                      <PopOverComponent
+                        element={element}
+                        handleChange={handleChange}
+                        removeFormFields={removeFormFields}
+                        index={index}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
             </form>
-          </Card.Section>
-          <Button onClick={handleSave}>Save</Button>
+          </div>
         </Card>
       ) : (
         <></>

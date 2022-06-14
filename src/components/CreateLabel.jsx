@@ -206,6 +206,14 @@ function CreateLabel({
         },
       }}
       fullWidth
+      breadcrumbs={[
+        {
+          content: "Back",
+          onAction: () => {
+            navigateToProducts();
+          },
+        },
+      ]}
     >
       <div style={{ display: "flex", flexDirection: "row" }}>
         {/* //  Todo left side page */}
