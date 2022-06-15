@@ -1,50 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Card, Page, Tabs } from "@shopify/polaris";
-import { Toast, useAppBridge } from "@shopify/app-bridge-react";
+import { Toast, Card, Page, Tabs, Frame } from "@shopify/polaris";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../App";
-import { SubscriptionPage } from "./SubscriptionPage";
-import { ProductsManagement } from "./ProductsManagement";
-import { BulkProductManagement } from "./BulkProductManagement";
 import MyLables from "./MyLables";
 import Translations from "./Translations";
 import CreateLabel from "./CreateLabel";
-// import Tabs from "@mui/material/Tabs";
-// import Tab from "@mui/material/Tab";
-import { IconButton, Snackbar } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import RecommendedIntake from "./RecommendedIntake";
 import PricinPlans from "./PricingPlans";
-import PropTypes from "prop-types";
 import Documentation from "./Documentation";
 
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && <div sx={{ p: 3 }}>{children}</div>}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
 const formDataEU = [
   {
     name: "Fat",
@@ -341,11 +305,9 @@ const newFormSet = {
   leftSpacing: "0",
   order: order,
 };
-function TabsPage({ host, shop }) {
+function TabsPage() {
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
-  // const [value, setValue] = React.useState(0);
-  const [snack, setSnack] = useState({ open: false, message: "" });
   const [langState, setLangState] = useState({
     values: {},
     checked: {},
@@ -358,16 +320,19 @@ function TabsPage({ host, shop }) {
     []
   );
   const [productsArray, setProductsArray] = useState();
-  const [location, setLocation] = useState("EU");
+  const [location, setLocation] = useState("");
   const [formData, setFormData] = useState([]);
   const [locationObj, setlocationObj] = useState({});
   const [emptyStore, setEmptyStore] = useState(false);
   const [checkPlan, setCheckPlan] = useState(true);
   const [categories, setCategories] = useState([]);
   const [storeData, setStoreData] = useState([]);
+  const [active, setActive] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   const [recommendedIntakeData, setRecommendedIntakeData] = useState(
     storeData.recommendedIntake
   );
+  const toggleActive = useCallback(() => setActive((active) => !active), []);
 
   // ! fix recommended intake late update for useState
   useEffect(async () => {
@@ -380,7 +345,7 @@ function TabsPage({ host, shop }) {
     }
   }, [storeData]);
 
-  /*** save store products if not saved */
+  /*** save store products if not saved and get store needed data */
   const saveProductsGetStoreData = async () => {
     const shopData = await fetch("/products-save").then((res) => res.json());
     if (shopData.recommendedIntake.length === 0) {
@@ -394,17 +359,28 @@ function TabsPage({ host, shop }) {
     const data = await fetch("/locations").then((res) => res.json());
     setlocationObj(data);
     if (data.length) {
+      const countryCode = data[0].country_code;
+      if (countryCode.includes("US") || countryCode.includes("UM")) {
+        setLocation("NA");
+        console.log("NA");
+      }
+      if (countryCode.includes("CA")) {
+        setLocation("CA");
+        console.log("CA");
+      } else {
+        setLocation("EU");
+        console.log("EU");
+      }
     } else {
       //Todo
       // setEmptyStore(true);
-      console.log("No products found!");
+      console.log("No location Provided!");
     }
   };
   /*** get store products */
   const fetchProducts = async () => {
     try {
       const data = await fetch("products-list").then((res) => res.json());
-      // console.log(data);
       if (data.length) {
         data.forEach((elem) => {
           if (elem.richText.notesText === undefined) {
@@ -420,9 +396,7 @@ function TabsPage({ host, shop }) {
             }
           }
         });
-
         setProductsArray(data);
-        // console.log(data);
         var array = [];
         var uniqueValues = [];
         const handlecategories = (element) => {
@@ -432,7 +406,6 @@ function TabsPage({ host, shop }) {
           array.push(newCategorie);
         };
         data.forEach((elem) => handlecategories(elem));
-
         const unique = array.filter((element) => {
           const isDuplicate = uniqueValues.includes(element.label);
           if (!isDuplicate) {
@@ -445,7 +418,6 @@ function TabsPage({ host, shop }) {
       } else {
         //Todo
         setEmptyStore(true);
-        console.log("No products found!");
       }
     } catch (err) {
       console.log(err);
@@ -465,9 +437,7 @@ function TabsPage({ host, shop }) {
     const data = await fetch("/LangData")
       .then((res) => res.json())
       .then((response) => {
-        // console.log(response);
         if (response.success && response.data.values !== undefined) {
-          // console.log(response.data[0]);
           const data = response.data[0];
           setLangState((langState) => ({
             ...langState,
@@ -483,11 +453,11 @@ function TabsPage({ host, shop }) {
   // todo clean up after the use effect
   useEffect(async () => {
     fetchLang();
-    checkLocation();
     await saveProductsGetStoreData();
     await fetchLocations();
     setTimeout(async () => {
       await fetchProducts();
+      await checkLocation();
     }, 500);
   }, []);
 
@@ -545,6 +515,76 @@ function TabsPage({ host, shop }) {
     }
   };
 
+  /***handle save non food products to database */
+  const handleSaveNonFoodProducts = async (products) => {
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ products, shop_id: storeData.shop_id }),
+    };
+    try {
+      const data = await fetch("/save_non-food", fetchOptions)
+        .then((res) => res.json())
+        .then(async (response) => {
+          if (response.success) {
+            await fetchProducts();
+            setSelected(0);
+            setToastMessage(response.message);
+            toggleActive();
+          }
+          // handleSnackToggle(messages.message);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  /** saving food products */
+  const handleSaveProducts = async (products) => {
+    console.log(products);
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ products, shop_id: storeData.shop_id }),
+    };
+    try {
+      const data = await fetch("/save_foodProducts", fetchOptions)
+        .then((res) => res.json())
+        .then(async (response) => {
+          if (response.success) {
+            await fetchProducts();
+            setSelected(0);
+            setToastMessage(response.message);
+            toggleActive();
+          }
+          // handleSnackToggle(messages.message);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  /***handle saving products labels to database */
+  const handleSaveSelectedProducts = async (
+    selectedProducts,
+    nonFoodProduct,
+    data
+  ) => {
+    if (nonFoodProduct) {
+      handleSaveNonFoodProducts(selectedProducts);
+    }
+    if (!nonFoodProduct) {
+      handleSaveProducts(selectedProducts);
+    }
+  };
+
   const handleSelectedProducts = (selectedPro) => {
     setSelected(1);
     setSelectedProducts(selectedPro);
@@ -553,32 +593,11 @@ function TabsPage({ host, shop }) {
     setSelected(1);
     setSelectedProducts(id);
   };
-  const navigateToProducts = () => {
-    setSelected(0);
-  };
-  const handleSnackClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnack((snack) => ({ open: false }));
-  };
 
-  const handleSnackToggle = (message) => {
-    setSnack((snack) => ({ open: !snack.open, message: message || "" }));
-  };
+  const toastMarkup = active ? (
+    <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />
+  ) : null;
 
-  const action = (
-    <React.Fragment>
-      <IconButton
-        size="small"
-        aria-label="close"
-        color="inherit"
-        onClick={handleSnackClose}
-      >
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  );
   const TranslationsPage = (
     <Translations
       langState={langState}
@@ -615,8 +634,9 @@ function TabsPage({ host, shop }) {
           location={location}
           setLocation={setLocation}
           selectedProducts={selectedProducts}
-          navigateToProducts={navigateToProducts}
+          handleTabChange={handleTabChange}
           productsArray={productsArray}
+          handleSaveSelectedProducts={handleSaveSelectedProducts}
         />
       ),
     },
@@ -652,17 +672,12 @@ function TabsPage({ host, shop }) {
 
   return (
     <div>
-      <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
-        <Card.Section>{tabs[selected].tab}</Card.Section>
-      </Tabs>
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        open={snack.open}
-        onClose={handleSnackToggle}
-        message={snack.message}
-        autoHideDuration={4000}
-        action={action}
-      />
+      <Frame>
+        <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
+          <Card.Section>{tabs[selected].tab}</Card.Section>
+        </Tabs>
+        {toastMarkup}
+      </Frame>
     </div>
   );
 }

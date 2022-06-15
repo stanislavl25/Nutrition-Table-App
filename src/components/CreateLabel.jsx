@@ -1,4 +1,9 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 import TablePreview from "./TablePreview";
 import ProductInfo from "./ProductInfo";
 import ServingSize from "./ServingSize";
@@ -26,8 +31,9 @@ function CreateLabel({
   location,
   setLocation,
   selectedProducts,
-  navigateToProducts,
+  handleTabChange,
   productsArray,
+  handleSaveSelectedProducts,
 }) {
   const [productExist, setProductExist] = useState(false);
   const [data, setData] = useState({
@@ -86,6 +92,27 @@ function CreateLabel({
 
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [nonFoodProduct, setNonFoodProduct] = useState(false);
+  const [rightSideWidth, setRightSideWidth] = useState("35%");
+  const [leftSideWidth, setLeftSideWidth] = useState("60%");
+  const [flexDirection, setFlexDirection] = useState("row");
+
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      if (window.innerWidth <= 960) {
+        setRightSideWidth("100%");
+        setLeftSideWidth("100%");
+        setFlexDirection("column");
+      } else {
+        setRightSideWidth("35%");
+        setLeftSideWidth("65%");
+        setFlexDirection("row");
+      }
+    });
+    window.removeEventListener("resize", () => {
+      console.log(window.innerWidth);
+    });
+  });
+
   const handleOrderSet = () => {
     for (var i = 0; i < formValues.length; i++) {
       let newFormValues = [...formValues];
@@ -203,6 +230,7 @@ function CreateLabel({
         onAction: () => {
           console.log("clicked");
           // todo save
+          handleSaveSelectedProducts(selectedProducts, nonFoodProduct, data);
         },
       }}
       fullWidth
@@ -210,14 +238,20 @@ function CreateLabel({
         {
           content: "Back",
           onAction: () => {
-            navigateToProducts();
+            handleTabChange(0);
           },
         },
       ]}
     >
-      <div style={{ display: "flex", flexDirection: "row" }}>
+      <div style={{ display: "flex", flexDirection: flexDirection }}>
         {/* //  Todo left side page */}
-        <div style={{ width: "65%", marginTop: "10px", marginRight: "20px" }}>
+        <div
+          style={{
+            width: leftSideWidth,
+            marginTop: "10px",
+            marginRight: "20px",
+          }}
+        >
           <ProductInfo
             productToPrepare={productToPrepare}
             handleproductToPrepare={handleproductToPrepare}
@@ -324,14 +358,20 @@ function CreateLabel({
               style={{ margin: "4px" }}
               type="button"
               className="button remove"
-              onClick={() => console.log("clicked")}
+              onClick={() =>
+                handleSaveSelectedProducts(
+                  selectedProducts,
+                  nonFoodProduct,
+                  data
+                )
+              }
             >
               Save Label
             </Button>
           </div>
         </div>
         {/* //  Todo right side page */}
-        <div style={{ width: "35%", marginTop: "10px" }}>
+        <div style={{ width: rightSideWidth, marginTop: "10px" }}>
           {nonFoodProduct ? (
             <></>
           ) : (

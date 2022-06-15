@@ -128,74 +128,83 @@ function RecommendedIntake({
         }
       >
         <Card sectioned>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              borderSpacing: "0 1em",
-            }}
-          >
-            <thead style={{ width: "100%" }}>
-              <tr style={{ width: "100%" }}>
-                <th style={{ verticalAlign: "bottom", textAlign: "start" }}>
-                  Nutrient
-                </th>
-                <th style={{ verticalAlign: "bottom", textAlign: "start" }}>
-                  Quantity
-                </th>
-                <th
-                  style={{
-                    verticalAlign: "bottom",
-                  }}
-                >
-                  Unit
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((elem, index) => (
-                <tr
-                  style={{
-                    borderTop: "1px solid #E1E3E5",
-                    lineHeight: "50px",
-                  }}
-                  key={index}
-                >
-                  {elem.name.length ? (
-                    <>
-                      <td style={{ verticalAlign: "top" }}>{elem.name}</td>
-                      <td style={{ verticalAlign: "top" }}>
-                        {elem.quantity || 0}
-                      </td>
-                      <td style={{ verticalAlign: "top", textAlign: "center" }}>
-                        {elem.unit || 0}
-                      </td>
-                    </>
-                  ) : (
-                    <>
-                      <td>New Reference</td>
-                    </>
-                  )}
-                  <td
+          <div style={{ width: "100%", overflowX: "scroll" }}>
+            <table
+              style={{
+                borderCollapse: "collapse",
+                borderSpacing: "0 1em",
+
+                width: "100%",
+              }}
+            >
+              <thead style={{ width: "100%" }}>
+                <tr style={{ width: "100%" }}>
+                  <th style={{ verticalAlign: "bottom", textAlign: "start" }}>
+                    Nutrient
+                  </th>
+                  <th style={{ verticalAlign: "bottom", textAlign: "start" }}>
+                    Quantity
+                  </th>
+                  <th
                     style={{
-                      textAlign: "end",
+                      verticalAlign: "bottom",
                     }}
                   >
-                    <Edit
-                      index={index}
-                      element={elem}
-                      handleChange={handleChange}
-                      handleDelete={handleDelete}
-                      storeId={storeData.shop_id}
-                      saveRecomIntake={saveRecomIntake}
-                      recommendedIntake={storeData.recommendedIntake}
-                      recommendedIntakeData={recommendedIntakeData}
-                    />
-                  </td>
+                    Unit
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody
+                style={{
+                  width: "100%",
+                }}
+              >
+                {rows.map((elem, index) => (
+                  <tr
+                    style={{
+                      borderTop: "1px solid #E1E3E5",
+                      lineHeight: "50px",
+                    }}
+                    key={index}
+                  >
+                    {elem.name.length ? (
+                      <>
+                        <td style={{ verticalAlign: "top" }}>{elem.name}</td>
+                        <td style={{ verticalAlign: "top" }}>
+                          {elem.quantity || 0}
+                        </td>
+                        <td
+                          style={{ verticalAlign: "top", textAlign: "center" }}
+                        >
+                          {elem.unit || 0}
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td>New Reference</td>
+                      </>
+                    )}
+                    <td
+                      style={{
+                        textAlign: "end",
+                      }}
+                    >
+                      <Edit
+                        index={index}
+                        element={elem}
+                        handleChange={handleChange}
+                        handleDelete={handleDelete}
+                        storeId={storeData.shop_id}
+                        saveRecomIntake={saveRecomIntake}
+                        recommendedIntake={storeData.recommendedIntake}
+                        recommendedIntakeData={recommendedIntakeData}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       </Page>
     </div>

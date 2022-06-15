@@ -61,6 +61,34 @@ export async function createServer(
     }
   });
 
+  /** handle food products save */
+  app.post("/save_foodProducts", verifyRequest(app), async (req, res) => {
+    console.log(req.body);
+    res.status(200).send({ message: "updates saved!", success: true });
+  });
+
+  /***handle non food save  */
+
+  app.post("/save_non-food", verifyRequest(app), async (req, res) => {
+    const products = req.body.products;
+    const storeId = req.body.shop_id;
+    try {
+      let updateData;
+      for (var i = 0; i < products.length; i++) {
+        updateData = await Products.findOneAndUpdate(
+          { store_id: storeId, name: products[i] },
+          { food_product: false },
+          { returnOriginal: false }
+        );
+      }
+      if (updateData)
+        res.status(200).send({ message: "updates saved!", success: true });
+    } catch (err) {
+      res
+        .status(400)
+        .send({ message: "Something wrong happend!", success: false });
+    }
+  });
   /**
    * handle Language page changes
    */
