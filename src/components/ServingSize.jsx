@@ -36,7 +36,9 @@ function ServingSize({
   servingSize,
   handleServingSizeChange,
   locationPlan,
+  data,
 }) {
+  console.log(data);
   return (
     <div
       style={{
@@ -50,7 +52,11 @@ function ServingSize({
               <Stack.Item fill>
                 <TextField
                   label="Serving size"
-                  value={servingSize.CA.servingSizeBasic || ""}
+                  value={
+                    data.servingSize && data.servingSize.length
+                      ? data.servingSize.CA.servingSizeBasic
+                      : ""
+                  }
                   onChange={(e) =>
                     handleServingSizeChange(e, "CA", "servingSizeBasic")
                   }
@@ -59,7 +65,11 @@ function ServingSize({
               <Stack.Item>
                 <TextField
                   label="Serving reference"
-                  value={servingSize.CA.servingRefBasic || ""}
+                  value={
+                    servingSize && servingSize.length
+                      ? servingSize.CA.servingRefBasic
+                      : ""
+                  }
                   onChange={(e) =>
                     handleServingSizeChange(e, "CA", "servingRefBasic")
                   }
@@ -68,7 +78,11 @@ function ServingSize({
               <Stack.Item fill>
                 <TextField
                   label="Bilingual reference"
-                  value={servingSize.CA.bilingualRefBasic || ""}
+                  value={
+                    servingSize && servingSize.length
+                      ? servingSize.CA.bilingualRefBasic
+                      : ""
+                  }
                   onChange={(e) =>
                     handleServingSizeChange(e, "CA", "bilingualRefBasic")
                   }
@@ -76,7 +90,11 @@ function ServingSize({
               </Stack.Item>
               <Stack.Item>
                 <SelectElement
-                  val={servingSize.CA.unitBasic || ""}
+                  val={
+                    servingSize && servingSize.length
+                      ? servingSize.CA.unitBasic
+                      : ""
+                  }
                   handleServingSizeChange={handleServingSizeChange}
                   tag="CA"
                 />
@@ -89,17 +107,25 @@ function ServingSize({
             <Stack wrap={false}>
               <Stack.Item fill>
                 <TextField
-                  label="Default Amoount"
-                  value={servingSize.EU.DefaultAmoount || ""}
+                  label="Default Amount"
+                  value={
+                    data.servingSize && data.servingSize.length
+                      ? data.servingSize.EU.DefaultAmount
+                      : ""
+                  }
                   onChange={(e) =>
-                    handleServingSizeChange(e, "EU", "DefaultAmoount")
+                    handleServingSizeChange(e, "EU", "DefaultAmount")
                   }
                   disabled
                 />
               </Stack.Item>
               <Stack.Item>
                 <SelectElement
-                  val={servingSize.EU.DefaultAmoountUnit || ""}
+                  val={
+                    data.servingSize && data.servingSize.length
+                      ? data.servingSize.EU.DefaultAmountUnit
+                      : ""
+                  }
                   handleServingSizeChange={handleServingSizeChange}
                   tag="EU"
                 />
@@ -107,7 +133,11 @@ function ServingSize({
               <Stack.Item fill>
                 <TextField
                   label="Portion Size"
-                  value={servingSize.EU.PortionSize || ""}
+                  value={
+                    data.servingSize && data.servingSize.length
+                      ? data.servingSize.EU.PortionSize
+                      : ""
+                  }
                   onChange={(e) =>
                     handleServingSizeChange(e, "EU", "PortionSize")
                   }
@@ -116,7 +146,11 @@ function ServingSize({
               </Stack.Item>
               <Stack.Item>
                 <SelectElement
-                  val={servingSize.EU.PortionSizeUnit || ""}
+                  val={
+                    data.servingSize && data.servingSize.length
+                      ? data.servingSize.EU.PortionSizeUnit
+                      : ""
+                  }
                   handleServingSizeChange={handleServingSizeChange}
                   tag="EU"
                 />
@@ -131,7 +165,11 @@ function ServingSize({
               <Stack.Item fill>
                 <TextField
                   label="Servings per container"
-                  value={servingSize.NA.Servingspercontainer || ""}
+                  value={
+                    servingSize && servingSize.length > 0
+                      ? servingSize.NA.Servingspercontainer
+                      : ""
+                  }
                   onChange={(e) =>
                     handleServingSizeChange(e, "NA", "Servingspercontainer")
                   }
@@ -140,7 +178,11 @@ function ServingSize({
               <Stack.Item>
                 <TextField
                   label="Serving reference"
-                  value={servingSize.NA.Servingreference || ""}
+                  value={
+                    servingSize && servingSize.length > 0
+                      ? servingSize.NA.Servingreference
+                      : ""
+                  }
                   onChange={(e) =>
                     handleServingSizeChange(e, "NA", "Servingreference")
                   }
@@ -149,7 +191,11 @@ function ServingSize({
               <Stack.Item fill>
                 <TextField
                   label="serving size"
-                  value={servingSize.NA.servingsize || ""}
+                  value={
+                    servingSize && servingSize.length > 0
+                      ? servingSize.NA.servingsize
+                      : ""
+                  }
                   onChange={(e) =>
                     handleServingSizeChange(e, "NA", "servingsize")
                   }
@@ -157,7 +203,11 @@ function ServingSize({
               </Stack.Item>
               <Stack.Item>
                 <SelectElement
-                  val={servingSize.NA.unit || ""}
+                  val={
+                    servingSize && servingSize.length > 0
+                      ? servingSize.NA.unit
+                      : ""
+                  }
                   handleServingSizeChange={handleServingSizeChange}
                   tag="NA"
                 />
@@ -182,7 +232,11 @@ function ServingSize({
                     onChange={(e) =>
                       handleServingSizeChange(e, "NA", "UnpreparedReference")
                     }
-                    value={servingSize.NA.UnpreparedReference || ""}
+                    value={
+                      servingSize && servingSize.length
+                        ? servingSize.NA.UnpreparedReference
+                        : ""
+                    }
                   />
                 </Stack.Item>
                 <Stack.Item>
@@ -191,7 +245,11 @@ function ServingSize({
                     onChange={(e) =>
                       handleServingSizeChange(e, "NA", "Unpreparedcalories")
                     }
-                    value={servingSize.NA.Unpreparedcalories || ""}
+                    value={
+                      servingSize && servingSize.length
+                        ? servingSize.NA.Unpreparedcalories
+                        : ""
+                    }
                   />
                 </Stack.Item>
               </Stack>
@@ -202,7 +260,11 @@ function ServingSize({
                     onChange={(e) =>
                       handleServingSizeChange(e, "NA", "PreparedReference")
                     }
-                    value={servingSize.NA.PreparedReference || ""}
+                    value={
+                      servingSize && servingSize.length
+                        ? servingSize.NA.PreparedReference
+                        : ""
+                    }
                   />
                 </Stack.Item>
                 <Stack.Item>
@@ -211,7 +273,11 @@ function ServingSize({
                     onChange={(e) =>
                       handleServingSizeChange(e, "NA", "Preparedcalories")
                     }
-                    value={servingSize.NA.Preparedcalories || ""}
+                    value={
+                      servingSize && servingSize.length
+                        ? servingSize.NA.Preparedcalories
+                        : ""
+                    }
                   />
                 </Stack.Item>
               </Stack>

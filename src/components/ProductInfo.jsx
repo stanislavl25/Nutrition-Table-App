@@ -3,7 +3,6 @@ import {
   Card,
   Checkbox,
   Combobox,
-  Heading,
   Icon,
   Listbox,
   Select,
@@ -11,30 +10,25 @@ import {
   Subheading,
   Tag,
   TextContainer,
-  TextField,
   Tooltip,
 } from "@shopify/polaris";
 import React, { useCallback, useMemo, useState } from "react";
 import { CircleInformationMajor, SearchMinor } from "@shopify/polaris-icons";
-const newBadgeFormSet = {
-  name: "",
-};
+
 function ProductInfo({
   productToPrepare,
   handleproductToPrepare,
   handleNutriScoreCheckElem,
-  setNonFoodProduct,
   nonFoodProduct,
   handleNonFoodProduct,
   locationPlan,
-  badgesFormValue,
-  setBadgeFormValue,
   productsArray,
+  selectedOptions,
+  setSelectedOptions,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
   const [selected, setSelected] = useState("");
-  const [selectedOptions, setSelectedOptions] = useState([]);
   const handleMemo = () => {
     let array = [];
     if (productsArray.length === 0) return array;
@@ -100,6 +94,7 @@ function ProductInfo({
   ];
   const removeTag = useCallback(
     (tag) => () => {
+      console.log(tag);
       const options = [...selectedOptions];
       options.splice(options.indexOf(tag), 1);
       setSelectedOptions(options);

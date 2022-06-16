@@ -65,15 +65,15 @@ function TablePreview({ data, formValues, productToPrepare }) {
               </th>
               <td className="thtd td">
                 <div>
-                  <div>{data.energyKj || 0}</div>
-                  <div>{data.energyKcal || 0}</div>
+                  <div>{data && data.length ? data.energyKj : 0}</div>
+                  <div>{data && data.length ? data.energyKcal : 0}</div>
                 </div>
               </td>
               {productToPrepare ? (
                 <td className="thtd td">
                   <div>
-                    <div>{data.energyKj || 0}</div>
-                    <div>{data.energyKcal || 0}</div>
+                    <div>{data && data.length ? data.energyKj : 0}</div>
+                    <div>{data && data.length ? data.energyKcal : 0}</div>
                   </div>
                 </td>
               ) : (
@@ -81,7 +81,7 @@ function TablePreview({ data, formValues, productToPrepare }) {
               )}
 
               <td className="thtd td" style={{ borderRight: "none" }}>
-                {data.energyKcal || 8} %
+                {data && data.length ? data.energyKcal : 8} %
               </td>
             </tr>
 
@@ -113,7 +113,7 @@ function TablePreview({ data, formValues, productToPrepare }) {
           </tbody>
         </table>
         <div className="small-info topBorderThick">
-          <Markup content={data.notesText} />
+          <Markup content={data && data.length ? data.notesText : ""} />
         </div>
         <hr style={{ width: "100%", borderCollapse: "collapse" }} />
         <div className="Ingredients_container">
@@ -121,7 +121,7 @@ function TablePreview({ data, formValues, productToPrepare }) {
             <Heading>Ingredients</Heading>
           </div>
           <hr style={{ width: "100%" }} />
-          <Markup content={data.ingredientsText} />
+          <Markup content={data && data.length ? data.ingredientsText : ""} />
         </div>
         <hr />
         <div className="Allergy_information thin-end">
@@ -129,11 +129,11 @@ function TablePreview({ data, formValues, productToPrepare }) {
             <Heading>Allergy information</Heading>
           </div>
           <hr style={{ width: "100%" }} />
-          <Markup content={data.allergyInfoText} />
+          <Markup content={data && data.length ? data.allergyInfoText : ""} />
         </div>
         <hr />
         <div className="LEGAL_NOTICE">
-          <Markup content={data.lEGALNOTICEText} />
+          <Markup content={data && data.length ? data.lEGALNOTICEText : ""} />
         </div>
       </div>
     </Card>

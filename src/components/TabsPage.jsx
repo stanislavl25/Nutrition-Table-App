@@ -295,6 +295,88 @@ const recommendedIntakeRows = [
   { name: "Salt", quantity: "00", unit: "Grams" },
   { name: "Vitamin C", quantity: "00", unit: "Grams" },
 ];
+const vitaminsEU = [
+  {
+    name: "Vitamin C",
+    per100g: "14.81",
+    perportion: "4.5",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Grams",
+  },
+];
+const mineralsEU = [];
+const vitaminsNA = [
+  {
+    name: "Vitamin D",
+    quantity: "2",
+    dailyValue: "10",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Micrograms",
+  },
+];
+const mineralsNA = [
+  {
+    name: "Calcium",
+    quantity: "260",
+    dailyValue: "20",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Miligrams",
+  },
+  {
+    name: "Vitamin D",
+    quantity: "8",
+    dailyValue: "45",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Miligrams",
+  },
+  {
+    name: "Vitamin D",
+    quantity: "240",
+    dailyValue: "6",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Miligrams",
+  },
+];
+const vitaminsCA = [];
+const mineralsCA = [
+  {
+    name: "Potassium",
+    quantity: "450",
+    dailyValue: "10",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Miligrams",
+  },
+  {
+    name: "Calcium",
+    quantity: "30",
+    dailyValue: "2",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Miligrams",
+  },
+  {
+    name: "Iron / Fer",
+    quantity: "0",
+    dailyValue: "0",
+    LeftSpacing: "",
+    order: "",
+    RI: "",
+    unit: "Miligrams",
+  },
+];
 const order = formDataCA.length;
 const newFormSet = {
   name: "",
@@ -356,27 +438,26 @@ function TabsPage() {
 
   /*** get store location */
   const fetchLocations = async () => {
-    const data = await fetch("/locations").then((res) => res.json());
-    setlocationObj(data);
-    if (data.length) {
-      const countryCode = data[0].country_code;
-      if (countryCode.includes("US") || countryCode.includes("UM")) {
-        setLocation("NA");
-        console.log("NA");
+    try {
+      const data = await fetch("/locations").then((res) => res.json());
+      setlocationObj(data);
+      if (data.length) {
+        const countryCode = data[0].country_code;
+        if (countryCode.includes("US") || countryCode.includes("UM")) {
+          setLocation("NA");
+        }
+        if (countryCode.includes("CA")) {
+          setLocation("CA");
+        } else {
+          setLocation("EU");
+        }
       }
-      if (countryCode.includes("CA")) {
-        setLocation("CA");
-        console.log("CA");
-      } else {
-        setLocation("EU");
-        console.log("EU");
-      }
-    } else {
+    } catch (err) {
       //Todo
-      // setEmptyStore(true);
-      console.log("No location Provided!");
+      console.log(err);
     }
   };
+
   /*** get store products */
   const fetchProducts = async () => {
     try {
@@ -394,6 +475,21 @@ function TabsPage() {
               elem.richText.notesText =
                 "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
             }
+          }
+          if (elem.nutritionData && elem.nutritionData.length === 0) {
+            if (location === "CA") elem.nutritionData = formDataCA;
+            if (location === "NA") elem.nutritionData = formDataNA;
+            if (location === "EU") elem.nutritionData = formDataEU;
+          }
+          if (elem.vitamins && elem.vitamins.length === 0) {
+            if (location === "CA") elem.vitamins = vitaminsCA;
+            if (location === "NA") elem.vitamins = vitaminsNA;
+            if (location === "EU") elem.vitamins = vitaminsEU;
+          }
+          if (elem.minerals && elem.minerals.length === 0) {
+            if (location === "CA") elem.minerals = mineralsCA;
+            if (location === "NA") elem.minerals = mineralsNA;
+            if (location === "EU") elem.minerals = mineralsEU;
           }
         });
         setProductsArray(data);
@@ -425,14 +521,6 @@ function TabsPage() {
     }
   };
 
-  /**
-   * get language page data from server
-   */
-  const checkLocation = () => {
-    if (location === "CA") setFormData(formDataCA);
-    if (location === "NA") setFormData(formDataNA);
-    if (location === "EU") setFormData(formDataEU);
-  };
   const fetchLang = async () => {
     const data = await fetch("/LangData")
       .then((res) => res.json())
@@ -457,7 +545,6 @@ function TabsPage() {
     await fetchLocations();
     setTimeout(async () => {
       await fetchProducts();
-      await checkLocation();
     }, 500);
   }, []);
 
@@ -555,17 +642,16 @@ function TabsPage() {
       body: JSON.stringify({ products, shop_id: storeData.shop_id }),
     };
     try {
-      const data = await fetch("/save_foodProducts", fetchOptions)
-        .then((res) => res.json())
-        .then(async (response) => {
-          if (response.success) {
-            await fetchProducts();
-            setSelected(0);
-            setToastMessage(response.message);
-            toggleActive();
-          }
-          // handleSnackToggle(messages.message);
-        });
+      // const data = await fetch("/save_foodProducts", fetchOptions)
+      //   .then((res) => res.json())
+      //   .then(async (response) => {
+      //     if (response.success) {
+      //       await fetchProducts();
+      //       setSelected(0);
+      //       setToastMessage(response.message);
+      //       toggleActive();
+      //     }
+      //    });
     } catch (err) {
       console.log(err);
     }
@@ -630,7 +716,6 @@ function TabsPage() {
         <CreateLabel
           langState={langState}
           newFormSet={newFormSet}
-          formData={formData}
           location={location}
           setLocation={setLocation}
           selectedProducts={selectedProducts}

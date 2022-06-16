@@ -27,16 +27,14 @@ const formLables = {
 function CreateLabel({
   langState,
   newFormSet,
-  formData,
   location,
-  setLocation,
   selectedProducts,
   handleTabChange,
   productsArray,
   handleSaveSelectedProducts,
 }) {
-  const [productExist, setProductExist] = useState(false);
-  const [data, setData] = useState({
+  const [data, setData] = useState({});
+  const [defaultData, setDefaultData] = useState({
     richText: {
       ingredientsText:
         "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
@@ -55,8 +53,8 @@ function CreateLabel({
         caloriesPerServingBasic: "110",
       },
       EU: {
-        DefaultAmoount: "100",
-        DefaultAmoountUnit: "Grams",
+        DefaultAmount: "100",
+        DefaultAmountUnit: "Grams",
         PortionSize: "25",
         PortionSizeUnit: "Grams",
       },
@@ -73,23 +71,13 @@ function CreateLabel({
       },
     },
   });
-
   const [locationPlan, setLocationPlan] = useState({
     location: location,
     plan: "Advanced",
   });
-  const handleLocation = (newlocation) => {
-    setLocation(newlocation);
-  };
-  const handlePlan = (newPlan) => {
-    let newData = { ...locationPlan };
-    locationPlan["plan"] = newPlan;
-    setLocationPlan(newData);
-  };
 
-  const [formValues, setFormValues] = useState(formData);
-  const [badgesFormValue, setBadgeFormValue] = useState([]);
-
+  const [formValues, setFormValues] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState(selectedProducts);
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [nonFoodProduct, setNonFoodProduct] = useState(false);
   const [rightSideWidth, setRightSideWidth] = useState("35%");
@@ -120,97 +108,60 @@ function CreateLabel({
       setFormValues(newFormValues);
     }
   };
-  const SetBasicPlanEUPerPortion = () => {
-    if (locationPlan.plan === "Basic") {
-      for (var i = 0; i < formValues.length; i++) {
-        let newFormValues = [...formValues];
-        newFormValues[i]["perportion"] = "";
-        setFormValues(newFormValues);
-      }
-    }
-  };
+
   const handleSelectedProducts = () => {
-    let newBadges = [];
-    productsArray.forEach((element) => {
-      if (selectedProducts) {
-        if (selectedProducts.includes(element._id)) {
-          newBadges.push(element);
-        }
-      }
-    });
-    setBadgeFormValue(newBadges);
     if (selectedProducts && selectedProducts.length > 0) {
       for (var i = 0; i < productsArray.length; i++) {
-        if (selectedProducts.includes(productsArray[i]._id)) {
+        if (selectedProducts.includes(productsArray[i].name)) {
           setData(productsArray[i]);
           return;
         }
       }
     }
-    console.log("!selectedProducts");
-    if (!selectedProducts) {
-      console.log("no products");
-      if (location === "CA") {
-        const valueCA =
-          "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong>   *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
-        let newData = { ...data };
-        newData["richText"]["notesText"] = valueCA;
-        setData(newData);
-        return;
-      }
-      if (location === "NA") {
-        const valueNA =
-          "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
-        let newData = { ...data };
-        newData["richText"]["notesText"] = valueNA;
-        setData(newData);
-        return;
-      }
-      if (location === "EU") {
-        const valueEU =
-          "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
-        let newData = { ...data };
-        newData["richText"]["notesText"] = valueEU;
-        setData(newData);
-        return;
-      }
-    }
   };
+
   useEffect(() => {
     handleSelectedProducts();
     handleOrderSet();
-    SetBasicPlanEUPerPortion();
-  }, []);
+  }, [productsArray, selectedProducts, data]);
+
   const handleOrderChange = (toIndex, prevIndex) => {
     const element = formValues.splice(prevIndex, 1)[0];
     formValues.splice(toIndex, 0, element);
     console.log(formValues);
   };
+
   const handleNutriScoreCheckElem = (newState) => {
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
     console.log(newState);
   };
+
   const handleServingSizeChange = useCallback((value, tag, name) => {
     let newData = { ...data };
     newData["servingSize"][tag][name] = value;
     setData(newData), [];
   });
+
   const handleproductToPrepare = useCallback(
     (newChecked) => setProductToPrepare(newChecked),
     []
   );
+
   const handleNonFoodProduct = useCallback(
     (newChecked) => setNonFoodProduct(newChecked),
     []
   );
+
   const handleIngredientsTextChange = async (e, editor) => {
     const editedText = await editor.getData();
     setData((prevState) => ({ ...prevState, ingredientsText: editedText }));
   };
+
   const handleAllergyInfoTextChange = (e, editor) => {
     const editedText = editor.getData();
     setData((prevState) => ({ ...prevState, allergyInfoText: editedText }));
   };
+
   const handleLEGALNOTICETextChange = (e, editor) => {
     const editedText = editor.getData();
     setData((prevState) => ({
@@ -218,18 +169,18 @@ function CreateLabel({
       lEGALNOTICEText: editedText,
     }));
   };
+
   const handleNotesTextChange = async (e, editor) => {
     const editedText = await editor.getData();
     setData((prevState) => ({ ...prevState, notesText: editedText }));
   };
+
   return (
     <Page
       title="Create Label"
       primaryAction={{
         content: "Save Label",
         onAction: () => {
-          console.log("clicked");
-          // todo save
           handleSaveSelectedProducts(selectedProducts, nonFoodProduct, data);
         },
       }}
@@ -259,9 +210,9 @@ function CreateLabel({
             handleNonFoodProduct={handleNonFoodProduct}
             handleNutriScoreCheckElem={handleNutriScoreCheckElem}
             locationPlan={locationPlan}
-            badgesFormValue={badgesFormValue}
-            setBadgeFormValue={setBadgeFormValue}
             productsArray={productsArray}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
           />
           {nonFoodProduct ? (
             <Card sectioned>
@@ -288,9 +239,14 @@ function CreateLabel({
             <div>
               <ServingSize
                 productToPrepare={productToPrepare}
-                servingSize={data.servingSize}
+                servingSize={
+                  data && data.length > 0
+                    ? data.servingSize
+                    : defaultData.servingSize
+                }
                 handleServingSizeChange={handleServingSizeChange}
                 locationPlan={locationPlan}
+                data={data}
               />
               {locationPlan.location === "EU" ? <CalsEnergyInfos /> : <></>}
 
@@ -310,27 +266,39 @@ function CreateLabel({
                 <BasicVitaminsMineralsPage />
               ) : (
                 <>
-                  <Vitamins />
-                  <Minerals />
+                  <Vitamins
+                    data={data && data.length > 0 ? data.vitamins : []}
+                  />
+                  <Minerals
+                    data={data && data.length > 0 ? data.minerals : []}
+                  />
                 </>
               )}
               <Notes
-                notesText={data.richText.notesText}
+                notesText={
+                  data && data.length > 0 ? data.richText.notesText : ""
+                }
                 handleTextChange={handleNotesTextChange}
               />
               <Ingredients
                 data={langState.values.Ingredients}
-                ingredientsText={data.richText.ingredientsText}
+                ingredientsText={
+                  data && data.length > 0 ? data.richText.ingredientsText : ""
+                }
                 handleTextChange={handleIngredientsTextChange}
               />
               <AllergyInfo
                 data={langState.values.AllergyInformation}
-                allergyInfoText={data.richText.allergyInfoText}
+                allergyInfoText={
+                  data && data.length > 0 ? data.richText.allergyInfoText : ""
+                }
                 handleTextChange={handleAllergyInfoTextChange}
               />
               <LegalNotes
                 data={langState.values.LEGALNOTICE}
-                lEGALNOTICEText={data.richText.lEGALNOTICEText}
+                lEGALNOTICEText={
+                  data && data.length > 0 ? data.richText.lEGALNOTICEText : ""
+                }
                 handleTextChange={handleLEGALNOTICETextChange}
               />
             </div>

@@ -43,8 +43,8 @@ const productSchema = new Schema(
         caloriesPerServingBasic: { type: String, default: "110" },
       },
       EU: {
-        DefaultAmoount: { type: String, default: "100" },
-        DefaultAmoountUnit: { type: String, default: "Grams" },
+        DefaultAmount: { type: String, default: "100" },
+        DefaultAmountUnit: { type: String, default: "Grams" },
         PortionSize: { type: String, default: "25" },
         PortionSizeUnit: { type: String, default: "Grams" },
       },
@@ -62,6 +62,7 @@ const productSchema = new Schema(
     },
     minerals: [],
     vitamins: [],
+    nutritionData: [],
   },
   {
     timestamps: true,

@@ -1,27 +1,18 @@
 import {
-  ActionList,
   Button,
-  Card,
-  Filters,
   IndexTable,
   Select,
   Spinner,
-  TextField,
   TextStyle,
   Thumbnail,
   useIndexResourceState,
-  Stack,
   FormLayout,
   Popover,
-  ChoiceList,
-  RangeSlider,
   Combobox,
   Listbox,
   Icon,
-  TextContainer,
-  Tag,
 } from "@shopify/polaris";
-import { Toast, useAppBridge } from "@shopify/app-bridge-react";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../App";
 import React, { useCallback, useMemo, useState } from "react";
 import { SearchMinor } from "@shopify/polaris-icons";
@@ -51,7 +42,6 @@ const PopOverElem = ({ index, productId, removeFormFields }) => {
       body: JSON.stringify({ productId }),
     };
     removeFormFields(index);
-    console.log(productId, index);
     const data = await fetch("/product_delete", fetchOptions)
       .then((res) => res.text())
       .then((messages) => {
@@ -99,7 +89,6 @@ function MyLablesTable({
     useIndexResourceState(productsArray, {
       resourceIDResolver,
     });
-  const [selectedOptions, setSelectedOptions] = useState([]);
   const [sortValue, setSortValue] = useState("");
   const [inputValue, setInputValue] = useState("");
   const handleMemo = () => {
@@ -134,13 +123,16 @@ function MyLablesTable({
   );
   const updateSelection = useCallback(
     (selected) => {
-      console.log(selected);
-      if (selectedOptions.includes(selected)) {
-        setSelectedOptions(
-          selectedOptions.filter((option) => option !== selected)
+      if (selectedResources.includes(selected)) {
+        const updatedSelectedResources = selectedResources.filter(
+          (option) => option !== selected
         );
+        selectedResources.splice(0, selectedResources.length);
+        updatedSelectedResources.forEach((elem) => {
+          selectedResources.push(elem);
+        });
       } else {
-        setSelectedOptions([...selectedOptions, selected]);
+        selectedResources.push(selected);
       }
 
       const matchedOption = memoOptions.find((option) => {
@@ -149,15 +141,7 @@ function MyLablesTable({
 
       updateText("");
     },
-    [memoOptions, selectedOptions]
-  );
-  const removeTag = useCallback(
-    (tag) => () => {
-      const options = [...selectedOptions];
-      options.splice(options.indexOf(tag), 1);
-      setSelectedOptions(options);
-    },
-    [selectedOptions]
+    [memoOptions, selectedResources]
   );
 
   const optionsMarkup =
@@ -168,7 +152,7 @@ function MyLablesTable({
             <Listbox.Option
               key={`${value}`}
               value={value}
-              selected={selectedOptions.includes(value)}
+              selected={selectedResources.includes(value)}
               accessibilityLabel={label}
             >
               {label}
@@ -176,21 +160,19 @@ function MyLablesTable({
           );
         })
       : null;
-  const tagsMarkup = selectedOptions.map((option) => (
-    <Tag key={`option-${option}`} onRemove={removeTag(option)}>
-      {option}
-    </Tag>
-  ));
 
-  const handleSortChange = useCallback((value) => {
-    setSortValue(value);
-    selectedOptions.splice(0, selectedOptions.length);
-    for (var i = 0; i < productsArray.length; i++) {
-      if (productsArray[i].product_type === value) {
-        selectedOptions.push(productsArray[i].name);
-      }
-    }
-  }, []);
+  const handleSortChange = useCallback(
+    (value) => {
+      setSortValue(value);
+      selectedResources.splice(0, selectedResources.length);
+      productsArray.forEach((elem) => {
+        if (elem.product_type.includes(value)) {
+          selectedResources.push(elem.name);
+        }
+      });
+    },
+    [selectedResources, productsArray]
+  );
   let removeFormFields = (i) => {
     let newproductsValues = [...productsArray];
     newproductsValues.splice(i, 1);
@@ -198,8 +180,8 @@ function MyLablesTable({
   };
   const handleBulkDelete = () => {
     productsArray.forEach((element, index) => {
-      console.log(selectedOptions.includes(element.name));
-      if (selectedOptions.includes(element.name)) {
+      console.log(selectedResources.includes(element.name));
+      if (selectedResources.includes(element.name)) {
         removeFormFields(index);
       }
     });
@@ -209,7 +191,7 @@ function MyLablesTable({
   const promotedBulkActions = [
     {
       content: "Edit Labels",
-      onAction: () => handleSelectedProducts(selectedOptions),
+      onAction: () => handleSelectedProducts(selectedResources),
     },
     {
       title: "More actions",
@@ -225,7 +207,6 @@ function MyLablesTable({
       ],
     },
   ];
-  console.log(productsArray);
   const rowMarkup =
     productsArray !== "none" ? (
       productsArray.map(
@@ -244,9 +225,9 @@ function MyLablesTable({
           index
         ) => (
           <IndexTable.Row
-            id={_id}
+            id={name}
             key={_id}
-            selected={selectedOptions.includes(name)}
+            selected={selectedResources.includes(name)}
             position={index}
           >
             <IndexTable.Cell>
@@ -324,11 +305,6 @@ function MyLablesTable({
                   <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
                 ) : null}
               </Combobox>
-              <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                <TextContainer>
-                  <Stack>{tagsMarkup}</Stack>
-                </TextContainer>
-              </div>
             </div>
             <div
               style={{
@@ -342,7 +318,7 @@ function MyLablesTable({
                 label="Categories"
                 options={categorieOptions}
                 value={sortValue}
-                onChange={handleSortChange}
+                onChange={(e) => handleSortChange(e)}
               />
             </div>
           </div>
@@ -350,10 +326,12 @@ function MyLablesTable({
           <IndexTable
             resourceName={resourceName}
             itemCount={productsArray.length}
-            selectedItemsCount={selectedOptions.length}
+            selectedItemsCount={
+              allResourcesSelected ? "All" : selectedResources.length
+            }
             bulkActions={bulkActions}
             promotedBulkActions={promotedBulkActions}
-            onSelectionChange={(e) => updateSelection(e)}
+            onSelectionChange={handleSelectionChange}
             headings={[
               { title: "" },
               { title: "Products" },
