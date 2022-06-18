@@ -32,45 +32,10 @@ function CreateLabel({
   handleTabChange,
   productsArray,
   handleSaveSelectedProducts,
+  data,
+  setData,
+  defaultSet,
 }) {
-  const [data, setData] = useState({});
-  const [defaultData, setDefaultData] = useState({
-    richText: {
-      ingredientsText:
-        "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
-      allergyInfoText:
-        "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
-      lEGALNOTICEText:
-        "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
-      nutriScore: "",
-    },
-    servingSize: {
-      CA: {
-        servingSizeBasic: "250",
-        servingRefBasic: "per 1 cup",
-        bilingualRefBasic: "pour 1 tasse",
-        unitBasic: "Milliliters",
-        caloriesPerServingBasic: "110",
-      },
-      EU: {
-        DefaultAmount: "100",
-        DefaultAmountUnit: "Grams",
-        PortionSize: "25",
-        PortionSizeUnit: "Grams",
-      },
-      NA: {
-        Servingspercontainer: "8",
-        Servingreference: "2/3 cup",
-        servingsize: "55",
-        unit: "Grams",
-        Caloriesperserving: "230",
-        UnpreparedReference: "Per 2/3 cup",
-        Unpreparedcalories: "140",
-        PreparedReference: "As prepared",
-        Preparedcalories: "230",
-      },
-    },
-  });
   const [locationPlan, setLocationPlan] = useState({
     location: location,
     plan: "Advanced",
@@ -109,19 +74,7 @@ function CreateLabel({
     }
   };
 
-  const handleSelectedProducts = () => {
-    if (selectedProducts && selectedProducts.length > 0) {
-      for (var i = 0; i < productsArray.length; i++) {
-        if (selectedProducts.includes(productsArray[i].name)) {
-          setData(productsArray[i]);
-          return;
-        }
-      }
-    }
-  };
-
   useEffect(() => {
-    handleSelectedProducts();
     handleOrderSet();
   }, [productsArray, selectedProducts, data]);
 
@@ -154,25 +107,30 @@ function CreateLabel({
 
   const handleIngredientsTextChange = async (e, editor) => {
     const editedText = await editor.getData();
-    setData((prevState) => ({ ...prevState, ingredientsText: editedText }));
+    let newData = { ...data };
+    newData["richText"]["ingredientsText"] = editedText;
+    setData(newData);
   };
 
-  const handleAllergyInfoTextChange = (e, editor) => {
-    const editedText = editor.getData();
-    setData((prevState) => ({ ...prevState, allergyInfoText: editedText }));
+  const handleAllergyInfoTextChange = async (e, editor) => {
+    const editedText = await editor.getData();
+    let newData = { ...data };
+    newData["richText"]["allergyInfoText"] = editedText;
+    setData(newData);
   };
 
-  const handleLEGALNOTICETextChange = (e, editor) => {
-    const editedText = editor.getData();
-    setData((prevState) => ({
-      ...prevState,
-      lEGALNOTICEText: editedText,
-    }));
+  const handleLEGALNOTICETextChange = async (e, editor) => {
+    const editedText = await editor.getData();
+    let newData = { ...data };
+    newData["richText"]["lEGALNOTICEText"] = editedText;
+    setData(newData);
   };
 
   const handleNotesTextChange = async (e, editor) => {
     const editedText = await editor.getData();
-    setData((prevState) => ({ ...prevState, notesText: editedText }));
+    let newData = { ...data };
+    newData["richText"]["notesText"] = editedText;
+    setData(newData);
   };
 
   return (
@@ -213,6 +171,7 @@ function CreateLabel({
             productsArray={productsArray}
             selectedOptions={selectedOptions}
             setSelectedOptions={setSelectedOptions}
+            defaultSet={defaultSet}
           />
           {nonFoodProduct ? (
             <Card sectioned>
@@ -239,11 +198,7 @@ function CreateLabel({
             <div>
               <ServingSize
                 productToPrepare={productToPrepare}
-                servingSize={
-                  data && data.length > 0
-                    ? data.servingSize
-                    : defaultData.servingSize
-                }
+                servingSize={data.servingSize}
                 handleServingSizeChange={handleServingSizeChange}
                 locationPlan={locationPlan}
                 data={data}
@@ -261,44 +216,41 @@ function CreateLabel({
                     ? formLables.formLablesEU
                     : formLables.formLablesCA_NA
                 }
+                data={data}
               />
-              {locationPlan.plan === "Basic" ? (
-                <BasicVitaminsMineralsPage />
+              {locationPlan.plan === "Basic" && location === "EU" ? (
+                <BasicVitaminsMineralsPage handleTabChange={handleTabChange} />
               ) : (
                 <>
                   <Vitamins
-                    data={data && data.length > 0 ? data.vitamins : []}
+                    data={data.vitamins}
+                    defaultSet={defaultSet}
+                    locationPlan={locationPlan}
                   />
                   <Minerals
-                    data={data && data.length > 0 ? data.minerals : []}
+                    data={data.minerals}
+                    defaultSet={defaultSet}
+                    locationPlan={locationPlan}
                   />
                 </>
               )}
               <Notes
-                notesText={
-                  data && data.length > 0 ? data.richText.notesText : ""
-                }
+                notesText={data.richText.notesText}
                 handleTextChange={handleNotesTextChange}
               />
               <Ingredients
                 data={langState.values.Ingredients}
-                ingredientsText={
-                  data && data.length > 0 ? data.richText.ingredientsText : ""
-                }
+                ingredientsText={data.richText.ingredientsText}
                 handleTextChange={handleIngredientsTextChange}
               />
               <AllergyInfo
                 data={langState.values.AllergyInformation}
-                allergyInfoText={
-                  data && data.length > 0 ? data.richText.allergyInfoText : ""
-                }
+                allergyInfoText={data.richText.allergyInfoText}
                 handleTextChange={handleAllergyInfoTextChange}
               />
               <LegalNotes
                 data={langState.values.LEGALNOTICE}
-                lEGALNOTICEText={
-                  data && data.length > 0 ? data.richText.lEGALNOTICEText : ""
-                }
+                lEGALNOTICEText={data.richText.lEGALNOTICEText}
                 handleTextChange={handleLEGALNOTICETextChange}
               />
             </div>

@@ -110,6 +110,7 @@ function NutritionInfo({
   handleOrderChange,
   newFormSet,
   locationPlan,
+  data,
 }) {
   let addFormFields = () => {
     setFormValues([...formValues, newFormSet]);
@@ -213,63 +214,69 @@ function NutritionInfo({
               />
 
               <div style={{ padding: "0px 20px 20px 20px", width: "100%" }}>
-                {formValues.map((element, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      marginTop: "20px",
-                    }}
-                  >
-                    <div style={{ maxWidth: "200px", marginRight: "20px" }}>
-                      <TextField
-                        value={element.name}
-                        name="Name"
-                        onChange={(e) => handleChange(e, "name", index)}
-                        label=""
-                        autoComplete="off"
-                      />
-                    </div>
-                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                      <TextField
-                        value={element.per100g || 0}
-                        name="Per100g"
-                        onChange={(e) => handleChange(e, "per100g", index)}
-                        inputMode="number"
-                        autoComplete="off"
-                      />
-                    </div>
-                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                      <TextField
-                        value={element.perportion || 0}
-                        name="Perportion"
-                        onChange={(e) => handleChange(e, "perportion", index)}
-                        autoComplete="off"
-                        inputMode="number"
-                        disabled={locationPlan.plan === "Basic" ? true : false}
-                      />
-                    </div>
+                {data.nutritionData && data.nutritionData.length > 0 ? (
+                  data.nutritionData.map((element, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        marginTop: "20px",
+                      }}
+                    >
+                      <div style={{ maxWidth: "200px", marginRight: "20px" }}>
+                        <TextField
+                          value={element.name}
+                          name="Name"
+                          onChange={(e) => handleChange(e, "name", index)}
+                          label=""
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                        <TextField
+                          value={element.per100g || 0}
+                          name="Per100g"
+                          onChange={(e) => handleChange(e, "per100g", index)}
+                          inputMode="number"
+                          autoComplete="off"
+                        />
+                      </div>
+                      <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                        <TextField
+                          value={element.perportion || 0}
+                          name="Perportion"
+                          onChange={(e) => handleChange(e, "perportion", index)}
+                          autoComplete="off"
+                          inputMode="number"
+                          disabled={
+                            locationPlan.plan === "Basic" ? true : false
+                          }
+                        />
+                      </div>
 
-                    <div style={{ maxWidth: "75px", marginRight: "20px" }}>
-                      <Select
-                        value={element.unit}
-                        onChange={(e) => handleChange(e, "unit", index)}
-                        options={options}
-                        name="unit"
-                      />
-                    </div>
+                      <div style={{ maxWidth: "75px", marginRight: "20px" }}>
+                        <Select
+                          value={element.unit}
+                          onChange={(e) => handleChange(e, "unit", index)}
+                          options={options}
+                          name="unit"
+                        />
+                      </div>
 
-                    <div style={{ maxWidth: "100px" }}>
-                      <PopOverComponent
-                        element={element}
-                        handleChange={handleChange}
-                        removeFormFields={removeFormFields}
-                        index={index}
-                      />
+                      <div style={{ maxWidth: "100px" }}>
+                        <PopOverComponent
+                          element={element}
+                          handleChange={handleChange}
+                          removeFormFields={removeFormFields}
+                          index={index}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <></>
+                )}
               </div>
             </form>
           </div>

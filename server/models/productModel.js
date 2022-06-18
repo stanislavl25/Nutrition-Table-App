@@ -41,6 +41,15 @@ const productSchema = new Schema(
         bilingualRefBasic: { type: String, default: "pour 1 tasse" },
         unitBasic: { type: String, default: "Milliliters" },
         caloriesPerServingBasic: { type: String, default: "110" },
+        unpreparedReference: { type: String, default: "As sold" },
+        unpreparedBilingualReference: {
+          type: String,
+          default: "Tel que vendu",
+        },
+        unpreparedCalories: { type: String, default: "110" },
+        preparedReference: { type: String, default: "Prepared" },
+        preparedBilingualReference: { type: String, default: "préparé" },
+        preparedCalories: { type: String, default: "70" },
       },
       EU: {
         DefaultAmount: { type: String, default: "100" },

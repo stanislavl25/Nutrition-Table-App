@@ -11,54 +11,67 @@ import React from "react";
 import star from "../assets/nta_star_for_plan_banner.png";
 
 const formLables = ["Name", "Per 100 g", "Per portion 25 g", "Unit"];
-function BasicVitaminsMineralsPage() {
+function BasicVitaminsMineralsPage({ handleTabChange }) {
   return (
     <div>
       <div
         style={{
           position: "absolute",
-          width: "100%",
-          height: "100%",
-          zIndex: "1000000000000000",
           display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "5px",
+          zIndex: "1000000000000000000000",
+          alignSelf: "center",
+          width: "60%",
         }}
       >
         <div
           style={{
-            marginLeft: "190px",
-            marginTop: "80px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: "50px",
           }}
         >
-          <div style={{ marginLeft: "190px" }}>
-            <img
-              src={star}
-              alt=""
-              style={{
-                width: "40px",
-                height: "40px",
-                marginRight: "4px",
-              }}
-            />
-          </div>
-          <div style={{ display: "block", marginLeft: "5px" }}>
-            <TextStyle>
-              Customize your Label, add Vitamins and Minerals, and more!
-            </TextStyle>
-          </div>
-          <div style={{ display: "block" }}>
-            <TextStyle variation="strong">
-              Take advantage of the priceless benefits of the Advanced Plan.
-            </TextStyle>
-          </div>
-          <div style={{ marginLeft: "115px", marginTop: "10px" }}>
-            <Button primary>Get the Advanced plan</Button>
-          </div>
+          <img
+            src={star}
+            alt=""
+            style={{
+              width: "40px",
+              height: "40px",
+            }}
+          />
+        </div>
+        <div style={{ display: "block", marginLeft: "5px" }}>
+          <TextStyle>
+            Customize your Label, add Vitamins and Minerals, and more!
+          </TextStyle>
+        </div>
+        <div style={{ display: "block" }}>
+          <TextStyle variation="strong">
+            Take advantage of the priceless benefits of the Advanced Plan.
+          </TextStyle>
+        </div>
+        <div>
+          <Button
+            primary
+            onClick={() => {
+              handleTabChange(5);
+            }}
+          >
+            Get the Advanced plan
+          </Button>
         </div>
       </div>
       <div
         style={{
           filter: "blur(2px)",
           marginBottom: "20px",
+          zIndex: "1",
+          position: "relative",
         }}
       >
         <Card>

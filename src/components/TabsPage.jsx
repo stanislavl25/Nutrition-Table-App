@@ -403,7 +403,6 @@ function TabsPage() {
   );
   const [productsArray, setProductsArray] = useState();
   const [location, setLocation] = useState("");
-  const [formData, setFormData] = useState([]);
   const [locationObj, setlocationObj] = useState({});
   const [emptyStore, setEmptyStore] = useState(false);
   const [checkPlan, setCheckPlan] = useState(true);
@@ -411,9 +410,58 @@ function TabsPage() {
   const [storeData, setStoreData] = useState([]);
   const [active, setActive] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [defaultSet, setDefaultSet] = useState(false);
   const [recommendedIntakeData, setRecommendedIntakeData] = useState(
     storeData.recommendedIntake
   );
+  const [arraydata, setArrayData] = useState({});
+  const [defaultData, setDefaultData] = useState({
+    richText: {
+      ingredientsText:
+        "<p>Mandarin Oranges (37.9%), Light Whipping Cream (<strong>Milk</strong>), Peras (12.4%), Peaches (7.7%), Thompson Seedles Grapes (7.6%), Apple (7.5%), Banana (5.9%), English Walnuts (<strong>Tree Nuts</strong>)</p>",
+      allergyInfoText:
+        "<p>Contains Wheat, Almond, Peanut, Soy, and Milk, It May contain other tree nuts.</p>",
+      lEGALNOTICEText:
+        "<p><strong>*LEGAL NOTICE </strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam.</p>",
+      nutriScore: "",
+    },
+    servingSize: {
+      CA: {
+        servingSizeBasic: "250",
+        servingRefBasic: "per 1 cup",
+        bilingualRefBasic: "pour 1 tasse",
+        unitBasic: "Milliliters",
+        caloriesPerServingBasic: "110",
+        unpreparedReference: "As sold",
+        unpreparedBilingualReference: "Tel que vendu",
+        unpreparedCalories: "110",
+        preparedReference: "Prepared",
+        preparedBilingualReference: "préparé",
+        preparedCalories: "70",
+      },
+      EU: {
+        DefaultAmount: "100",
+        DefaultAmountUnit: "Grams",
+        PortionSize: "25",
+        PortionSizeUnit: "Grams",
+      },
+      NA: {
+        Servingspercontainer: "8",
+        Servingreference: "2/3 cup",
+        servingsize: "55",
+        unit: "Grams",
+        Caloriesperserving: "230",
+        UnpreparedReference: "Per 2/3 cup",
+        Unpreparedcalories: "140",
+        PreparedReference: "As prepared",
+        Preparedcalories: "230",
+      },
+    },
+    minerals: [],
+    nutritionData: [],
+    vitamins: [],
+  });
+
   const toggleActive = useCallback(() => setActive((active) => !active), []);
 
   // ! fix recommended intake late update for useState
@@ -458,12 +506,36 @@ function TabsPage() {
     }
   };
 
-  /*** get store products */
+  const handleSettingDefaultData = () => {
+    if (location === "CA") {
+      defaultData.nutritionData = formDataCA;
+      defaultData.richText.notesText =
+        "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
+      defaultData.minerals = mineralsCA;
+      defaultData.vitamins = vitaminsCA;
+    }
+    if (location === "NA") {
+      defaultData.nutritionData = formDataNA;
+      defaultData.richText.notesText =
+        "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
+      defaultData.minerals = mineralsNA;
+      defaultData.vitamins = vitaminsNA;
+    }
+    if (location === "EU") {
+      defaultData.nutritionData = formDataEU;
+      defaultData.richText.notesText =
+        "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
+      defaultData.minerals = mineralsEU;
+      defaultData.vitamins = vitaminsEU;
+    }
+  };
+
+  /*** get store products and check if some primary elements empty */
   const fetchProducts = async () => {
     try {
       const data = await fetch("products-list").then((res) => res.json());
       if (data.length) {
-        data.forEach((elem) => {
+        await data.forEach((elem) => {
           if (elem.richText.notesText === undefined) {
             if (location === "EU")
               elem.richText.notesText =
@@ -476,23 +548,25 @@ function TabsPage() {
                 "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
             }
           }
-          if (elem.nutritionData && elem.nutritionData.length === 0) {
+          if (!elem.nutritionData?.length > 0) {
             if (location === "CA") elem.nutritionData = formDataCA;
             if (location === "NA") elem.nutritionData = formDataNA;
             if (location === "EU") elem.nutritionData = formDataEU;
           }
-          if (elem.vitamins && elem.vitamins.length === 0) {
+          if (!elem.vitamins?.length > 0) {
             if (location === "CA") elem.vitamins = vitaminsCA;
             if (location === "NA") elem.vitamins = vitaminsNA;
             if (location === "EU") elem.vitamins = vitaminsEU;
           }
-          if (elem.minerals && elem.minerals.length === 0) {
+          if (!elem.minerals?.length > 0) {
             if (location === "CA") elem.minerals = mineralsCA;
             if (location === "NA") elem.minerals = mineralsNA;
             if (location === "EU") elem.minerals = mineralsEU;
           }
         });
         setProductsArray(data);
+        setArrayData(defaultData);
+        setDefaultSet(true);
         var array = [];
         var uniqueValues = [];
         const handlecategories = (element) => {
@@ -540,9 +614,10 @@ function TabsPage() {
   };
   // todo clean up after the use effect
   useEffect(async () => {
-    fetchLang();
-    await saveProductsGetStoreData();
     await fetchLocations();
+    await saveProductsGetStoreData();
+    await fetchLang();
+    handleSettingDefaultData();
     setTimeout(async () => {
       await fetchProducts();
     }, 500);
@@ -592,7 +667,7 @@ function TabsPage() {
       const data = await fetch("/LangFieldsSave", fetchOptions)
         .then((res) => res.json())
         .then((response) => {
-          console.log(response);
+          console.log(response, "translation data");
           // handleSnackToggle(messages.message);
         })
         .catch((err) => {
@@ -631,7 +706,7 @@ function TabsPage() {
   };
   /** saving food products */
   const handleSaveProducts = async (products) => {
-    console.log(products);
+    console.log(products, "handle save");
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -672,8 +747,25 @@ function TabsPage() {
   };
 
   const handleSelectedProducts = (selectedPro) => {
-    setSelected(1);
-    setSelectedProducts(selectedPro);
+    if (selectedPro && selectedPro.length > 0) {
+      setSelectedProducts(selectedPro);
+      const products = productsArray;
+      setProductsArray("none");
+      setDefaultSet(false);
+      setTimeout(() => {
+        setProductsArray(products);
+        setSelected(1);
+      }, 300);
+      for (var i = 0; i < productsArray.length; i++) {
+        if (selectedPro.includes(productsArray[i].name)) {
+          setArrayData(productsArray[i]);
+          return;
+        }
+      }
+    } else {
+      setToastMessage("No products selected");
+      toggleActive();
+    }
   };
   const handleEditProduct = (id) => {
     setSelected(1);
@@ -722,6 +814,9 @@ function TabsPage() {
           handleTabChange={handleTabChange}
           productsArray={productsArray}
           handleSaveSelectedProducts={handleSaveSelectedProducts}
+          data={arraydata}
+          setData={setArrayData}
+          defaultSet={defaultSet}
         />
       ),
     },

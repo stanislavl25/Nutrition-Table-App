@@ -1,4 +1,5 @@
 import {
+  Banner,
   Button,
   Card,
   Checkbox,
@@ -25,6 +26,7 @@ function ProductInfo({
   productsArray,
   selectedOptions,
   setSelectedOptions,
+  defaultSet,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
@@ -59,7 +61,7 @@ function ProductInfo({
   );
   const updateSelection = useCallback(
     (selected) => {
-      if (selectedOptions.includes(selected)) {
+      if (selectedOptions?.includes(selected)) {
         setSelectedOptions(
           selectedOptions.filter((option) => option !== selected)
         );
@@ -103,14 +105,14 @@ function ProductInfo({
   );
 
   const optionsMarkup =
-    memoOptions.length > 0
-      ? memoOptions.map((option) => {
+    memoOptions?.length > 0
+      ? memoOptions?.map((option) => {
           const { label, value } = option;
           return (
             <Listbox.Option
               key={`${value}`}
               value={value}
-              selected={selectedOptions.includes(value)}
+              selected={selectedOptions?.includes(value)}
               accessibilityLabel={label}
             >
               {label}
@@ -118,11 +120,27 @@ function ProductInfo({
           );
         })
       : null;
-  const tagsMarkup = selectedOptions.map((option) => (
-    <Tag key={`option-${option}`} onRemove={removeTag(option)}>
-      {option}
-    </Tag>
-  ));
+  const tagsMarkup =
+    !defaultSet && selectedOptions?.length !== 0 ? (
+      <Stack>
+        {selectedOptions?.map((option) => (
+          <Tag key={`option-${option}`} onRemove={removeTag(option)}>
+            {option}
+          </Tag>
+        ))}
+      </Stack>
+    ) : (
+      <div
+        style={{
+          width: "100%",
+          marginTop: "15px",
+        }}
+      >
+        <Banner title="">
+          <p>With no products selected a default data is set!</p>
+        </Banner>
+      </div>
+    );
   return (
     <Card sectioned title="Product Info">
       <div
@@ -175,9 +193,7 @@ function ProductInfo({
             <></>
           ) : (
             <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-              <TextContainer>
-                <Stack>{tagsMarkup}</Stack>
-              </TextContainer>
+              <TextContainer>{tagsMarkup}</TextContainer>
             </div>
           )}
           <Checkbox

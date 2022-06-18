@@ -9,6 +9,8 @@ import {
   TextField,
   Layout,
   Stack,
+  TextContainer,
+  Banner,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
@@ -83,7 +85,7 @@ const SelectElement = ({ index, handleChange, unit }) => {
   );
 };
 
-function Vitamins() {
+function Vitamins({ data, defaultSet, locationPlan }) {
   const [formValues, setFormValues] = useState([
     {
       name: "Vitamin C",
@@ -159,11 +161,25 @@ function Vitamins() {
           onClick={() => addFormFields()}
           style={{ margin: "4px" }}
           primary
+          disabled={
+            locationPlan?.plan === "basic" && locationPlan?.location !== "EU"
+              ? true
+              : false
+          }
         >
           Add
         </Button>
       </div>
-      {formValues.length === 0 ? (
+      {locationPlan?.plan === "basic" && locationPlan?.location !== "EU" ? (
+        <TextContainer>
+          <Banner status="warning">
+            Upgrade your plan to add more Vitamins
+          </Banner>
+        </TextContainer>
+      ) : (
+        <></>
+      )}
+      {data.length === 0 ? (
         <div style={{ textAlign: "center", paddingBottom: "20px" }}>
           <p>Click add to create a new Vitamin</p>
         </div>
@@ -177,7 +193,7 @@ function Vitamins() {
           </div>
           <hr style={{ borderTop: "1px solid #cecece", width: "100%" }} />
           <div style={{ padding: "20px 20px 20px 20px", marginRight: "10px" }}>
-            {formValues.map((element, index) => (
+            {data.map((element, index) => (
               <div
                 key={index}
                 style={{

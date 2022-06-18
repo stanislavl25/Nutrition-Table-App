@@ -1,10 +1,12 @@
 import {
+  Banner,
   Button,
   Card,
   FormLayout,
   Heading,
   Popover,
   Select,
+  TextContainer,
   TextField,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
@@ -86,7 +88,7 @@ const SelectElement = ({ unit, handleChange, index }) => {
   );
 };
 
-function Minerals() {
+function Minerals({ data, locationPlan, defaultSet }) {
   const [formValues, setFormValues] = useState([]);
   let handleChange = useCallback((e, tag, i) => {
     console.log(e);
@@ -154,12 +156,25 @@ function Minerals() {
           onClick={() => addFormFields()}
           style={{ margin: "4px" }}
           primary
+          disabled={
+            locationPlan?.plan === "basic" && locationPlan?.location !== "EU"
+              ? true
+              : false
+          }
         >
           Add
         </Button>
       </div>
-
-      {formValues.length === 0 ? (
+      {locationPlan?.plan === "basic" && locationPlan?.location !== "EU" ? (
+        <TextContainer>
+          <Banner status="warning">
+            Upgrade your plan to add more Vitamins
+          </Banner>
+        </TextContainer>
+      ) : (
+        <></>
+      )}
+      {data.length === 0 ? (
         <div style={{ textAlign: "center", paddingBottom: "20px" }}>
           <p>Click add to create a new Mineral</p>
         </div>
@@ -173,7 +188,7 @@ function Minerals() {
           </div>
           <hr style={{ borderTop: "1px solid #cecece" }} />
 
-          {formValues.map((element, index) => (
+          {data.map((element, index) => (
             <div
               className="form-inline"
               key={index}
