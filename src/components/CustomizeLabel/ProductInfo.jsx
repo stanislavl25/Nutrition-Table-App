@@ -27,21 +27,14 @@ function ProductInfo({
   selectedOptions,
   setSelectedOptions,
   defaultSet,
+  deselectedOptions,
+  memoOptions,
+  setMemoOptions,
+  removeTag,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
-  const [selected, setSelected] = useState("");
-  const handleMemo = () => {
-    let array = [];
-    if (productsArray.length === 0) return array;
-    productsArray.forEach((element) => {
-      const name = element.name;
-      array.push({ value: name, label: name });
-    });
-    return array;
-  };
-  const deselectedOptions = useMemo(handleMemo);
-  const [memoOptions, setMemoOptions] = useState(deselectedOptions);
+  const [selectedNutriScore, setSelectedNutriScore] = useState("");
 
   const updateText = useCallback(
     (value) => {
@@ -80,7 +73,7 @@ function ProductInfo({
 
   const handleSelectChange = useCallback((value) => {
     handleNutriScoreCheckElem(value);
-    setSelected(value);
+    setSelectedNutriScore(value);
   }, []);
   const handleNutriScore = useCallback(
     (newChecked) => setNutriScore(newChecked),
@@ -94,15 +87,6 @@ function ProductInfo({
     { label: "D", value: "D" },
     { label: "E", value: "E" },
   ];
-  const removeTag = useCallback(
-    (tag) => () => {
-      console.log(tag);
-      const options = [...selectedOptions];
-      options.splice(options.indexOf(tag), 1);
-      setSelectedOptions(options);
-    },
-    [selectedOptions]
-  );
 
   const optionsMarkup =
     memoOptions?.length > 0
@@ -185,7 +169,7 @@ function ProductInfo({
               />
             }
           >
-            {memoOptions.length > 0 ? (
+            {memoOptions?.length > 0 ? (
               <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
             ) : null}
           </Combobox>
@@ -291,7 +275,7 @@ function ProductInfo({
                   label=""
                   options={options}
                   onChange={handleSelectChange}
-                  value={selected}
+                  value={selectedNutriScore}
                 />
                 <></>
                 <></>

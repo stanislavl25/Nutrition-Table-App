@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Toast, useAppBridge } from "@shopify/app-bridge-react";
-import { userLoggedInFetch } from "../App";
+import React from "react";
+
 import {
   Button,
   Heading,
@@ -12,7 +11,7 @@ import {
   Stack,
 } from "@shopify/polaris";
 import MyLablesTable from "./MyLablesTable";
-import star from "../assets/nta_star_for_plan_banner.png";
+import star from "../../assets/nta_star_for_plan_banner.png";
 function MyLables({
   handleTabChange,
   handleSelectedProducts,
@@ -22,7 +21,14 @@ function MyLables({
   emptyStore,
   categories,
   checkPlan,
+  deselectedOptions,
+  memoOptions,
+  setMemoOptions,
+  removeTag,
+  selectedOptions,
+  setSelectedOptions,
 }) {
+  console.log(productsArray);
   return (
     <div>
       {checkPlan ? (
@@ -107,6 +113,11 @@ function MyLables({
                 handleSelectedProducts={handleSelectedProducts}
                 categories={categories}
                 handleEditProduct={handleEditProduct}
+                deselectedOptions={deselectedOptions}
+                memoOptions={memoOptions}
+                setMemoOptions={setMemoOptions}
+                selectedOptions={selectedOptions}
+                setSelectedOptions={setSelectedOptions}
               />
             )}
           </Card>

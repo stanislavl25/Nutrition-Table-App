@@ -1,290 +1,25 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Toast, Card, Page, Tabs, Frame } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
-import { userLoggedInFetch } from "../App";
-import MyLables from "./MyLables";
-import Translations from "./Translations";
-import CreateLabel from "./CreateLabel";
-import RecommendedIntake from "./RecommendedIntake";
-import PricinPlans from "./PricingPlans";
-import Documentation from "./Documentation";
+import { userLoggedInFetch } from "../../App";
+import MyLables from "../MyLabels/MyLables";
+import Translations from "../Translations/Translations";
+import CreateLabel from "../CustomizeLabel/CreateLabel";
+import RecommendedIntake from "../RecommendedIntake/RecommendedIntake";
+import PricinPlans from "../PricingPlans/PricingPlans";
+import Documentation from "../Documentaion/Documentation";
+import {
+  formDataCA,
+  formDataEU,
+  formDataNA,
+  vitaminsCA,
+  vitaminsEU,
+  vitaminsNA,
+  mineralsCA,
+  mineralsEU,
+  mineralsNA,
+} from "../defaultData.js";
 
-const formDataEU = [
-  {
-    name: "Fat",
-    per100g: "9.2",
-    perportion: "8",
-    unit: "Grams",
-    bold: "No",
-    leftSpacing: "0",
-    order: "",
-    RI: "10",
-  },
-  {
-    name: "Of which Saturates",
-    per100g: "5.6",
-    perportion: "3.7",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-    RI: "10",
-  },
-  {
-    name: "Carbohydrate",
-    per100g: "46",
-    perportion: "9",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-    RI: "10",
-  },
-  {
-    name: "Of which Sugars",
-    per100g: "21",
-    perportion: "8",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-    RI: "10",
-  },
-  {
-    name: "Protein",
-    per100g: "5.0",
-    perportion: "2.7",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-    RI: "10",
-  },
-  {
-    name: "Salt",
-    per100g: "0.2",
-    perportion: "0.11",
-    unit: "Grams",
-    bold: "Yes",
-    leftSpacing: "0",
-    order: "",
-    RI: "10",
-  },
-];
-const formDataNA = [
-  {
-    name: "Total Fat",
-    quantity: "8",
-    unit: "Grams",
-    dailyValue: "10",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Saturated Fat",
-    quantity: "1",
-    unit: "Grams",
-    dailyValue: "5",
-    bold: "No",
-    order: "",
-    leftSpacing: "1",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Trans Fat",
-    quantity: "0",
-    unit: "MilliGrams",
-    dailyValue: "",
-    bold: "No",
-    order: "",
-    leftSpacing: "1",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Cholesterol",
-    quantity: "0",
-    unit: "MilliGrams",
-    dailyValue: "0",
-    bold: "No",
-    order: "",
-    leftSpacing: "",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Sodium ",
-    quantity: "160",
-    unit: "Milligrams",
-    dailyValue: "7",
-    bold: "No",
-    order: "",
-    leftSpacing: "",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Total Carbohydrate",
-    quantity: "37",
-    unit: "Grams",
-    dailyValue: "13",
-    bold: "No",
-    order: "",
-    leftSpacing: "",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Dietary Fiber",
-    quantity: "4",
-    unit: "Grams",
-    dailyValue: "14",
-    bold: "No",
-    order: "",
-    leftSpacing: "1",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Total Sugars",
-    quantity: "12",
-    unit: "Grams",
-    dailyValue: "",
-    bold: "No",
-    order: "",
-    leftSpacing: "",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Includes Added Sugars",
-    quantity: "10",
-    unit: "Grams",
-    dailyValue: "20",
-    bold: "No",
-    order: "",
-    leftSpacing: "2",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-  {
-    name: "Protein",
-    quantity: "3",
-    unit: "Grams",
-    dailyValue: "10",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProductQuantity: "",
-    preparedProductDV: "",
-    preparedProductUnit: "Grams",
-  },
-];
-const formDataCA = [
-  {
-    name: "Fat / Lipides",
-    quantity: "0",
-    Unit: "Grams",
-    dailyValue: "0",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "Saturated / saturés",
-    quantity: "0",
-    Unit: "Grams",
-    dailyValue: "0",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "+ Trans / trans",
-    quantity: "0",
-    Unit: "Grams",
-    dailyValue: "",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "Carbohydrate / Glucid",
-    quantity: "26",
-    Unit: "Grams",
-    dailyValue: "",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "Fibre & Fibres",
-    quantity: "0",
-    Unit: "Grams",
-    dailyValue: "0",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "Sugars / sucres",
-    quantity: "22",
-    Unit: "Grams",
-    dailyValue: "22",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "Protein / Protéines",
-    quantity: "2",
-    Unit: "Grams",
-    dailyValue: "",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "Cholesterol / Cholest",
-    quantity: "0",
-    Unit: "Grams",
-    dailyValue: "",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-  {
-    name: "Sodium",
-    quantity: "0",
-    Unit: "Grams",
-    dailyValue: "0",
-    bold: "Yes",
-    order: "",
-    leftSpacing: "",
-    preparedProduct: "5",
-  },
-];
 const recommendedIntakeRows = [
   { name: "Energy", quantity: "2000", unit: "Grams" },
   { name: "Fat", quantity: "44", unit: "Grams" },
@@ -295,88 +30,7 @@ const recommendedIntakeRows = [
   { name: "Salt", quantity: "00", unit: "Grams" },
   { name: "Vitamin C", quantity: "00", unit: "Grams" },
 ];
-const vitaminsEU = [
-  {
-    name: "Vitamin C",
-    per100g: "14.81",
-    perportion: "4.5",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Grams",
-  },
-];
-const mineralsEU = [];
-const vitaminsNA = [
-  {
-    name: "Vitamin D",
-    quantity: "2",
-    dailyValue: "10",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Micrograms",
-  },
-];
-const mineralsNA = [
-  {
-    name: "Calcium",
-    quantity: "260",
-    dailyValue: "20",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Miligrams",
-  },
-  {
-    name: "Vitamin D",
-    quantity: "8",
-    dailyValue: "45",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Miligrams",
-  },
-  {
-    name: "Vitamin D",
-    quantity: "240",
-    dailyValue: "6",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Miligrams",
-  },
-];
-const vitaminsCA = [];
-const mineralsCA = [
-  {
-    name: "Potassium",
-    quantity: "450",
-    dailyValue: "10",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Miligrams",
-  },
-  {
-    name: "Calcium",
-    quantity: "30",
-    dailyValue: "2",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Miligrams",
-  },
-  {
-    name: "Iron / Fer",
-    quantity: "0",
-    dailyValue: "0",
-    LeftSpacing: "",
-    order: "",
-    RI: "",
-    unit: "Miligrams",
-  },
-];
+
 const order = formDataCA.length;
 const newFormSet = {
   name: "",
@@ -411,6 +65,7 @@ function TabsPage() {
   const [active, setActive] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [defaultSet, setDefaultSet] = useState(false);
+
   const [recommendedIntakeData, setRecommendedIntakeData] = useState(
     storeData.recommendedIntake
   );
@@ -466,11 +121,9 @@ function TabsPage() {
 
   // ! fix recommended intake late update for useState
   useEffect(async () => {
-    console.log(storeData.recommendedIntake !== recommendedIntakeData);
     if (storeData.recommendedIntake !== recommendedIntakeData) {
       setTimeout(async () => {
         await setRecommendedIntakeData(storeData.recommendedIntake);
-        console.log(recommendedIntakeData);
       }, 1000);
     }
   }, [storeData]);
@@ -535,35 +188,6 @@ function TabsPage() {
     try {
       const data = await fetch("products-list").then((res) => res.json());
       if (data.length) {
-        await data.forEach((elem) => {
-          if (elem.richText.notesText === undefined) {
-            if (location === "EU")
-              elem.richText.notesText =
-                "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
-            if (location === "NA")
-              elem.richText.notesText =
-                "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
-            if (location === "CA") {
-              elem.richText.notesText =
-                "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
-            }
-          }
-          if (!elem.nutritionData?.length > 0) {
-            if (location === "CA") elem.nutritionData = formDataCA;
-            if (location === "NA") elem.nutritionData = formDataNA;
-            if (location === "EU") elem.nutritionData = formDataEU;
-          }
-          if (!elem.vitamins?.length > 0) {
-            if (location === "CA") elem.vitamins = vitaminsCA;
-            if (location === "NA") elem.vitamins = vitaminsNA;
-            if (location === "EU") elem.vitamins = vitaminsEU;
-          }
-          if (!elem.minerals?.length > 0) {
-            if (location === "CA") elem.minerals = mineralsCA;
-            if (location === "NA") elem.minerals = mineralsNA;
-            if (location === "EU") elem.minerals = mineralsEU;
-          }
-        });
         setProductsArray(data);
         setArrayData(defaultData);
         setDefaultSet(true);
@@ -612,16 +236,6 @@ function TabsPage() {
         console.log(err);
       });
   };
-  // todo clean up after the use effect
-  useEffect(async () => {
-    await fetchLocations();
-    await saveProductsGetStoreData();
-    await fetchLang();
-    handleSettingDefaultData();
-    setTimeout(async () => {
-      await fetchProducts();
-    }, 500);
-  }, []);
 
   /**
    * Handle recommended intake save to backend
@@ -667,7 +281,7 @@ function TabsPage() {
       const data = await fetch("/LangFieldsSave", fetchOptions)
         .then((res) => res.json())
         .then((response) => {
-          console.log(response, "translation data");
+          console.log(response, "translation data saved");
           // handleSnackToggle(messages.message);
         })
         .catch((err) => {
@@ -772,6 +386,41 @@ function TabsPage() {
     setSelectedProducts(id);
   };
 
+  // todo clean up after the use effect
+  useEffect(async () => {
+    await fetchLocations();
+    await saveProductsGetStoreData();
+    await fetchLang();
+    handleSettingDefaultData();
+    setTimeout(async () => {
+      await fetchProducts();
+    }, 500);
+  }, []);
+
+  /** handle memo set for filter functionality */
+  const handleMemo = () => {
+    let array = [];
+    if (productsArray?.length === 0) return array;
+    if (productsArray?.length > 0 && productsArray !== "none") {
+      productsArray.forEach((element) => {
+        const name = element.name;
+        array.push({ value: name, label: name });
+      });
+    }
+    return array;
+  };
+  const deselectedOptions = useMemo(handleMemo);
+  const [memoOptions, setMemoOptions] = useState(deselectedOptions);
+  const [selectedOptions, setSelectedOptions] = useState();
+  const removeTag = useCallback(
+    (tag) => () => {
+      const options = [...selectedOptions];
+      options.splice(options.indexOf(tag), 1);
+      setSelectedOptions(options);
+    },
+    [selectedOptions]
+  );
+
   const toastMarkup = active ? (
     <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />
   ) : null;
@@ -798,6 +447,11 @@ function TabsPage() {
           emptyStore={emptyStore}
           categories={categories}
           checkPlan={checkPlan}
+          deselectedOptions={deselectedOptions}
+          memoOptions={memoOptions}
+          setMemoOptions={setMemoOptions}
+          selectedOptions={selectedOptions}
+          setSelectedOptions={setSelectedOptions}
         />
       ),
     },
@@ -817,6 +471,12 @@ function TabsPage() {
           data={arraydata}
           setData={setArrayData}
           defaultSet={defaultSet}
+          deselectedOptions={deselectedOptions}
+          memoOptions={memoOptions}
+          setMemoOptions={setMemoOptions}
+          removeTag={removeTag}
+          selectedOptions={selectedOptions}
+          setSelectedOptions={setSelectedOptions}
         />
       ),
     },

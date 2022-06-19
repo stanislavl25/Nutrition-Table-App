@@ -16,6 +16,17 @@ import AllergyInfo from "./AllergyInfo";
 import LegalNotes from "./LegalNotes";
 import { Heading, Card, Button, Page, TextStyle } from "@shopify/polaris";
 import NutritionInfo from "./NutritionInfoEU";
+import {
+  formDataCA,
+  formDataEU,
+  formDataNA,
+  vitaminsCA,
+  vitaminsEU,
+  vitaminsNA,
+  mineralsCA,
+  mineralsEU,
+  mineralsNA,
+} from "../defaultData.js";
 import BasicVitaminsMineralsPage from "./BasicVitaminsMineralsPage";
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
 const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
@@ -35,6 +46,12 @@ function CreateLabel({
   data,
   setData,
   defaultSet,
+  deselectedOptions,
+  memoOptions,
+  setMemoOptions,
+  removeTag,
+  selectedOptions,
+  setSelectedOptions,
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
@@ -42,13 +59,44 @@ function CreateLabel({
   });
 
   const [formValues, setFormValues] = useState([]);
-  const [selectedOptions, setSelectedOptions] = useState(selectedProducts);
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [nonFoodProduct, setNonFoodProduct] = useState(false);
   const [rightSideWidth, setRightSideWidth] = useState("35%");
   const [leftSideWidth, setLeftSideWidth] = useState("60%");
   const [flexDirection, setFlexDirection] = useState("row");
-
+  const updateProducts = useCallback(async () => {
+    if (data.richText.notesText === undefined) {
+      if (location === "EU")
+        data.richText.notesText =
+          "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
+      if (location === "NA")
+        data.richText.notesText =
+          "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
+      if (location === "CA") {
+        data.richText.notesText =
+          "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
+      }
+    }
+    if (data.nutritionData?.length === 0) {
+      if (location === "CA") data.nutritionData = formDataCA;
+      if (location === "NA") data.nutritionData = formDataNA;
+      if (location === "EU") data.nutritionData = formDataEU;
+    }
+    if (data.vitamins?.length === 0) {
+      if (location === "CA") data.vitamins = vitaminsCA;
+      if (location === "NA") data.vitamins = vitaminsNA;
+      if (location === "EU") data.vitamins = vitaminsEU;
+    }
+    if (data.minerals?.length === 0) {
+      if (location === "CA") data.minerals = mineralsCA;
+      if (location === "NA") data.minerals = mineralsNA;
+      if (location === "EU") data.minerals = mineralsEU;
+    }
+    console.log(data);
+  }, []);
+  useEffect(async () => {
+    await updateProducts();
+  });
   useEffect(() => {
     window.addEventListener("resize", () => {
       if (window.innerWidth <= 960) {
@@ -76,7 +124,7 @@ function CreateLabel({
 
   useEffect(() => {
     handleOrderSet();
-  }, [productsArray, selectedProducts, data]);
+  }, []);
 
   const handleOrderChange = (toIndex, prevIndex) => {
     const element = formValues.splice(prevIndex, 1)[0];
@@ -172,6 +220,10 @@ function CreateLabel({
             selectedOptions={selectedOptions}
             setSelectedOptions={setSelectedOptions}
             defaultSet={defaultSet}
+            deselectedOptions={deselectedOptions}
+            memoOptions={memoOptions}
+            setMemoOptions={setMemoOptions}
+            removeTag={removeTag}
           />
           {nonFoodProduct ? (
             <Card sectioned>

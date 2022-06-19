@@ -1,6 +1,6 @@
 import { Banner, Card, Heading } from "@shopify/polaris";
 import React, { useState } from "react";
-import "../assets/previewStyles.css";
+import "../../assets/previewStyles.css";
 import { Markup } from "interweave";
 function TablePreview({ data, formValues, productToPrepare }) {
   const [bannerDismissed, setBannerDismissed] = useState(true);

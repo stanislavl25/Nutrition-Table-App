@@ -1,6 +1,6 @@
 import { Card, Subheading, TextStyle } from "@shopify/polaris";
 import React from "react";
-import RichTextEditor from "./RichTextEditor";
+import RichTextEditor from "../RichText/RichTextEditor";
 function Notes({ notesText, handleTextChange }) {
   return (
     <Card sectioned title="Notes">

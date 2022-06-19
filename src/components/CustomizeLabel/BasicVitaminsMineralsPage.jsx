@@ -8,7 +8,7 @@ import {
   Heading,
 } from "@shopify/polaris";
 import React from "react";
-import star from "../assets/nta_star_for_plan_banner.png";
+import star from "../../assets/nta_star_for_plan_banner.png";
 
 const formLables = ["Name", "Per 100 g", "Per portion 25 g", "Unit"];
 function BasicVitaminsMineralsPage({ handleTabChange }) {

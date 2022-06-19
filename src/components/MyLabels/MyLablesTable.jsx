@@ -13,7 +13,7 @@ import {
   Icon,
 } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
-import { userLoggedInFetch } from "../App";
+import { userLoggedInFetch } from "../../App";
 import React, { useCallback, useMemo, useState } from "react";
 import { SearchMinor } from "@shopify/polaris-icons";
 
@@ -77,6 +77,11 @@ function MyLablesTable({
   handleSelectedProducts,
   categories,
   handleEditProduct,
+  deselectedOptions,
+  memoOptions,
+  setMemoOptions,
+  selectedOptions,
+  setSelectedOptions,
 }) {
   const resourceName = {
     singular: "product",
@@ -91,20 +96,6 @@ function MyLablesTable({
     });
   const [sortValue, setSortValue] = useState("");
   const [inputValue, setInputValue] = useState("");
-  const handleMemo = () => {
-    let array = [];
-    if (productsArray.length === 0) return array;
-    if (productsArray != "none") {
-      productsArray.forEach((element) => {
-        const name = element.name;
-        array.push({ value: name, label: name });
-      });
-    }
-    return array;
-  };
-  const deselectedOptions = useMemo(handleMemo);
-  const [memoOptions, setMemoOptions] = useState(deselectedOptions);
-
   const updateText = useCallback(
     (value) => {
       setInputValue(value);
@@ -145,8 +136,8 @@ function MyLablesTable({
   );
 
   const optionsMarkup =
-    memoOptions.length > 0
-      ? memoOptions.map((option) => {
+    memoOptions?.length > 0
+      ? memoOptions?.map((option) => {
           const { label, value } = option;
           return (
             <Listbox.Option
@@ -209,7 +200,7 @@ function MyLablesTable({
   ];
   const rowMarkup =
     productsArray !== "none" ? (
-      productsArray.map(
+      productsArray?.map(
         (
           {
             _id,
@@ -301,7 +292,7 @@ function MyLablesTable({
                   />
                 }
               >
-                {memoOptions.length > 0 ? (
+                {memoOptions?.length > 0 ? (
                   <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
                 ) : null}
               </Combobox>

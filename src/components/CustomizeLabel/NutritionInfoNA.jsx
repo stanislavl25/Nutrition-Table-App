@@ -9,7 +9,6 @@ import {
   TextField,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
-import SelectComponent from "./SelectComponent";
 
 const PopOverComponent = ({
   handleChange,

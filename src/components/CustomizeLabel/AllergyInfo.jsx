@@ -1,16 +1,16 @@
 import { Card } from "@shopify/polaris";
 import React from "react";
-import RichTextEditor from "./RichTextEditor";
+import RichTextEditor from "../RichText/RichTextEditor";
 
-function Ingredients({ data, ingredientsText, handleTextChange }) {
+function AllergyInfo({ data, allergyInfoText, handleTextChange }) {
   return (
     <Card sectioned title={data}>
       <RichTextEditor
-        text={ingredientsText}
+        text={allergyInfoText}
         handleTextChange={handleTextChange}
       />
     </Card>
   );
 }
 
-export default Ingredients;
+export default AllergyInfo;
