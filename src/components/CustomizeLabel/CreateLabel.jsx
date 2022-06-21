@@ -56,7 +56,6 @@ function CreateLabel({
   handleSaveSelectedProducts,
   data,
   setData,
-  defaultSet,
   deselectedOptions,
   memoOptions,
   setMemoOptions,
@@ -73,7 +72,7 @@ function CreateLabel({
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
-    plan: "Advanced",
+    plan: "Basic",
   });
 
   const [formValues, setFormValues] = useState([]);
@@ -83,6 +82,14 @@ function CreateLabel({
   const [leftSideWidth, setLeftSideWidth] = useState("60%");
   const [flexDirection, setFlexDirection] = useState("row");
   const [productExist, setProductExist] = useState(false);
+  const handleOrderSet = () => {
+    for (var i = 0; i < formValues.length; i++) {
+      let newFormValues = [...formValues];
+      newFormValues[i]["order"] = i;
+      setFormValues(newFormValues);
+    }
+  };
+
   const updateProducts = async () => {
     if (data.richText.notesText === undefined) {
       if (location === "EU")
@@ -90,7 +97,7 @@ function CreateLabel({
           "<p>Salt content is exclusively due to the presence of naturally occurring sodium.</p>";
       if (location === "NA")
         data.richText.notesText =
-          "<p>* The % Daily Value (DV) tells you how muchanutrient in aserving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
+          "<p>* The % Daily Value (DV) tells you how much a nutrient in a serving of a food contributs to a daily diet.<hr /> 2,000 caloriesaday is used for general nutrition advice.</p>";
       if (location === "CA") {
         data.richText.notesText =
           "<p>*5% or less is <strong>a little</strong> , 15% or more is <strong>a lot</strong> *5% ou moins c’est <strong>peu</strong>, 15% ou plus c’est <strong>beaucoup</strong></p>";
@@ -115,6 +122,7 @@ function CreateLabel({
       data.calsEnergyInfo = calsEnergyInfo;
     }
     console.log(data);
+    handleOrderSet();
     setProductExist(true);
   };
   useEffect(() => {
@@ -140,18 +148,6 @@ function CreateLabel({
       console.log(window.innerWidth);
     });
   });
-
-  const handleOrderSet = () => {
-    for (var i = 0; i < formValues.length; i++) {
-      let newFormValues = [...formValues];
-      newFormValues[i]["order"] = i;
-      setFormValues(newFormValues);
-    }
-  };
-
-  useEffect(() => {
-    handleOrderSet();
-  }, []);
 
   const handleNutriScoreCheckElem = (newState) => {
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
@@ -232,10 +228,8 @@ function CreateLabel({
               handleNonFoodProduct={handleNonFoodProduct}
               handleNutriScoreCheckElem={handleNutriScoreCheckElem}
               locationPlan={locationPlan}
-              productsArray={productsArray}
               selectedOptions={selectedOptions}
               setSelectedOptions={setSelectedOptions}
-              defaultSet={defaultSet}
               deselectedOptions={deselectedOptions}
               memoOptions={memoOptions}
               setMemoOptions={setMemoOptions}
@@ -380,7 +374,6 @@ function CreateLabel({
             ) : (
               <TablePreview
                 data={data}
-                formValues={formValues}
                 productToPrepare={productToPrepare}
                 locationPlan={locationPlan}
               />

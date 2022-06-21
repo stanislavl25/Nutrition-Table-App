@@ -496,7 +496,7 @@ function TabsPage() {
           {
             name: "",
             quantity: "",
-            unit: "",
+            unit: "Grams",
             dailyValue: "",
             order: "",
             RI: "",
@@ -534,7 +534,7 @@ function TabsPage() {
           {
             name: "",
             quantity: "",
-            unit: "",
+            unit: "Grams",
             dailyValue: "",
             order: "",
             RI: "",

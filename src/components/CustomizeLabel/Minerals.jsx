@@ -43,14 +43,14 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
         />{" "}
         <TextField
           label="Left Spacing (Table)"
-          type="text"
+          type="number"
           name="LeftSpacing"
           value={element.LeftSpacing || ""}
           onChange={(e) => handleChange(e, "minerals", "LeftSpacing", index)}
         />
         <TextField
           label="Order"
-          type="text"
+          type="number"
           name="Name"
           value={element.order || ""}
           onChange={(e) => handleChange(e, "minerals", "order", index)}

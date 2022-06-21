@@ -23,9 +23,10 @@
 .thead{
   border-bottom: 3px solid black;
 }
-.table_conatiner{
+.table_container{
   border:1px solid #dcdcdc;
-  padding: 10px;
+  width: 100%;
+  margin-top: 10px;
 }
 .table_header{
   margin-top: 10px;
@@ -34,7 +35,17 @@
 .tbody{
   border-bottom: 3px solid black;
 }
-.table_conatiner{
-  width: 100%;
-  margin-top: 10px;
+ 
+
+
+.arrow {
+  border: solid rgb(190, 190, 190);
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 6px;
+}
+
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
 }

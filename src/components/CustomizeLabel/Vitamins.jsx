@@ -190,10 +190,10 @@ function Vitamins({
                     <div style={{ maxWidth: "150px", marginRight: "20px" }}>
                       <TextField
                         type="text"
-                        name="perportion"
-                        value={element.perportion || ""}
+                        name="dailyValue"
+                        value={element.dailyValue || ""}
                         onChange={(e) =>
-                          handleChange(e, "vitamins", "perportion", index)
+                          handleChange(e, "vitamins", "dailyValue", index)
                         }
                       />
                     </div>
