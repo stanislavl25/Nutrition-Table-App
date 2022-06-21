@@ -5,11 +5,10 @@ import {
   TextField,
   Stack,
   Tooltip,
-  Link,
   Icon,
 } from "@shopify/polaris";
 import { CircleInformationMajor } from "@shopify/polaris-icons";
-function CalsEnergyInfos() {
+function CalsEnergyInfos({ data, handleChange }) {
   return (
     <div style={{ marginTop: "20px" }}>
       <Card title="Calories/Energy Information" sectioned>
@@ -19,14 +18,38 @@ function CalsEnergyInfos() {
         </TextStyle>
         <div style={{ marginTop: "10px" }}>
           <Stack distribution="fillEvenly">
-            <TextField label="Energy (KJ) per 100 g" value="ea" />
-            <TextField label="Energy (KJ) per 25 g" value="ea" />
+            <TextField
+              label="Energy (KJ) per 100 g"
+              value={data?.calsEnergyInfo?.energyKj100}
+              onChange={(e) => {
+                handleChange(e, "calsEnergyInfo", "energyKj100");
+              }}
+            />
+            <TextField
+              label="Energy (KJ) per 25 g"
+              value={data?.calsEnergyInfo?.energyKj25}
+              onChange={(e) => {
+                handleChange(e, "calsEnergyInfo", "energyKj25");
+              }}
+            />
           </Stack>
         </div>
         <div style={{ marginTop: "10px" }}>
           <Stack distribution="fillEvenly">
-            <TextField label="Energy (Kcal) per 100 g" value="ea" />
-            <TextField label="Energy (Kcal) per 25 g" value="ea" />
+            <TextField
+              label="Energy (Kcal) per 100 g"
+              value={data?.calsEnergyInfo?.energyKcal100}
+              onChange={(e) => {
+                handleChange(e, "calsEnergyInfo", "energyKcal100");
+              }}
+            />
+            <TextField
+              label="Energy (Kcal) per 25 g"
+              value={data?.calsEnergyInfo?.energyKcal25}
+              onChange={(e) => {
+                handleChange(e, "calsEnergyInfo", "energyKcal25");
+              }}
+            />
           </Stack>
         </div>
         <div style={{ marginTop: "10px" }}>
@@ -38,7 +61,13 @@ function CalsEnergyInfos() {
               justifyContent: "start",
             }}
           >
-            <TextField label="% RI* Recommended intake" value="8" />
+            <TextField
+              label="% RI* Recommended intake"
+              value={data?.calsEnergyInfo?.Ri}
+              onChange={(e) => {
+                handleChange(e, "calsEnergyInfo", "Ri");
+              }}
+            />
             <Tooltip
               dismissOnMouseOut
               content={

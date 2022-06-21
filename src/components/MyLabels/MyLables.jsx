@@ -1,15 +1,6 @@
 import React from "react";
 
-import {
-  Button,
-  Heading,
-  Card,
-  Layout,
-  Page,
-  DisplayText,
-  EmptyState,
-  Stack,
-} from "@shopify/polaris";
+import { Button, Heading, Card, Page, EmptyState } from "@shopify/polaris";
 import MyLablesTable from "./MyLablesTable";
 import star from "../../assets/nta_star_for_plan_banner.png";
 function MyLables({

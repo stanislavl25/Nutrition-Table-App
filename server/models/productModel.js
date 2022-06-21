@@ -72,6 +72,13 @@ const productSchema = new Schema(
     minerals: [],
     vitamins: [],
     nutritionData: [],
+    calsEnergyInfo: {
+      energyKj100: { type: String, default: "1210" },
+      energyKj25: { type: String, default: "641" },
+      energyKcal100: { type: String, default: "287" },
+      energyKcal25: { type: String, default: "152" },
+      Ri: { type: String, default: "8" },
+    },
   },
   {
     timestamps: true,

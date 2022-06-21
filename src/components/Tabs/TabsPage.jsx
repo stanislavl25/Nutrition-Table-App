@@ -32,15 +32,7 @@ const recommendedIntakeRows = [
 ];
 
 const order = formDataCA.length;
-const newFormSet = {
-  name: "",
-  per100g: "",
-  perportion: "",
-  unit: "Grams",
-  bold: "Yes",
-  leftSpacing: "0",
-  order: order,
-};
+
 function TabsPage() {
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
@@ -115,6 +107,7 @@ function TabsPage() {
     minerals: [],
     nutritionData: [],
     vitamins: [],
+    calsEnergyInfo: {},
   });
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
@@ -142,6 +135,8 @@ function TabsPage() {
     try {
       const data = await fetch("/locations").then((res) => res.json());
       setlocationObj(data);
+      setLocation("CA");
+      return;
       if (data.length) {
         const countryCode = data[0].country_code;
         if (countryCode.includes("US") || countryCode.includes("UM")) {
@@ -254,16 +249,16 @@ function TabsPage() {
       body: JSON.stringify({ formVal, storeId }),
     };
     console.log(formVal, storeId);
-    // const data = await fetch("/recommendedIntake_save", fetchOptions)
-    //   .then((res) => res.json())
-    //   .then((response) => {
-    //     console.log(response);
-    //     // handleSnackToggle(messages.message);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     // handleSnackToggle("Something wrong happend!");
-    //   });
+    const data = await fetch("/recommendedIntake_save", fetchOptions)
+      .then((res) => res.json())
+      .then((response) => {
+        console.log(response);
+        // handleSnackToggle(messages.message);
+      })
+      .catch((err) => {
+        console.log(err);
+        // handleSnackToggle("Something wrong happend!");
+      });
   };
 
   const fetchLangChanges = async (name, value) => {
@@ -421,6 +416,139 @@ function TabsPage() {
     [selectedOptions]
   );
 
+  const handleChange = useCallback((val, tag, name, secondTag) => {
+    if (!secondTag && typeof secondTag !== "number") {
+      let newData = { ...arraydata };
+      newData[tag][name] = val;
+      setArrayData(newData);
+    }
+    if (
+      secondTag.length > 0 ||
+      typeof secondTag === "number" ||
+      secondTag.length > 0
+    ) {
+      let newData = { ...arraydata };
+      newData[tag][secondTag][name] = val;
+      setArrayData(newData);
+    }
+  });
+  const handleAddNutritionData = () => {
+    if (location === "EU")
+      setArrayData({
+        ...arraydata,
+        nutritionData: [
+          ...arraydata.nutritionData,
+          {
+            name: "",
+            per100g: "",
+            perportion: "",
+            unit: "Grams",
+            bold: "Yes",
+            leftSpacing: "0",
+            order: order,
+          },
+        ],
+      });
+    else
+      setArrayData({
+        ...arraydata,
+        nutritionData: [
+          ...arraydata.nutritionData,
+          {
+            name: "",
+            quantity: "",
+            Unit: "Grams",
+            dailyValue: "",
+            bold: "No",
+            order: "",
+            leftSpacing: "",
+            preparedProduct: "",
+          },
+        ],
+      });
+  };
+  const handleRemoveNutritionData = (i) => {
+    let newArrayData = { ...arraydata };
+    newArrayData.nutritionData.splice(i, 1);
+    setArrayData(newArrayData);
+  };
+  const handleAddVitamins = () => {
+    if (location === "EU")
+      setArrayData({
+        ...arraydata,
+        vitamins: [
+          ...arraydata.vitamins,
+          {
+            name: "",
+            per100g: "",
+            perportion: "",
+            LeftSpacing: "",
+            order: "",
+            RI: "",
+          },
+        ],
+      });
+    else
+      setArrayData({
+        ...arraydata,
+        vitamins: [
+          ...arraydata.vitamins,
+          {
+            name: "",
+            quantity: "",
+            unit: "",
+            dailyValue: "",
+            order: "",
+            RI: "",
+            LeftSpacing: "",
+          },
+        ],
+      });
+  };
+  const handleRemoveVitamins = (i) => {
+    let newArrayData = { ...arraydata };
+    newArrayData.vitamins.splice(i, 1);
+    setArrayData(newArrayData);
+  };
+  const handleAddMinerals = () => {
+    if (location === "EU")
+      setArrayData({
+        ...arraydata,
+        minerals: [
+          ...arraydata.minerals,
+          {
+            name: "",
+            per100g: "",
+            perportion: "",
+            LeftSpacing: "",
+            order: "",
+            RI: "",
+          },
+        ],
+      });
+    else
+      setArrayData({
+        ...arraydata,
+        minerals: [
+          ...arraydata.minerals,
+          {
+            name: "",
+            quantity: "",
+            unit: "",
+            dailyValue: "",
+            order: "",
+            RI: "",
+            LeftSpacing: "",
+          },
+        ],
+      });
+  };
+  const handleRemoveMinerals = (i) => {
+    let newArrayData = { ...arraydata };
+    newArrayData.minerals.splice(i, 1);
+    setArrayData(newArrayData);
+  };
+
   const toastMarkup = active ? (
     <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />
   ) : null;
@@ -461,7 +589,6 @@ function TabsPage() {
       tab: (
         <CreateLabel
           langState={langState}
-          newFormSet={newFormSet}
           location={location}
           setLocation={setLocation}
           selectedProducts={selectedProducts}
@@ -477,6 +604,13 @@ function TabsPage() {
           removeTag={removeTag}
           selectedOptions={selectedOptions}
           setSelectedOptions={setSelectedOptions}
+          handleChange={handleChange}
+          handleAddNutritionData={handleAddNutritionData}
+          handleRemoveNutritionData={handleRemoveNutritionData}
+          handleAddVitamins={handleAddVitamins}
+          handleRemoveVitamins={handleRemoveVitamins}
+          handleAddMinerals={handleAddMinerals}
+          handleRemoveMinerals={handleRemoveMinerals}
         />
       ),
     },

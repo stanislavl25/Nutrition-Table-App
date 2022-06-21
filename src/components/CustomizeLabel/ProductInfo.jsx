@@ -104,8 +104,9 @@ function ProductInfo({
           );
         })
       : null;
+  console.log(selectedOptions);
   const tagsMarkup =
-    !defaultSet && selectedOptions?.length !== 0 ? (
+    selectedOptions?.length !== 0 ? (
       <Stack>
         {selectedOptions?.map((option) => (
           <Tag key={`option-${option}`} onRemove={removeTag(option)}>

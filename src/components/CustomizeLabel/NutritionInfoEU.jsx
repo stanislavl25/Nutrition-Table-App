@@ -47,13 +47,17 @@ const PopOverComponent = ({
       <FormLayout>
         <Stack>
           <Stack.Item fill>
-            <Select
-              onChange={(e) => handleChange(e, "bold", index)}
-              value={element.bold || ""}
-              options={options}
-              name="bold"
-              label="Bold Name"
-            />
+            <div style={{ maxWidth: "80px" }}>
+              <Select
+                onChange={(e) =>
+                  handleChange(e, "nutritionData", "bold", index)
+                }
+                value={element.bold || ""}
+                options={options}
+                name="bold"
+                label="Bold Name"
+              />
+            </div>
           </Stack.Item>
           <Stack.Item>
             <TextField
@@ -63,7 +67,7 @@ const PopOverComponent = ({
               min={0}
               value={element.order || ""}
               onChange={(e) => {
-                handleChange(e, "order", index);
+                handleChange(e, "nutritionData", "order", index);
               }}
               multiline={false}
             />
@@ -75,7 +79,9 @@ const PopOverComponent = ({
           value={element.leftSpacing || ""}
           min={0}
           name="leftSpacing"
-          onChange={(e) => handleChange(e, "leftSpacing", index)}
+          onChange={(e) =>
+            handleChange(e, "nutritionData", "leftSpacing", index)
+          }
           multiline={false}
         />
         <TextField
@@ -84,7 +90,7 @@ const PopOverComponent = ({
           value={element.RI || ""}
           min={0}
           name="% RI*"
-          onChange={(e) => handleChange(e, "RI", index)}
+          onChange={(e) => handleChange(e, "nutritionData", "RI", index)}
           multiline={false}
         />
 
@@ -104,35 +110,14 @@ const PopOverComponent = ({
 };
 
 function NutritionInfo({
-  formValues,
-  setFormValues,
   formLables,
-  handleOrderChange,
-  newFormSet,
   locationPlan,
   data,
+  handleAddNutritionData,
+  handleRemoveNutritionData,
+  handleChange,
+  productToPrepare,
 }) {
-  let addFormFields = () => {
-    setFormValues([...formValues, newFormSet]);
-  };
-
-  let removeFormFields = (i) => {
-    let newFormValues = [...formValues];
-    newFormValues.splice(i, 1);
-    setFormValues(newFormValues);
-    handlePopOverClose();
-  };
-  let handleSave = async (event) => {
-    event.preventDefault();
-    console.log(JSON.stringify(formValues));
-  };
-  const handleChange = useCallback((e, name, i) => {
-    console.log(e);
-    let newFormValues = [...formValues];
-    newFormValues[i][name] = e;
-    setFormValues(newFormValues);
-  }, []);
-
   const options = [
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
@@ -142,23 +127,22 @@ function NutritionInfo({
     <div style={{ marginTop: "20px", marginBottom: "20px" }}>
       {locationPlan.location === "CA" ? (
         <NutritionInfoCA
-          formValues={formValues}
-          setFormValues={setFormValues}
+          formValues={data.nutritionData}
           formLables={formLables}
-          handleOrderChange={handleOrderChange}
-          newFormSet={newFormSet}
-          locationPlan={locationPlan}
+          handleChange={handleChange}
+          handleAddNutritionData={handleAddNutritionData}
+          handleRemoveNutritionData={handleRemoveNutritionData}
         />
       ) : (
         <></>
       )}
       {locationPlan.location === "NA" ? (
         <NutritionInfoNA
-          formValues={formValues}
-          setFormValues={setFormValues}
-          handleOrderChange={handleOrderChange}
-          newFormSet={newFormSet}
-          locationPlan={locationPlan}
+          formValues={data.nutritionData}
+          handleChange={handleChange}
+          handleAddNutritionData={handleAddNutritionData}
+          handleRemoveNutritionData={handleRemoveNutritionData}
+          productToPrepare={productToPrepare}
         />
       ) : (
         <></>
@@ -173,7 +157,7 @@ function NutritionInfo({
                 variant="contained"
                 className="button add"
                 type="button"
-                onClick={() => addFormFields()}
+                onClick={() => handleAddNutritionData()}
                 style={{ margin: "4px" }}
                 primary
               >
@@ -183,7 +167,7 @@ function NutritionInfo({
           </div>
 
           <div>
-            <form onSubmit={handleSave}>
+            <form>
               <div
                 style={{
                   display: "flex",
@@ -228,7 +212,9 @@ function NutritionInfo({
                         <TextField
                           value={element.name}
                           name="Name"
-                          onChange={(e) => handleChange(e, "name", index)}
+                          onChange={(e) =>
+                            handleChange(e, "nutritionData", "name", index)
+                          }
                           label=""
                           autoComplete="off"
                         />
@@ -237,7 +223,9 @@ function NutritionInfo({
                         <TextField
                           value={element.per100g || 0}
                           name="Per100g"
-                          onChange={(e) => handleChange(e, "per100g", index)}
+                          onChange={(e) =>
+                            handleChange(e, "nutritionData", "per100g", index)
+                          }
                           inputMode="number"
                           autoComplete="off"
                         />
@@ -246,7 +234,14 @@ function NutritionInfo({
                         <TextField
                           value={element.perportion || 0}
                           name="Perportion"
-                          onChange={(e) => handleChange(e, "perportion", index)}
+                          onChange={(e) =>
+                            handleChange(
+                              e,
+                              "nutritionData",
+                              "perportion",
+                              index
+                            )
+                          }
                           autoComplete="off"
                           inputMode="number"
                           disabled={
@@ -258,7 +253,9 @@ function NutritionInfo({
                       <div style={{ maxWidth: "75px", marginRight: "20px" }}>
                         <Select
                           value={element.unit}
-                          onChange={(e) => handleChange(e, "unit", index)}
+                          onChange={(e) =>
+                            handleChange(e, "nutritionData", "unit", index)
+                          }
                           options={options}
                           name="unit"
                         />
@@ -268,7 +265,7 @@ function NutritionInfo({
                         <PopOverComponent
                           element={element}
                           handleChange={handleChange}
-                          removeFormFields={removeFormFields}
+                          removeFormFields={handleRemoveNutritionData}
                           index={index}
                         />
                       </div>

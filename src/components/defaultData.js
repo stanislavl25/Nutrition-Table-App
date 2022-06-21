@@ -357,3 +357,10 @@ export const mineralsCA = [
     unit: "Miligrams",
   },
 ];
+export const calsEnergyInfo = {
+  energyKj100: "1210",
+  energyKj25: "641",
+  energyKcal100: "287",
+  energyKcal25: "152",
+  Ri: "8",
+};

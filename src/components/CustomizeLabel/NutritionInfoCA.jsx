@@ -46,7 +46,7 @@ const PopOverComponent = ({
         <Stack>
           <Stack.Item fill>
             <Select
-              onChange={(e) => handleChange(e, "bold", index)}
+              onChange={(e) => handleChange(e, "nutritionData", "bold", index)}
               value={element.bold || ""}
               options={options}
               name="bold"
@@ -60,9 +60,7 @@ const PopOverComponent = ({
               name="order"
               min={0}
               value={element.order || ""}
-              onChange={(e) => {
-                handleChange(e, "order", index);
-              }}
+              onChange={(e) => handleChange(e, "nutritionData", "order", index)}
               multiline={false}
             />
           </Stack.Item>
@@ -73,7 +71,9 @@ const PopOverComponent = ({
           value={element.leftSpacing || ""}
           min={0}
           name="leftSpacing"
-          onChange={(e) => handleChange(e, "leftSpacing", index)}
+          onChange={(e) =>
+            handleChange(e, "nutritionData", "leftSpacing", index)
+          }
           multiline={false}
         />
         <div>
@@ -84,7 +84,9 @@ const PopOverComponent = ({
             value={element.preparedProduct || ""}
             min={0}
             name="% RI*"
-            onChange={(e) => handleChange(e, "preparedProduct", index)}
+            onChange={(e) =>
+              handleChange(e, "nutritionData", "preparedProduct", index)
+            }
             multiline={false}
           />
         </div>
@@ -105,41 +107,13 @@ const PopOverComponent = ({
     </Popover>
   );
 };
-const newFormSet = {
-  name: "",
-  quantity: "",
-  Unit: "Grams",
-  dailyValue: "",
-  bold: "No",
-  order: "",
-  leftSpacing: "",
-  preparedProduct: "",
-};
 function NutritionInfoCA({
   formValues,
-  setFormValues,
   formLables,
-  locationPlan,
+  handleAddNutritionData,
+  handleRemoveNutritionData,
+  handleChange,
 }) {
-  let addFormFields = () => {
-    setFormValues([...formValues, newFormSet]);
-  };
-
-  let removeFormFields = (i) => {
-    let newFormValues = [...formValues];
-    newFormValues.splice(i, 1);
-    setFormValues(newFormValues);
-  };
-  let handleSave = async (event) => {
-    event.preventDefault();
-    console.log(JSON.stringify(formValues));
-  };
-  const handleChange = useCallback((e, name, i) => {
-    console.log(e);
-    let newFormValues = [...formValues];
-    newFormValues[i][name] = e;
-    setFormValues(newFormValues);
-  }, []);
   const options = [
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
@@ -153,7 +127,7 @@ function NutritionInfoCA({
             variant="contained"
             className="button add"
             type="button"
-            onClick={() => addFormFields()}
+            onClick={() => handleAddNutritionData()}
             style={{ margin: "4px" }}
             primary
           >
@@ -162,7 +136,7 @@ function NutritionInfoCA({
         </Stack>
       </Card.Section>
       <Card.Section>
-        <form onSubmit={handleSave}>
+        <form>
           <div>
             <Stack distribution="fill" spacing="tight">
               {formLables.map((lableTitle, index) => (
@@ -182,21 +156,27 @@ function NutritionInfoCA({
                   style={{ width: "130px", marginRight: "10px" }}
                   value={element.name || ""}
                   name="name"
-                  onChange={(e) => handleChange(e, "name", index)}
+                  onChange={(e) =>
+                    handleChange(e, "nutritionData", "name", index)
+                  }
                   autoComplete="off"
                 />
                 <TextField
                   style={{ width: "80px", marginRight: "10px" }}
                   value={element.quantity || 0}
                   name="quantity"
-                  onChange={(e) => handleChange(e, "quantity", index)}
+                  onChange={(e) =>
+                    handleChange(e, "nutritionData", "quantity", index)
+                  }
                   inputMode="number"
                   autoComplete="off"
                 />
                 <div style={{ width: "100px", marginRight: "10px" }}>
                   <Select
                     value={element.Unit || ""}
-                    onChange={(e) => handleChange(e, "Unit", index)}
+                    onChange={(e) =>
+                      handleChange(e, "nutritionData", "Unit", index)
+                    }
                     options={options}
                     name="Unit"
                   />
@@ -204,14 +184,16 @@ function NutritionInfoCA({
                 <TextField
                   value={element.dailyValue || 0}
                   name="dailyValue"
-                  onChange={(e) => handleChange(e, "dailyValue", index)}
+                  onChange={(e) =>
+                    handleChange(e, "nutritionData", "dailyValue", index)
+                  }
                   autoComplete="off"
                   inputMode="number"
                 />
                 <PopOverComponent
                   element={element}
                   handleChange={handleChange}
-                  removeFormFields={removeFormFields}
+                  removeFormFields={handleRemoveNutritionData}
                   index={index}
                 />
               </Stack>
@@ -219,7 +201,6 @@ function NutritionInfoCA({
           </div>
         </form>
       </Card.Section>
-      <Button onClick={handleSave}>Save</Button>
     </Card>
   );
 }

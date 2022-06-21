@@ -14,7 +14,18 @@ import Notes from "./Notes";
 import Ingredients from "./Ingredients";
 import AllergyInfo from "./AllergyInfo";
 import LegalNotes from "./LegalNotes";
-import { Heading, Card, Button, Page, TextStyle } from "@shopify/polaris";
+import {
+  Heading,
+  Card,
+  Button,
+  Page,
+  TextStyle,
+  SkeletonPage,
+  Layout,
+  SkeletonBodyText,
+  TextContainer,
+  SkeletonDisplayText,
+} from "@shopify/polaris";
 import NutritionInfo from "./NutritionInfoEU";
 import {
   formDataCA,
@@ -26,6 +37,7 @@ import {
   mineralsCA,
   mineralsEU,
   mineralsNA,
+  calsEnergyInfo,
 } from "../defaultData.js";
 import BasicVitaminsMineralsPage from "./BasicVitaminsMineralsPage";
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
@@ -37,7 +49,6 @@ const formLables = {
 
 function CreateLabel({
   langState,
-  newFormSet,
   location,
   selectedProducts,
   handleTabChange,
@@ -52,6 +63,13 @@ function CreateLabel({
   removeTag,
   selectedOptions,
   setSelectedOptions,
+  handleChange,
+  handleAddNutritionData,
+  handleRemoveNutritionData,
+  handleAddVitamins,
+  handleRemoveVitamins,
+  handleAddMinerals,
+  handleRemoveMinerals,
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
@@ -64,7 +82,8 @@ function CreateLabel({
   const [rightSideWidth, setRightSideWidth] = useState("35%");
   const [leftSideWidth, setLeftSideWidth] = useState("60%");
   const [flexDirection, setFlexDirection] = useState("row");
-  const updateProducts = useCallback(async () => {
+  const [productExist, setProductExist] = useState(false);
+  const updateProducts = async () => {
     if (data.richText.notesText === undefined) {
       if (location === "EU")
         data.richText.notesText =
@@ -92,11 +111,19 @@ function CreateLabel({
       if (location === "NA") data.minerals = mineralsNA;
       if (location === "EU") data.minerals = mineralsEU;
     }
+    if (!Object.keys(data?.calsEnergyInfo).length > 0) {
+      data.calsEnergyInfo = calsEnergyInfo;
+    }
     console.log(data);
+    setProductExist(true);
+  };
+  useEffect(() => {
+    window.addEventListener("DOMContentLoaded", updateProducts());
+
+    window.removeEventListener("DOMContentLoaded", () => {
+      console.log("done!");
+    });
   }, []);
-  useEffect(async () => {
-    await updateProducts();
-  });
   useEffect(() => {
     window.addEventListener("resize", () => {
       if (window.innerWidth <= 960) {
@@ -126,22 +153,10 @@ function CreateLabel({
     handleOrderSet();
   }, []);
 
-  const handleOrderChange = (toIndex, prevIndex) => {
-    const element = formValues.splice(prevIndex, 1)[0];
-    formValues.splice(toIndex, 0, element);
-    console.log(formValues);
-  };
-
   const handleNutriScoreCheckElem = (newState) => {
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
     console.log(newState);
   };
-
-  const handleServingSizeChange = useCallback((value, tag, name) => {
-    let newData = { ...data };
-    newData["servingSize"][tag][name] = value;
-    setData(newData), [];
-  });
 
   const handleproductToPrepare = useCallback(
     (newChecked) => setProductToPrepare(newChecked),
@@ -200,161 +215,225 @@ function CreateLabel({
         },
       ]}
     >
-      <div style={{ display: "flex", flexDirection: flexDirection }}>
-        {/* //  Todo left side page */}
-        <div
-          style={{
-            width: leftSideWidth,
-            marginTop: "10px",
-            marginRight: "20px",
-          }}
-        >
-          <ProductInfo
-            productToPrepare={productToPrepare}
-            handleproductToPrepare={handleproductToPrepare}
-            nonFoodProduct={nonFoodProduct}
-            handleNonFoodProduct={handleNonFoodProduct}
-            handleNutriScoreCheckElem={handleNutriScoreCheckElem}
-            locationPlan={locationPlan}
-            productsArray={productsArray}
-            selectedOptions={selectedOptions}
-            setSelectedOptions={setSelectedOptions}
-            defaultSet={defaultSet}
-            deselectedOptions={deselectedOptions}
-            memoOptions={memoOptions}
-            setMemoOptions={setMemoOptions}
-            removeTag={removeTag}
-          />
-          {nonFoodProduct ? (
-            <Card sectioned>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Heading>This product doesn’t need a nutrition label.</Heading>
-                <div style={{ textAlign: "center", marginTop: "10px" }}>
-                  <TextStyle variation="subdued">
-                    Since this product is a non-food item, you do not need to
-                    enter any further information. By default, no nutrition
-                    label is displayed for this product on the product detail
-                    page.
-                  </TextStyle>
-                </div>
-              </div>
-            </Card>
-          ) : (
-            <div>
-              <ServingSize
-                productToPrepare={productToPrepare}
-                servingSize={data.servingSize}
-                handleServingSizeChange={handleServingSizeChange}
-                locationPlan={locationPlan}
-                data={data}
-              />
-              {locationPlan.location === "EU" ? <CalsEnergyInfos /> : <></>}
-
-              <NutritionInfo
-                locationPlan={locationPlan}
-                formValues={formValues}
-                setFormValues={setFormValues}
-                handleOrderChange={handleOrderChange}
-                newFormSet={newFormSet}
-                formLables={
-                  locationPlan.location === "EU"
-                    ? formLables.formLablesEU
-                    : formLables.formLablesCA_NA
-                }
-                data={data}
-              />
-              {locationPlan.plan === "Basic" && location === "EU" ? (
-                <BasicVitaminsMineralsPage handleTabChange={handleTabChange} />
-              ) : (
-                <>
-                  <Vitamins
-                    data={data.vitamins}
-                    defaultSet={defaultSet}
-                    locationPlan={locationPlan}
-                  />
-                  <Minerals
-                    data={data.minerals}
-                    defaultSet={defaultSet}
-                    locationPlan={locationPlan}
-                  />
-                </>
-              )}
-              <Notes
-                notesText={data.richText.notesText}
-                handleTextChange={handleNotesTextChange}
-              />
-              <Ingredients
-                data={langState.values.Ingredients}
-                ingredientsText={data.richText.ingredientsText}
-                handleTextChange={handleIngredientsTextChange}
-              />
-              <AllergyInfo
-                data={langState.values.AllergyInformation}
-                allergyInfoText={data.richText.allergyInfoText}
-                handleTextChange={handleAllergyInfoTextChange}
-              />
-              <LegalNotes
-                data={langState.values.LEGALNOTICE}
-                lEGALNOTICEText={data.richText.lEGALNOTICEText}
-                handleTextChange={handleLEGALNOTICETextChange}
-              />
-            </div>
-          )}
+      {productExist ? (
+        <div style={{ display: "flex", flexDirection: flexDirection }}>
+          {/* //  Todo left side page */}
           <div
             style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginTop: "20px",
+              width: leftSideWidth,
+              marginTop: "10px",
+              marginRight: "20px",
             }}
           >
-            <Button
-              destructive
-              outline
-              style={{ margin: "4px" }}
-              type="button"
-              className="button remove"
-              onClick={() => console.log("clicked")}
+            <ProductInfo
+              productToPrepare={productToPrepare}
+              handleproductToPrepare={handleproductToPrepare}
+              nonFoodProduct={nonFoodProduct}
+              handleNonFoodProduct={handleNonFoodProduct}
+              handleNutriScoreCheckElem={handleNutriScoreCheckElem}
+              locationPlan={locationPlan}
+              productsArray={productsArray}
+              selectedOptions={selectedOptions}
+              setSelectedOptions={setSelectedOptions}
+              defaultSet={defaultSet}
+              deselectedOptions={deselectedOptions}
+              memoOptions={memoOptions}
+              setMemoOptions={setMemoOptions}
+              removeTag={removeTag}
+            />
+            {nonFoodProduct ? (
+              <Card sectioned>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Heading>
+                    This product doesn’t need a nutrition label.
+                  </Heading>
+                  <div style={{ textAlign: "center", marginTop: "10px" }}>
+                    <TextStyle variation="subdued">
+                      Since this product is a non-food item, you do not need to
+                      enter any further information. By default, no nutrition
+                      label is displayed for this product on the product detail
+                      page.
+                    </TextStyle>
+                  </div>
+                </div>
+              </Card>
+            ) : (
+              <div>
+                <ServingSize
+                  productToPrepare={productToPrepare}
+                  servingSize={data.servingSize}
+                  locationPlan={locationPlan}
+                  data={data}
+                  handleChange={handleChange}
+                />
+                {locationPlan.location === "EU" ? (
+                  <CalsEnergyInfos
+                    data={data ? data : {}}
+                    handleChange={handleChange}
+                  />
+                ) : (
+                  <></>
+                )}
+
+                <NutritionInfo
+                  locationPlan={locationPlan}
+                  formLables={
+                    locationPlan.location === "EU"
+                      ? formLables.formLablesEU
+                      : formLables.formLablesCA_NA
+                  }
+                  data={data}
+                  handleAddNutritionData={handleAddNutritionData}
+                  handleRemoveNutritionData={handleRemoveNutritionData}
+                  handleChange={handleChange}
+                  productToPrepare={productToPrepare}
+                />
+                {locationPlan.plan === "Basic" && location === "EU" ? (
+                  <BasicVitaminsMineralsPage
+                    handleTabChange={handleTabChange}
+                  />
+                ) : (
+                  <>
+                    <Vitamins
+                      data={data.vitamins}
+                      locationPlan={locationPlan}
+                      handleAddVitamins={handleAddVitamins}
+                      handleRemoveVitamins={handleRemoveVitamins}
+                      handleChange={handleChange}
+                    />
+                    <Minerals
+                      data={data.minerals}
+                      locationPlan={locationPlan}
+                      handleAddMinerals={handleAddMinerals}
+                      handleRemoveMinerals={handleRemoveMinerals}
+                      handleChange={handleChange}
+                    />
+                  </>
+                )}
+                <Notes
+                  notesText={data.richText.notesText}
+                  handleTextChange={handleNotesTextChange}
+                />
+                <Ingredients
+                  data={langState.values.Ingredients}
+                  ingredientsText={data.richText.ingredientsText}
+                  handleTextChange={handleIngredientsTextChange}
+                />
+                <AllergyInfo
+                  data={langState.values.AllergyInformation}
+                  allergyInfoText={data.richText.allergyInfoText}
+                  handleTextChange={handleAllergyInfoTextChange}
+                />
+                <LegalNotes
+                  data={langState.values.LEGALNOTICE}
+                  lEGALNOTICEText={data.richText.lEGALNOTICEText}
+                  handleTextChange={handleLEGALNOTICETextChange}
+                />
+              </div>
+            )}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: "20px",
+              }}
             >
-              Delete Label
-            </Button>
-            <Button
-              primary
-              style={{ margin: "4px" }}
-              type="button"
-              className="button remove"
-              onClick={() =>
-                handleSaveSelectedProducts(
-                  selectedProducts,
-                  nonFoodProduct,
-                  data
-                )
-              }
-            >
-              Save Label
-            </Button>
+              <Button
+                destructive
+                outline
+                style={{ margin: "4px" }}
+                type="button"
+                className="button remove"
+                onClick={() => console.log("clicked")}
+              >
+                Delete Label
+              </Button>
+              <Button
+                primary
+                style={{ margin: "4px" }}
+                type="button"
+                className="button remove"
+                onClick={() =>
+                  handleSaveSelectedProducts(
+                    selectedProducts,
+                    nonFoodProduct,
+                    data
+                  )
+                }
+              >
+                Save Label
+              </Button>
+            </div>
+          </div>
+          {/* //  Todo right side page */}
+          <div style={{ width: rightSideWidth, marginTop: "10px" }}>
+            {nonFoodProduct ? (
+              <></>
+            ) : (
+              <TablePreview
+                data={data}
+                formValues={formValues}
+                productToPrepare={productToPrepare}
+                locationPlan={locationPlan}
+              />
+            )}
           </div>
         </div>
-        {/* //  Todo right side page */}
-        <div style={{ width: rightSideWidth, marginTop: "10px" }}>
-          {nonFoodProduct ? (
-            <></>
-          ) : (
-            <TablePreview
-              data={data}
-              formValues={formValues}
-              productToPrepare={productToPrepare}
-            />
-          )}
-        </div>
-      </div>
+      ) : (
+        <SkeletonPage primaryAction>
+          <Layout>
+            <Layout.Section>
+              <Card sectioned>
+                <SkeletonBodyText />
+              </Card>
+              <Card sectioned>
+                <TextContainer>
+                  <SkeletonDisplayText size="small" />
+                  <SkeletonBodyText />
+                </TextContainer>
+              </Card>
+              <Card sectioned>
+                <TextContainer>
+                  <SkeletonDisplayText size="small" />
+                  <SkeletonBodyText />
+                </TextContainer>
+              </Card>
+            </Layout.Section>
+            <Layout.Section secondary>
+              <Card>
+                <Card.Section>
+                  <TextContainer>
+                    <SkeletonDisplayText size="small" />
+                    <SkeletonBodyText lines={2} />
+                  </TextContainer>
+                </Card.Section>
+                <Card.Section>
+                  <SkeletonBodyText lines={1} />
+                </Card.Section>
+              </Card>
+              <Card subdued>
+                <Card.Section>
+                  <TextContainer>
+                    <SkeletonDisplayText size="small" />
+                    <SkeletonBodyText lines={2} />
+                  </TextContainer>
+                </Card.Section>
+                <Card.Section>
+                  <SkeletonBodyText lines={2} />
+                </Card.Section>
+              </Card>
+            </Layout.Section>
+          </Layout>
+        </SkeletonPage>
+      )}
     </Page>
   );
 }
