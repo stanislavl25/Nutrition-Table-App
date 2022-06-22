@@ -54,6 +54,7 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
           name="Name"
           value={element.order || ""}
           onChange={(e) => handleChange(e, "minerals", "order", index)}
+          inputMode="numeric"
         />
         <Button
           destructive

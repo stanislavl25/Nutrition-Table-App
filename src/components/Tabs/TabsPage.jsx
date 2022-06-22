@@ -135,7 +135,7 @@ function TabsPage() {
     try {
       const data = await fetch("/locations").then((res) => res.json());
       setlocationObj(data);
-      setLocation("CA");
+      setLocation("EU");
       return;
       if (data.length) {
         const countryCode = data[0].country_code;
@@ -415,13 +415,41 @@ function TabsPage() {
     },
     [selectedOptions]
   );
-
-  const handleChange = useCallback((val, tag, name, secondTag) => {
+  /**
+   * handle change of any value
+   */
+  const handleChange = useCallback(async (val, tag, name, secondTag) => {
+    /***
+     * handle order change
+     */
+    if (name === "order") {
+      let newData = { ...arraydata };
+      var element = newData[tag][secondTag];
+      newData[tag].splice(secondTag, 1);
+      newData[tag].splice(val, 0, element);
+      newData[tag][secondTag][name] = val;
+      await setArrayData(newData);
+      setTimeout(async () => {
+        for (var i = 0; i < newData[tag].length; i++) {
+          const num = i;
+          newData[tag][i]["order"] = num.toString();
+        }
+        await setArrayData(newData);
+      }, 500);
+      return;
+    }
+    /***
+     * handle change if not secondTag is an index (number)
+     */
     if (!secondTag && typeof secondTag !== "number") {
       let newData = { ...arraydata };
       newData[tag][name] = val;
       setArrayData(newData);
+      return;
     }
+    /**
+     * handle change if secondeTag is a number (index)
+     */
     if (
       secondTag.length > 0 ||
       typeof secondTag === "number" ||
@@ -430,6 +458,7 @@ function TabsPage() {
       let newData = { ...arraydata };
       newData[tag][secondTag][name] = val;
       setArrayData(newData);
+      return;
     }
   });
   const handleAddNutritionData = () => {
@@ -445,7 +474,7 @@ function TabsPage() {
             unit: "Grams",
             bold: "Yes",
             leftSpacing: "0",
-            order: order,
+            order: arraydata.nutritionData.length.toString(),
           },
         ],
       });
@@ -460,7 +489,7 @@ function TabsPage() {
             Unit: "Grams",
             dailyValue: "",
             bold: "No",
-            order: "",
+            order: arraydata.nutritionData.length.toString(),
             leftSpacing: "",
             preparedProduct: "",
           },
@@ -483,7 +512,7 @@ function TabsPage() {
             per100g: "",
             perportion: "",
             LeftSpacing: "",
-            order: "",
+            order: arraydata.vitamins.length.toString(),
             RI: "",
           },
         ],
@@ -498,7 +527,7 @@ function TabsPage() {
             quantity: "",
             unit: "Grams",
             dailyValue: "",
-            order: "",
+            order: arraydata.vitamins.length.toString(),
             RI: "",
             LeftSpacing: "",
           },
@@ -521,7 +550,7 @@ function TabsPage() {
             per100g: "",
             perportion: "",
             LeftSpacing: "",
-            order: "",
+            order: arraydata.minerals.length.toString(),
             RI: "",
           },
         ],
@@ -536,7 +565,7 @@ function TabsPage() {
             quantity: "",
             unit: "Grams",
             dailyValue: "",
-            order: "",
+            order: arraydata.minerals.length.toString(),
             RI: "",
             LeftSpacing: "",
           },

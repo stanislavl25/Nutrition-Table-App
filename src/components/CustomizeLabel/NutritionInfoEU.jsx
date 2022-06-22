@@ -17,6 +17,7 @@ const PopOverComponent = ({
   index,
   element,
   removeFormFields,
+  dataLength,
 }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
@@ -65,7 +66,8 @@ const PopOverComponent = ({
               type="number"
               name="order"
               min={0}
-              value={element.order || ""}
+              max={dataLength}
+              value={element.order}
               onChange={(e) => {
                 handleChange(e, "nutritionData", "order", index);
               }}
@@ -78,6 +80,7 @@ const PopOverComponent = ({
           type="number"
           value={element.leftSpacing || ""}
           min={0}
+          max={30}
           name="leftSpacing"
           onChange={(e) =>
             handleChange(e, "nutritionData", "leftSpacing", index)
@@ -132,6 +135,7 @@ function NutritionInfo({
           handleChange={handleChange}
           handleAddNutritionData={handleAddNutritionData}
           handleRemoveNutritionData={handleRemoveNutritionData}
+          dataLength={data.length}
         />
       ) : (
         <></>
@@ -143,6 +147,7 @@ function NutritionInfo({
           handleAddNutritionData={handleAddNutritionData}
           handleRemoveNutritionData={handleRemoveNutritionData}
           productToPrepare={productToPrepare}
+          dataLength={data.length}
         />
       ) : (
         <></>
@@ -267,6 +272,7 @@ function NutritionInfo({
                           handleChange={handleChange}
                           removeFormFields={handleRemoveNutritionData}
                           index={index}
+                          dataLength={data.length}
                         />
                       </div>
                     </div>

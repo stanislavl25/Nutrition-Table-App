@@ -72,7 +72,7 @@ function CreateLabel({
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
-    plan: "Basic",
+    plan: "Advanced",
   });
 
   const [formValues, setFormValues] = useState([]);
@@ -83,11 +83,13 @@ function CreateLabel({
   const [flexDirection, setFlexDirection] = useState("row");
   const [productExist, setProductExist] = useState(false);
   const handleOrderSet = () => {
-    for (var i = 0; i < formValues.length; i++) {
-      let newFormValues = [...formValues];
-      newFormValues[i]["order"] = i;
-      setFormValues(newFormValues);
+    for (var i = 0; i < data.nutritionData.length; i++) {
+      const num = i;
+      let newData = [...data.nutritionData];
+      newData[i]["order"] = num.toString();
+      setFormValues(newData);
     }
+    setProductExist(true);
   };
 
   const updateProducts = async () => {
@@ -121,9 +123,8 @@ function CreateLabel({
     if (!Object.keys(data?.calsEnergyInfo).length > 0) {
       data.calsEnergyInfo = calsEnergyInfo;
     }
+    await handleOrderSet();
     console.log(data);
-    handleOrderSet();
-    setProductExist(true);
   };
   useEffect(() => {
     window.addEventListener("DOMContentLoaded", updateProducts());

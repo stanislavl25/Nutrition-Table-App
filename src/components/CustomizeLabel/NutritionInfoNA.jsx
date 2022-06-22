@@ -16,6 +16,7 @@ const PopOverComponent = ({
   element,
   removeFormFields,
   productToPrepare,
+  dataLength,
 }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
@@ -59,12 +60,16 @@ const PopOverComponent = ({
               onChange={(e) => handleChange(e, "nutritionData", "order", index)}
               autoComplete="off"
               value={element.order}
+              min={0}
+              max={dataLength}
             />
           </Stack.Item>
         </Stack>
         <TextField
           label="Left Spacing (Table)"
           value={element.leftSpacing}
+          max={30}
+          min={0}
           onChange={(e) =>
             handleChange(e, "nutritionData", "leftSpacing", index)
           }
@@ -127,6 +132,7 @@ function NutritionInfoNA({
   handleRemoveNutritionData,
   handleChange,
   productToPrepare,
+  dataLength,
 }) {
   const options = [
     { label: "Grams", value: "Grams" },
@@ -207,6 +213,7 @@ function NutritionInfoNA({
                 handleChange={handleChange}
                 removeFormFields={handleRemoveNutritionData}
                 productToPrepare={productToPrepare}
+                dataLength={dataLength}
               />
             </Stack.Item>
           </Stack>
