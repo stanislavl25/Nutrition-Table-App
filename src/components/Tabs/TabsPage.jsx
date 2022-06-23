@@ -295,7 +295,7 @@ function TabsPage() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ products, shop_id: storeData.shop_id }),
+      body: JSON.stringify({ products }),
     };
     try {
       const data = await fetch("/save_non-food", fetchOptions)
@@ -429,13 +429,13 @@ function TabsPage() {
       newData[tag].splice(val, 0, element);
       newData[tag][secondTag][name] = val;
       await setArrayData(newData);
-      setTimeout(async () => {
-        for (var i = 0; i < newData[tag].length; i++) {
-          const num = i;
-          newData[tag][i]["order"] = num.toString();
-        }
-        await setArrayData(newData);
-      }, 500);
+      // setTimeout(async () => {
+      //   for (var i = 0; i < newData[tag].length; i++) {
+      //     const num = i;
+      //     newData[tag][i]["order"] = num.toString();
+      //   }
+      //   await setArrayData(newData);
+      // }, 500);
       return;
     }
     /***

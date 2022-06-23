@@ -211,7 +211,7 @@ function MyLablesTable({
             Protein,
             Salt,
             food_product,
-            images,
+            image,
           },
           index
         ) => (
@@ -222,7 +222,7 @@ function MyLablesTable({
             position={index}
           >
             <IndexTable.Cell>
-              <Thumbnail source={images[0] ? images[0].src : ""} alt="" />
+              <Thumbnail source={image !== null ? image : ""} alt="" />
             </IndexTable.Cell>
             <IndexTable.Cell>
               <TextStyle variation="strong">{name}</TextStyle>

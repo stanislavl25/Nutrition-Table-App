@@ -10,7 +10,7 @@ const productSchema = new Schema(
     productId: { type: String },
     food_product: { type: Boolean, default: true },
     is_deleted: { type: Boolean, default: false },
-    images: {},
+    image: { type: String },
     product_type: { type: String },
     nutriScore: { type: String, default: "A" },
     richText: {

@@ -9,6 +9,7 @@ import db from "./db.js";
 import ProductsLabels from "./models/productsLabels.js";
 import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
+import { throws } from "assert";
 const USE_ONLINE_TOKENS = true;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 
@@ -69,8 +70,9 @@ export async function createServer(
   /***handle non food save  */
 
   app.post("/save_non-food", verifyRequest(app), async (req, res) => {
+    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const products = req.body.products;
-    const storeId = req.body.shop_id;
+    const storeId = session.shop;
     try {
       let updateData;
       for (var i = 0; i < products.length; i++) {
@@ -99,20 +101,25 @@ export async function createServer(
     const store = session.shop;
     try {
       const update = { [name]: value };
-      const updateData = await StoreModel.findOneAndUpdate(
-        { shop_id: store },
-        update,
-        { returnOriginal: false }
-      );
-      // console.log(updateData);
-      if (updateData) {
-        res.status(200).send({
-          success: true,
-          message: "Changes Saved!",
-        });
+      if (typeof name === "string" && typeof value === "string") {
+        const updateData = await StoreModel.findOneAndUpdate(
+          { shop_id: store },
+          update,
+          { returnOriginal: false }
+        );
+        // console.log(updateData);
+        if (updateData) {
+          res.status(200).send({
+            success: true,
+            message: "Changes Saved!",
+          });
+        }
+      } else {
+        throw new Error("type of data is bad!");
       }
     } catch (err) {
-      res.status(500).send(err);
+      res.status(400).send({ message: "Something wrong happend!" });
+      console.log(err);
     }
   });
 
@@ -198,13 +205,16 @@ export async function createServer(
   };
   /** check if the products exist */
   const checkProductsExist = async (product, shopId) => {
-    const check = await Products.exists({ productId: product.id });
+    const check = await Products.find({ productId: product.id });
+    console.log(check);
+    if (check) {
+    }
     if (check === null) {
       const productCreation = await Products.create({
         name: product.title,
         store_id: shopId,
         productId: product.id,
-        images: product.images,
+        image: product.images.length ? product.images[0].src : null,
         product_type: product.product_type,
       });
     }
@@ -214,7 +224,7 @@ export async function createServer(
 
   app.get("/locations", verifyRequest(app), async (req, res) => {
     const { Location } = await import(
-      "@shopify/shopify-api/dist/rest-resources/2022-04/index.js"
+      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
     );
     const session = await Shopify.Utils.loadCurrentSession(req, res);
     const locations = await Location.all({
