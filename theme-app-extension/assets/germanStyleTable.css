@@ -3,8 +3,8 @@
 .container_performance-facts{
     display:flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    width: 100%;
 }
 .performance-facts_secondaryHeader{
     display:flex;
@@ -34,10 +34,8 @@ p {
 }
 
 .performance-facts {
-  border: 1px solid black;
   margin: 20px;
   float: left;
-  width: 280px;
   padding: 0.5rem;
 }
 .performance-facts table {
@@ -51,7 +49,6 @@ p {
 }
 
 .performance-facts__header {
-  border-bottom: 10px solid black;
   padding: 0 0 0.25rem 0;
   margin: 0 0 0.5rem 0;
 }
@@ -88,9 +85,9 @@ p {
 .performance-facts__table .thick-row th, .performance-facts__table--grid .thick-row th, .performance-facts__table--small .thick-row th,
 .performance-facts__table .thick-row td,
 .performance-facts__table--grid .thick-row td,
-.performance-facts__table--small .thick-row td {
+/* .performance-facts__table--small .thick-row td {
   border-top-width: 5px;
-}
+} */
 
 .small-info {
   font-size: 0.9rem;
@@ -128,9 +125,9 @@ p {
   text-align: center;
 }
 
-.thick-end {
+/* .thick-end {
   border-bottom: 10px solid black;
-}
+} */
 
 .thin-end {
   border-bottom: 1px solid black;

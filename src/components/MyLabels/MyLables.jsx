@@ -19,7 +19,6 @@ function MyLables({
   selectedOptions,
   setSelectedOptions,
 }) {
-  console.log(productsArray);
   return (
     <div>
       {checkPlan ? (
@@ -98,7 +97,7 @@ function MyLables({
             ) : (
               <MyLablesTable
                 productsArray={
-                  productsArray === undefined ? "none" : productsArray
+                  productsArray.length === 0 ? "none" : productsArray
                 }
                 setProductsArray={setProductsArray}
                 handleSelectedProducts={handleSelectedProducts}

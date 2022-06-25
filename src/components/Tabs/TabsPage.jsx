@@ -47,7 +47,7 @@ function TabsPage() {
     (selectedTabIndex) => setSelected(selectedTabIndex),
     []
   );
-  const [productsArray, setProductsArray] = useState();
+  const [productsArray, setProductsArray] = useState([]);
   const [location, setLocation] = useState("");
   const [locationObj, setlocationObj] = useState({});
   const [emptyStore, setEmptyStore] = useState(false);
@@ -120,14 +120,22 @@ function TabsPage() {
       }, 1000);
     }
   }, [storeData]);
-
+  /***  hqndle deleted products from the store admin and removing from the app's database  */
+  const handleDeletedStoreProducts = async () => {
+    const data = await fetch("deleted-store-products").then((res) =>
+      res.json()
+    );
+    console.log(data);
+  };
   /*** save store products if not saved and get store needed data */
   const saveProductsGetStoreData = async () => {
-    const shopData = await fetch("/products-save").then((res) => res.json());
-    if (shopData.recommendedIntake.length === 0) {
-      shopData.recommendedIntake = recommendedIntakeRows;
+    const shopData = await fetch("products-save").then((res) => res.json());
+    if (shopData.success) {
+      if (shopData.data.recommendedIntake.length === 0) {
+        shopData.data.recommendedIntake = recommendedIntakeRows;
+      }
+      setStoreData(shopData.data);
     }
-    setStoreData(shopData);
   };
 
   /*** get store location */
@@ -182,8 +190,9 @@ function TabsPage() {
   const fetchProducts = async () => {
     try {
       const data = await fetch("products-list").then((res) => res.json());
-      if (data.length) {
-        setProductsArray(data);
+      if (data.success) {
+        console.log(data.data);
+        setProductsArray(data.data);
         setArrayData(defaultData);
         setDefaultSet(true);
         var array = [];
@@ -194,7 +203,7 @@ function TabsPage() {
           newCategorie.value = element.product_type;
           array.push(newCategorie);
         };
-        data.forEach((elem) => handlecategories(elem));
+        data.data.forEach((elem) => handlecategories(elem));
         const unique = array.filter((element) => {
           const isDuplicate = uniqueValues.includes(element.label);
           if (!isDuplicate) {
@@ -204,6 +213,7 @@ function TabsPage() {
           return false;
         });
         setCategories(unique);
+        console.log(unique);
       } else {
         //Todo
         setEmptyStore(true);
@@ -386,6 +396,7 @@ function TabsPage() {
     await fetchLocations();
     await saveProductsGetStoreData();
     await fetchLang();
+    await handleDeletedStoreProducts();
     handleSettingDefaultData();
     setTimeout(async () => {
       await fetchProducts();

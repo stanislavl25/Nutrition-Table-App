@@ -78,8 +78,7 @@ export async function createServer(
       for (var i = 0; i < products.length; i++) {
         updateData = await Products.findOneAndUpdate(
           { store_id: storeId, name: products[i] },
-          { food_product: false },
-          { returnOriginal: false }
+          { food_product: false }
         );
       }
       if (updateData)
@@ -157,12 +156,17 @@ export async function createServer(
         fields: "id,title,product_type,images",
       });
       const shop = await checkShopExist(storeProducts[0]["session"].shop);
-      for (var i = 0; i < storeProducts.length; i++) {
-        checkProductsExist(storeProducts[i], shop.shop_id);
+      if (storeProducts.length > 0) {
+        for (var i = 0; i < storeProducts.length; i++) {
+          checkProductsExist(storeProducts[i], shop.shop_id);
+        }
       }
-      res.status(200).send(shop);
+      res
+        .status(200)
+        .send({ data: shop, success: true, message: "data is back!" });
     } catch (err) {
       res.status(400).send("Something wrong happend");
+      console.log(err);
     }
   });
   /***
@@ -186,14 +190,73 @@ export async function createServer(
     }
   });
 
+  /*** handle deleted store products */
+
+  app.get("/deleted-store-products", verifyRequest(app), async (req, res) => {
+    console.log("deleted store products");
+    let array = [];
+    let comparisonArray = [];
+    try {
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const productsDatabase = await Products.find({
+        store_id: session.shop,
+      }).lean();
+      const { Product } = await import(
+        `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+      );
+      const storeProducts = await Product.all({
+        session,
+        fields: "id,title,product_type,images",
+      });
+      if (storeProducts) {
+        storeProducts.forEach((elem) => {
+          let num = elem.id;
+          let text = num.toString();
+          array.push(text);
+        });
+      }
+      if (productsDatabase) {
+        productsDatabase.forEach((elem) => {
+          comparisonArray.push(elem.productId);
+        });
+        comparisonArray.forEach(async (elem) => {
+          if (!array.includes(elem)) {
+            console.log(true);
+            const deleteElement = await Products.findOneAndDelete({
+              productId: elem,
+            });
+          } else {
+            console.log(false);
+          }
+        });
+        console.log("array", array);
+        console.log("2nd array", comparisonArray);
+      }
+      res.status(200).send({ success: true, message: "products deleted!" });
+    } catch (err) {
+      res
+        .status(400)
+        .send({ success: false, message: "products not deleted!" });
+    }
+  });
   /***
    * get all products with the same shop_id
    */
   app.get("/products-list", verifyRequest(app), async (req, res) => {
     console.log("get products");
-    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-    const products = await Products.find({ store_id: session.shop }).lean();
-    res.status(200).send(products);
+    try {
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const productsDatabase = await Products.find({
+        store_id: session.shop,
+      }).lean();
+      res.status(200).send({
+        data: productsDatabase,
+        message: "found products!",
+        success: true,
+      });
+    } catch (err) {
+      res.status(400).send({ success: false, message: "no products found!" });
+    }
   });
 
   /**check if the store exist */
@@ -206,17 +269,52 @@ export async function createServer(
   /** check if the products exist */
   const checkProductsExist = async (product, shopId) => {
     const check = await Products.find({ productId: product.id });
-    console.log(check);
-    if (check) {
-    }
-    if (check === null) {
-      const productCreation = await Products.create({
-        name: product.title,
-        store_id: shopId,
-        productId: product.id,
-        image: product.images.length ? product.images[0].src : null,
-        product_type: product.product_type,
-      });
+    try {
+      /** check if product has an updated name or image and update according to those */
+      if (check) {
+        if (product.images.length > 0) {
+          if (
+            check.length > 0 &&
+            check[0].image === null &&
+            check[0].image !== product.images[0].src
+          ) {
+            const update = await Products.findOneAndUpdate(
+              { productId: product.id },
+              { image: product.images[0].src },
+              { returnOriginal: false }
+            );
+          }
+        }
+        if (
+          !product.images.length > 0 &&
+          check.length > 0 &&
+          check[0].image !== null
+        ) {
+          const update = await Products.findOneAndUpdate(
+            { productId: product.id },
+            { image: null },
+            { returnOriginal: false }
+          );
+        }
+        if (check.length > 0 && check[0].name !== product.title) {
+          const update = await Products.findOneAndUpdate(
+            { productId: product.id },
+            { name: product.title },
+            { returnOriginal: false }
+          );
+        }
+      }
+      if (!check.length) {
+        const productCreation = await Products.create({
+          name: product.title,
+          store_id: shopId,
+          productId: product.id,
+          image: product.images.length ? product.images[0].src : null,
+          product_type: product.product_type,
+        });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 

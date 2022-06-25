@@ -1,15 +1,25 @@
-<nutrition-Table class="container_performance-facts" data-id="{{ block.id }}">
-  {%- if block.settings.heading -%}
+<!-- {{ 'theme.scss.css' | asset_url | stylesheet_tag }} -->
+{% style %}
+  .performance-facts__title {
+    color: #222222;
+  }
+{% endstyle %}
+<nutrition-Table class="container_performance-facts" data-id="{{ block.id }}" style="align-items:{{block.settings.vertical_alignment}};"  >
+  <!-- {%- if block.settings.heading -%}
     <h1>{{ block.settings.heading }}</h1>
   {%- endif -%}
 
   {%- if block.settings.description -%}
     <p>{{ block.settings.description }}</p>
-  {%- endif -%}
+  {%- endif -%} -->
  
+ 
+  <!-- {%- if block.settings.vertical_alignment == "center" -%}
+<p>center</p>
+  {%- endif -%}  -->
+  <section class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; ">
 
-  <section class="performance-facts">
-    <header class="performance-facts__header">
+    <header class="performance-facts__header" style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};">
       <div class="performance-facts__header_title">
         <h1 class="performance-facts__title">Nutrition Facts</h1>
       </div>
@@ -23,7 +33,7 @@
     <table class="performance-facts__table">
       <thead>
         <tr>
-          <th colspan="3" class="small-info">
+          <th colspan="3" class="small-info" id="servingstuff">
             Amount Per Serving
           </th>
         </tr>
@@ -122,7 +132,7 @@
           <td>
           </td>
         </tr>
-        <tr class="thick-end">
+        <tr style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}}">
           <th colspan="2">
             <b>Protein</b>
             3g
@@ -172,18 +182,6 @@
       "type":"header",
       "content":"Label Block"
     },
-    {
-      "type":"checkbox",
-      "id":"checkbox1",
-      "label":"Open accordion by default",
-      "default":false
-   },
-   {
-    "type":"checkbox",
-    "id":"checkBox2",
-    "label":"Use custom width",
-    "default":false
-   },
    {
     "type":"select",
     "id":"vertical_alignment",
@@ -199,7 +197,7 @@
           "label":"Center"
        },
        {
-          "value":"right",
+          "value":"end",
           "label":"Right"
        }
     ],
@@ -207,8 +205,8 @@
    },
    {
     "type":"range",
-    "id":"width",
-    "min":12,
+    "id":"tableWidth",
+    "min":25,
     "max":100,
     "step":1,
     "unit":"%",
@@ -222,12 +220,6 @@
    {
     "type":"paragraph",
     "content":"These settings affect the main table or section."
-   },
-   {
-    "type":"checkbox",
-    "id":"checkbox3",
-    "label":"Show Border",
-    "default":false
    },
    {
     "type":"color",
@@ -244,9 +236,9 @@
    {
     "type":"range",
     "id":"primaryBorderThickness",
-    "min":-1,
-    "max":1,
-    "step":1,
+    "min":0,
+    "max":3,
+    "step":0.5,
     "unit":"px",
     "label":"Primary Border Thickness",
     "default":1
@@ -254,9 +246,9 @@
    {
     "type":"range",
     "id":"secondaryBorderThickness",
-    "min":-2,
-    "max":2,
-    "step":1,
+    "min":0,
+    "max":5,
+    "step":0.5,
     "unit":"px",
     "label":"Secondary Border Thickness",
     "default":2
@@ -378,33 +370,33 @@
     "unit": "px",
     "label": "Horizontal cell padding",
     "default": 0.9
-  },
-  {
-    "type":"checkbox",
-    "id":"checkbox4",
-    "label":"Show tick icon before each ingredient",
-    "default":false
-   },
-   {
-    "type": "color",
-    "id": "tick_icon_color",
-    "label": "Tick icon color",
-    "default": "#000000"
-  },
-  {
-    "type": "color",
-    "id": "ingredients_text_color",
-    "label": "Ingredients text color",
-    "default": "#000000"
-  },
-  {
-    "type": "image_picker",
-    "id": "custom_ingredient_icon",
-    "label": "Custom ingredient icon"
   }
   ]
 }
 {% endschema %}
+<!-- {
+  "type":"checkbox",
+  "id":"checkbox4",
+  "label":"Show tick icon before each ingredient",
+  "default":false
+ },
+ {
+  "type": "color",
+  "id": "tick_icon_color",
+  "label": "Tick icon color",
+  "default": "#000000"
+} -->
+<!-- {
+  "type": "color",
+  "id": "ingredients_text_color",
+  "label": "Ingredients text color",
+  "default": "#000000"
+},
+{
+  "type": "image_picker",
+  "id": "custom_ingredient_icon",
+  "label": "Custom ingredient icon"
+} -->
 <!-- {
   "type":"header",
   "content":"ICONS AND DETAILS"
