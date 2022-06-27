@@ -143,7 +143,7 @@ function TabsPage() {
     try {
       const data = await fetch("/locations").then((res) => res.json());
       setlocationObj(data);
-      setLocation("EU");
+      setLocation("CA");
       return;
       if (data.length) {
         const countryCode = data[0].country_code;
