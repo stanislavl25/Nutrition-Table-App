@@ -80,20 +80,15 @@ function MyLablesTable({
   deselectedOptions,
   memoOptions,
   setMemoOptions,
-  selectedOptions,
-  setSelectedOptions,
+  selectedResources,
+  allResourcesSelected,
+  handleSelectionChange,
 }) {
   const resourceName = {
     singular: "product",
     plural: "products",
   };
-  const resourceIDResolver = (products) => {
-    return products.name;
-  };
-  const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(productsArray, {
-      resourceIDResolver,
-    });
+
   const [sortValue, setSortValue] = useState("");
   const [inputValue, setInputValue] = useState("");
   const updateText = useCallback(

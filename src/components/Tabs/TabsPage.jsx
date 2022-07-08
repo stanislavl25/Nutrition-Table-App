@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Toast, Card, Page, Tabs, Frame } from "@shopify/polaris";
+import {
+  Toast,
+  Card,
+  Page,
+  Tabs,
+  Frame,
+  useIndexResourceState,
+} from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../../App";
 import MyLables from "../MyLabels/MyLables";
@@ -388,8 +395,15 @@ function TabsPage() {
   };
   const handleEditProduct = (id) => {
     setSelected(1);
-    setSelectedProducts(id);
+    setSelectedOptions([...selectedOptions, id]);
   };
+  const resourceIDResolver = (products) => {
+    return products.name;
+  };
+  const { selectedResources, allResourcesSelected, handleSelectionChange } =
+    useIndexResourceState(productsArray, {
+      resourceIDResolver,
+    });
 
   // todo clean up after the use effect
   useEffect(async () => {
@@ -417,7 +431,7 @@ function TabsPage() {
   };
   const deselectedOptions = useMemo(handleMemo);
   const [memoOptions, setMemoOptions] = useState(deselectedOptions);
-  const [selectedOptions, setSelectedOptions] = useState();
+  const [selectedOptions, setSelectedOptions] = useState(selectedResources);
   const removeTag = useCallback(
     (tag) => () => {
       const options = [...selectedOptions];
@@ -618,8 +632,9 @@ function TabsPage() {
           deselectedOptions={deselectedOptions}
           memoOptions={memoOptions}
           setMemoOptions={setMemoOptions}
-          selectedOptions={selectedOptions}
-          setSelectedOptions={setSelectedOptions}
+          selectedResources={selectedResources}
+          allResourcesSelected={allResourcesSelected}
+          handleSelectionChange={handleSelectionChange}
         />
       ),
     },

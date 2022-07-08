@@ -9,7 +9,12 @@ import db from "./db.js";
 import ProductsLabels from "./models/productsLabels.js";
 import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
-import { throws } from "assert";
+import AppSession from "./models/AppSessionModel.js";
+import {
+  storeCallback,
+  loadCallback,
+  deleteCallback,
+} from "./custom-sessions.js";
 const USE_ONLINE_TOKENS = true;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 
@@ -24,7 +29,11 @@ Shopify.Context.initialize({
   API_VERSION: ApiVersion.April22,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
-  SESSION_STORAGE: new Shopify.Session.MemorySessionStorage(),
+  SESSION_STORAGE: new Shopify.Session.CustomSessionStorage(
+    storeCallback,
+    loadCallback,
+    deleteCallback
+  ),
 });
 
 // Storing the currently active shops in memory will force them to re-login when your server restarts. You should
@@ -363,21 +372,20 @@ export async function createServer(
   });
 
   app.use("/*", async (req, res, next) => {
-    const shop = req.query.shop;
-
-    // Detect whether we need to reinstall the app, any request from Shopify will
-    // include a shop in the query parameters.
-    if (app.get("active-shopify-shops")[shop] === undefined && shop) {
+    const { shop } = req.query;
+    console.log(" ################### SHOP  ################### ");
+    console.log(shop);
+    console.log(shop === undefined);
+    console.log(" ################### SHOP  ################### ");
+    const checkShop = await AppSession.exists({ shop: shop });
+    console.log(" ################### checkShop  ################### ");
+    console.log(checkShop);
+    console.log(" ################### checkShop  ################### ");
+    console.log(" ################### !checkShop  ################### ");
+    console.log(!checkShop);
+    console.log(" ################### !checkShop  ################### ");
+    if (!checkShop && shop !== undefined) {
       res.redirect(`/auth?shop=${shop}`);
-      const check = await StoreModel.findOne({ shop_id: shop }).exec();
-      if (check) {
-        //do nothing
-        // console.log(check);
-      } else {
-        let store = new StoreModel({ shop_id: shop });
-        await store.save();
-        // console.log("check false");
-      }
     } else {
       next();
     }

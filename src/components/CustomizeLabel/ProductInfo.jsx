@@ -30,6 +30,7 @@ function ProductInfo({
   setMemoOptions,
   removeTag,
 }) {
+  console.log(selectedOptions);
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
   const [selectedNutriScore, setSelectedNutriScore] = useState("");

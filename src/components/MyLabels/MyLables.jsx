@@ -15,9 +15,11 @@ function MyLables({
   deselectedOptions,
   memoOptions,
   setMemoOptions,
-  removeTag,
   selectedOptions,
   setSelectedOptions,
+  selectedResources,
+  allResourcesSelected,
+  handleSelectionChange,
 }) {
   return (
     <div>
@@ -108,6 +110,9 @@ function MyLables({
                 setMemoOptions={setMemoOptions}
                 selectedOptions={selectedOptions}
                 setSelectedOptions={setSelectedOptions}
+                selectedResources={selectedResources}
+                allResourcesSelected={allResourcesSelected}
+                handleSelectionChange={handleSelectionChange}
               />
             )}
           </Card>
