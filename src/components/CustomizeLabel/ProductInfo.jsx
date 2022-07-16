@@ -29,6 +29,7 @@ function ProductInfo({
   memoOptions,
   setMemoOptions,
   removeTag,
+  productsAredifferent,
 }) {
   console.log(selectedOptions);
   const [inputValue, setInputValue] = useState("");
@@ -103,16 +104,29 @@ function ProductInfo({
           );
         })
       : null;
-  console.log(selectedOptions);
+  // console.log(selectedOptions);
   const tagsMarkup =
     selectedOptions?.length !== 0 ? (
-      <Stack>
-        {selectedOptions?.map((option) => (
-          <Tag key={`option-${option}`} onRemove={removeTag(option)}>
-            {option}
-          </Tag>
-        ))}
-      </Stack>
+      <>
+        <Stack>
+          {selectedOptions?.map((option) => (
+            <Tag key={`option-${option}`} onRemove={removeTag(option)}>
+              {option}
+            </Tag>
+          ))}
+        </Stack>
+        {productsAredifferent ? (
+          <Banner title="" status="critical">
+            <p>
+              You have made different settings in the past for the products you
+              selected. If you make settings on this page and save them, you
+              will overwrite all previous settings of these products.
+            </p>
+          </Banner>
+        ) : (
+          <></>
+        )}
+      </>
     ) : (
       <div
         style={{

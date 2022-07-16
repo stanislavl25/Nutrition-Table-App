@@ -26,7 +26,7 @@ import {
   TextContainer,
   SkeletonDisplayText,
 } from "@shopify/polaris";
-import NutritionInfo from "./NutritionInfoEU";
+import NutritionInfoEU from "./NutritionInfoEU";
 import {
   formDataCA,
   formDataEU,
@@ -69,6 +69,7 @@ function CreateLabel({
   handleRemoveVitamins,
   handleAddMinerals,
   handleRemoveMinerals,
+  productsAredifferent,
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
@@ -124,13 +125,13 @@ function CreateLabel({
       data.calsEnergyInfo = calsEnergyInfo;
     }
     await handleOrderSet();
-    console.log(data);
+    // console.log(data);
   };
   useEffect(() => {
     window.addEventListener("DOMContentLoaded", updateProducts());
 
     window.removeEventListener("DOMContentLoaded", () => {
-      console.log("done!");
+      // console.log("done!");
     });
   }, []);
   useEffect(() => {
@@ -146,13 +147,13 @@ function CreateLabel({
       }
     });
     window.removeEventListener("resize", () => {
-      console.log(window.innerWidth);
+      // console.log(window.innerWidth);
     });
   });
 
   const handleNutriScoreCheckElem = (newState) => {
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
-    console.log(newState);
+    // console.log(newState);
   };
 
   const handleproductToPrepare = useCallback(
@@ -235,6 +236,7 @@ function CreateLabel({
               memoOptions={memoOptions}
               setMemoOptions={setMemoOptions}
               removeTag={removeTag}
+              productsAredifferent={productsAredifferent}
             />
             {nonFoodProduct ? (
               <Card sectioned>
@@ -277,7 +279,7 @@ function CreateLabel({
                   <></>
                 )}
 
-                <NutritionInfo
+                <NutritionInfoEU
                   locationPlan={locationPlan}
                   formLables={
                     locationPlan.location === "EU"

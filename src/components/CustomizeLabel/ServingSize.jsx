@@ -35,7 +35,7 @@ function ServingSize({
   data,
   handleChange,
 }) {
-  console.log(data);
+  // console.log(data);
   return (
     <div
       style={{

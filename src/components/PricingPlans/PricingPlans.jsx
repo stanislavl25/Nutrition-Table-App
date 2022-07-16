@@ -14,7 +14,7 @@ import { CircleTickMajor } from "@shopify/polaris-icons";
 import React from "react";
 import PricingPlanTable from "./PricingPlanTable";
 
-function PricinPlans() {
+function PricinPlans({ plan, handlePlan }) {
   return (
     <Page
       title="Plans and Pricing"
@@ -48,9 +48,15 @@ function PricinPlans() {
                   marginTop: "20px",
                 }}
               >
-                <Button size="large" fullWidth>
-                  Current Plan
-                </Button>
+                {plan && plan === "Basic" ? (
+                  <Button size="large" fullWidth>
+                    Current Plan
+                  </Button>
+                ) : (
+                  <Button size="large" primary fullWidth>
+                    Downgrade Plan
+                  </Button>
+                )}
               </div>
             </Card.Section>
             <Card.Section title="MAIN FEATURES">
@@ -113,9 +119,20 @@ function PricinPlans() {
                   textAlign: "center",
                 }}
               >
-                <Button size="large" primary fullWidth>
-                  Upgrade
-                </Button>
+                {plan && plan !== "Advanced" ? (
+                  <Button
+                    size="large"
+                    primary
+                    fullWidth
+                    onClick={() => handlePlan("Advanced")}
+                  >
+                    Upgrade
+                  </Button>
+                ) : (
+                  <Button size="large" fullWidth>
+                    Current Plan
+                  </Button>
+                )}
               </div>
             </Card.Section>
             <Card.Section title="MAIN FEATURES">
@@ -175,9 +192,15 @@ function PricinPlans() {
                   textAlign: "center",
                 }}
               >
-                <Button size="large" primary fullWidth>
-                  Upgrade
-                </Button>
+                {plan && plan === "Enterprise" ? (
+                  <Button size="large" fullWidth>
+                    Current Plan
+                  </Button>
+                ) : (
+                  <Button size="large" primary fullWidth>
+                    Upgrade
+                  </Button>
+                )}
               </div>
             </Card.Section>
             <Card.Section title="MAIN FEATURES">

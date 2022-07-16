@@ -64,6 +64,7 @@ function TabsPage() {
   const [active, setActive] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [defaultSet, setDefaultSet] = useState(false);
+  const [productsAredifferent, setProductsAredifferent] = useState(false);
 
   const [recommendedIntakeData, setRecommendedIntakeData] = useState(
     storeData.recommendedIntake
@@ -132,7 +133,7 @@ function TabsPage() {
     const data = await fetch("deleted-store-products").then((res) =>
       res.json()
     );
-    console.log(data);
+    // console.log(data);
   };
   /*** save store products if not saved and get store needed data */
   const saveProductsGetStoreData = async () => {
@@ -142,6 +143,7 @@ function TabsPage() {
         shopData.data.recommendedIntake = recommendedIntakeRows;
       }
       setStoreData(shopData.data);
+      // console.log(shopData);
     }
   };
 
@@ -165,7 +167,7 @@ function TabsPage() {
       }
     } catch (err) {
       //Todo
-      console.log(err);
+      // console.log(err);
     }
   };
 
@@ -198,7 +200,7 @@ function TabsPage() {
     try {
       const data = await fetch("products-list").then((res) => res.json());
       if (data.success) {
-        console.log(data.data);
+        // console.log(data.data);
         setProductsArray(data.data);
         setArrayData(defaultData);
         setDefaultSet(true);
@@ -220,13 +222,13 @@ function TabsPage() {
           return false;
         });
         setCategories(unique);
-        console.log(unique);
+        // console.log(unique);
       } else {
         //Todo
         setEmptyStore(true);
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       setEmptyStore(true);
     }
   };
@@ -265,7 +267,7 @@ function TabsPage() {
       },
       body: JSON.stringify({ formVal, storeId }),
     };
-    console.log(formVal, storeId);
+    // console.log(formVal, storeId);
     const data = await fetch("/recommendedIntake_save", fetchOptions)
       .then((res) => res.json())
       .then((response) => {
@@ -293,7 +295,7 @@ function TabsPage() {
       const data = await fetch("/LangFieldsSave", fetchOptions)
         .then((res) => res.json())
         .then((response) => {
-          console.log(response, "translation data saved");
+          // console.log(response, "translation data saved");
           // handleSnackToggle(messages.message);
         })
         .catch((err) => {
@@ -332,7 +334,7 @@ function TabsPage() {
   };
   /** saving food products */
   const handleSaveProducts = async (products) => {
-    console.log(products, "handle save");
+    // console.log(products, "handle save");
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -373,29 +375,115 @@ function TabsPage() {
   };
 
   const handleSelectedProducts = (selectedPro) => {
-    if (selectedPro && selectedPro.length > 0) {
-      setSelectedProducts(selectedPro);
-      const products = productsArray;
-      setProductsArray("none");
-      setDefaultSet(false);
-      setTimeout(() => {
-        setProductsArray(products);
-        setSelected(1);
-      }, 300);
-      for (var i = 0; i < productsArray.length; i++) {
-        if (selectedPro.includes(productsArray[i].name)) {
-          setArrayData(productsArray[i]);
-          return;
+    console.log(selectedPro);
+    setSelectedOptions(selectedPro);
+    const products = productsArray;
+    setProductsArray("none");
+    setDefaultSet(false);
+    setTimeout(() => {
+      setProductsArray(products);
+      setSelected(1);
+    }, 500);
+    for (var i = 0; i < productsArray.length; i++) {
+      if (selectedPro.includes(productsArray[i].name)) {
+        setArrayData(productsArray[i]);
+        return;
+      }
+    }
+    let selectedElements = [];
+    if (selectedPro.length > 1) {
+      productsArray.forEach((elem) => {
+        if (selectedPro.includes(elem.name)) {
+          selectedElements.push(elem);
+        }
+      });
+      for (var i = 1; i < selectedElements.length; i++) {
+        if (
+          selectedElements[0].food_product !==
+            selectedElements[i].food_product ||
+          selectedElements[0].product_type !==
+            selectedElements[i].product_type ||
+          selectedElements[0].nutriScore !== selectedElements[i].nutriScore ||
+          selectedElements[0].richText.ingredientsText !==
+            selectedElements[i].richText.ingredientsText ||
+          selectedElements[0].richText.allergyInfoText !==
+            selectedElements[i].richText.allergyInfoText ||
+          selectedElements[0].richText.lEGALNOTICEText !==
+            selectedElements[i].richText.lEGALNOTICEText ||
+          selectedElements[0].richText.notesText !==
+            selectedElements[i].richText.notesText ||
+          selectedElements[0].servingSize.CA.servingSizeBasic !==
+            selectedElements[i].servingSize.CA.servingSizeBasic ||
+          selectedElements[0].servingSize.CA.servingRefBasic !==
+            selectedElements[i].servingSize.CA.servingRefBasic ||
+          selectedElements[0].servingSize.CA.bilingualRefBasic !==
+            selectedElements[i].servingSize.CA.bilingualRefBasic ||
+          selectedElements[0].servingSize.CA.unitBasic !==
+            selectedElements[i].servingSize.CA.unitBasic ||
+          selectedElements[0].servingSize.CA.caloriesPerServingBasic !==
+            selectedElements[i].servingSize.CA.caloriesPerServingBasic ||
+          selectedElements[0].servingSize.CA.unpreparedReference !==
+            selectedElements[i].servingSize.CA.unpreparedReference ||
+          selectedElements[0].servingSize.CA.unpreparedBilingualReference !==
+            selectedElements[i].servingSize.CA.unpreparedBilingualReference ||
+          selectedElements[0].servingSize.CA.unpreparedCalories !==
+            selectedElements[i].servingSize.CA.unpreparedCalories ||
+          selectedElements[0].servingSize.CA.preparedReference !==
+            selectedElements[i].servingSize.CA.preparedReference ||
+          selectedElements[0].servingSize.CA.preparedBilingualReference !==
+            selectedElements[i].servingSize.CA.preparedBilingualReference ||
+          selectedElements[0].servingSize.CA.preparedCalories !==
+            selectedElements[i].servingSize.CA.preparedCalories ||
+          selectedElements[0].servingSize.EU.DefaultAmount !==
+            selectedElements[i].servingSize.EU.DefaultAmount ||
+          selectedElements[0].servingSize.EU.DefaultAmountUnit !==
+            selectedElements[i].servingSize.EU.DefaultAmountUnit ||
+          selectedElements[0].servingSize.EU.PortionSize !==
+            selectedElements[i].servingSize.EU.PortionSize ||
+          selectedElements[0].servingSize.EU.PortionSizeUnit !==
+            selectedElements[i].servingSize.EU.PortionSizeUnit ||
+          selectedElements[0].servingSize.NA.Servingspercontainer !==
+            selectedElements[i].servingSize.NA.Servingspercontainer ||
+          selectedElements[0].servingSize.NA.Servingreference !==
+            selectedElements[i].servingSize.NA.Servingreference ||
+          selectedElements[0].servingSize.NA.servingsize !==
+            selectedElements[i].servingSize.NA.servingsize ||
+          selectedElements[0].servingSize.NA.unit !==
+            selectedElements[i].servingSize.NA.unit ||
+          selectedElements[0].servingSize.NA.Caloriesperserving !==
+            selectedElements[i].servingSize.NA.Caloriesperserving ||
+          selectedElements[0].servingSize.NA.UnpreparedReference !==
+            selectedElements[i].servingSize.NA.UnpreparedReference ||
+          selectedElements[0].servingSize.NA.Unpreparedcalories !==
+            selectedElements[i].servingSize.NA.Unpreparedcalories ||
+          selectedElements[0].servingSize.NA.PreparedReference !==
+            selectedElements[i].servingSize.NA.PreparedReference ||
+          selectedElements[0].servingSize.NA.Preparedcalories !==
+            selectedElements[i].servingSize.NA.Preparedcalories ||
+          selectedElements[0].calsEnergyInfo.energyKj100 !==
+            selectedElements[i].calsEnergyInfo.energyKj100 ||
+          selectedElements[0].calsEnergyInfo.energyKj25 !==
+            selectedElements[i].calsEnergyInfo.energyKj25 ||
+          selectedElements[0].calsEnergyInfo.energyKcal100 !==
+            selectedElements[i].calsEnergyInfo.energyKcal100 ||
+          selectedElements[0].calsEnergyInfo.energyKcal25 !==
+            selectedElements[i].calsEnergyInfo.energyKcal25 ||
+          selectedElements[0].calsEnergyInfo.Ri !==
+            selectedElements[i].calsEnergyInfo.Ri ||
+          selectedElements[0].minerals !== selectedElements[i].minerals ||
+          selectedElements[0].vitamins !== selectedElements[i].vitamins ||
+          selectedElements[0].nutritionData !==
+            selectedElements[i].nutritionData
+        ) {
+          setProductsAredifferent(true);
+          console.log("products are different");
         }
       }
-    } else {
-      setToastMessage("No products selected");
-      toggleActive();
     }
   };
   const handleEditProduct = (id) => {
     setSelected(1);
-    setSelectedOptions([...selectedOptions, id]);
+    setSelectedOptions([id]);
   };
   const resourceIDResolver = (products) => {
     return products.name;
@@ -603,6 +691,31 @@ function TabsPage() {
     setArrayData(newArrayData);
   };
 
+  const handlePlan = async (planType) => {
+    const store = storeData.shop_id,
+      fetchOptions = {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ planType, store }),
+      };
+    try {
+      const data = await fetch("/recurring-subscribtion", fetchOptions)
+        .then((res) => res.json())
+        .then(async (response) => {
+          if (response.success) {
+            console.log("## /// plan /// ##");
+            console.log(response);
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const toastMarkup = active ? (
     <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />
   ) : null;
@@ -666,6 +779,7 @@ function TabsPage() {
           handleRemoveVitamins={handleRemoveVitamins}
           handleAddMinerals={handleAddMinerals}
           handleRemoveMinerals={handleRemoveMinerals}
+          productsAredifferent={productsAredifferent}
         />
       ),
     },
@@ -695,7 +809,7 @@ function TabsPage() {
     {
       id: "PricinPlans",
       content: "Pricing Plans",
-      tab: <PricinPlans />,
+      tab: <PricinPlans plan={storeData.shop_plan} handlePlan={handlePlan} />,
     },
   ];
 

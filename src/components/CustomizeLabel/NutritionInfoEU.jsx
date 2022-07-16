@@ -136,6 +136,7 @@ function NutritionInfo({
           handleAddNutritionData={handleAddNutritionData}
           handleRemoveNutritionData={handleRemoveNutritionData}
           dataLength={data.length}
+          productToPrepare={productToPrepare}
         />
       ) : (
         <></>

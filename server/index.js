@@ -10,6 +10,7 @@ import ProductsLabels from "./models/productsLabels.js";
 import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
 import AppSession from "./models/AppSessionModel.js";
+import { handleAllWebhooks } from "./webhookhandler.js";
 import {
   storeCallback,
   loadCallback,
@@ -39,10 +40,27 @@ Shopify.Context.initialize({
 // Storing the currently active shops in memory will force them to re-login when your server restarts. You should
 // persist this object in your app.
 const ACTIVE_SHOPIFY_SHOPS = {};
-Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
-  path: "/webhooks",
-  webhookHandler: async (topic, shop, body) => {
-    delete ACTIVE_SHOPIFY_SHOPS[shop];
+
+Shopify.Webhooks.Registry.addHandlers({
+  APP_UNINSTALLED: {
+    path: "/webhooks",
+    webhookHandler: async (topic, shop, body) => {
+      // delete ACTIVE_SHOPIFY_SHOPS[shop];
+      //sessionStorage.deleteActiveShop(shop);
+      console.log("APP_UNINSTALLED WEBHOOK HANDLER TRIGGERED");
+    },
+  },
+  PRODUCTS_UPDATE: {
+    path: "/webhooks",
+    webhookHandler: async (topic, shop, body) => {
+      console.log("PRODUCTS_UPDATE WEBHOOK HANDLER TRIGGERED");
+    },
+  },
+  ORDERS_CREATE: {
+    path: "/webhooks",
+    webhookHandler: async (topic, shop, body) => {
+      console.log("ORDERS_CREATE WEBHOOK HANDLER TRIGGERED");
+    },
   },
 });
 
@@ -62,12 +80,22 @@ export async function createServer(
 
   app.post("/webhooks", async (req, res) => {
     try {
-      await Shopify.Webhooks.Registry.process(req, res);
+      const topic = req.headers["x-shopify-topic"];
+      console.log(topic);
+      const shop = req.headers["x-shopify-shop-domain"];
+      await handleAllWebhooks(shop, topic, req.body);
+      const a = await Shopify.Webhooks.Registry.process(req, res);
+      console.log(a);
       console.log(`Webhook processed, returned status code 200`);
     } catch (error) {
       console.log(`Failed to process webhook: ${error}`);
       res.status(500).send(error.message);
     }
+  });
+
+  app.post("/test", async (req, res) => {
+    console.log(req.body);
+    res.status(200).send({ message: "RJAA3" });
   });
 
   /** handle food products save */
@@ -230,16 +258,13 @@ export async function createServer(
         });
         comparisonArray.forEach(async (elem) => {
           if (!array.includes(elem)) {
-            console.log(true);
             const deleteElement = await Products.findOneAndDelete({
               productId: elem,
             });
           } else {
-            console.log(false);
+            // do something
           }
         });
-        console.log("array", array);
-        console.log("2nd array", comparisonArray);
       }
       res.status(200).send({ success: true, message: "products deleted!" });
     } catch (err) {
@@ -327,6 +352,68 @@ export async function createServer(
     }
   };
 
+  app.post("/recurring-subscribtion", verifyRequest(app), async (req, res) => {
+    console.log(req.body);
+    const plan = req.body.planType;
+    const store = req.body.store;
+    const accessToken = await AppSession.findOne({ shop: store })
+      .select("accessToken -_id")
+      .exec();
+    let plan_price;
+    if (plan === "Basic") {
+      console.log("Basic");
+      plan_price = 10;
+    }
+    if (plan === "Advanced") {
+      console.log("Advanced");
+      plan_price = 20;
+    }
+    if (plan === "Entreprise") {
+      console.log("Entreprise");
+      plan_price = 100;
+    }
+    console.log(plan_price);
+    //     const client = new Shopify.Clients.Graphql(store, accessToken.accessToken);
+    //     const data = await client.query({
+    //    data: {
+    //     "query": `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL! ){
+    //       appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems) {
+    //         userErrors {
+    //           field
+    //           message
+    //         }
+    //         appSubscription {
+    //           id
+    //         }
+    //         confirmationUrl
+    //       }
+    //     }`,
+    //     "variables": {
+    //       "name": `${plan} Plan`,
+    //       "returnUrl": "http://appName.shopifyapps.com/",
+    //       "lineItems": [
+    //         {
+    //           "plan": {
+    //             "appRecurringPricingDetails": {
+    //               "price": {
+    //                 "amount": plan_price,
+    //                 "currencyCode": "USD"
+    //               },
+    //               "interval": "EVERY_30_DAYS"
+    //             }
+    //           }
+    //         }
+    //       ]
+    //     },
+    //   },
+    // });
+    res.status(200).send({
+      success: true,
+      message: "Plan updated successfully!",
+      accessToken,
+    });
+  });
+
   /**return the locations object */
 
   app.get("/locations", verifyRequest(app), async (req, res) => {
@@ -343,7 +430,6 @@ export async function createServer(
   app.post("/product_delete", verifyRequest(app), async (req, res) => {
     console.log(req.body);
     const session = await Shopify.Utils.loadCurrentSession(req, res);
-
     res.status(200).send("hsy");
   });
 
@@ -373,17 +459,9 @@ export async function createServer(
 
   app.use("/*", async (req, res, next) => {
     const { shop } = req.query;
-    console.log(" ################### SHOP  ################### ");
-    console.log(shop);
-    console.log(shop === undefined);
-    console.log(" ################### SHOP  ################### ");
     const checkShop = await AppSession.exists({ shop: shop });
-    console.log(" ################### checkShop  ################### ");
-    console.log(checkShop);
-    console.log(" ################### checkShop  ################### ");
-    console.log(" ################### !checkShop  ################### ");
-    console.log(!checkShop);
-    console.log(" ################### !checkShop  ################### ");
+    // Detect whether we need to reinstall the app, any request from Shopify will
+    // include a shop in the query parameters.
     if (!checkShop && shop !== undefined) {
       res.redirect(`/auth?shop=${shop}`);
     } else {

@@ -156,7 +156,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                     gap: "10px",
                   }}
                 >
-                  <hr style={{ border: "2px solid black", width: "140%" }} />
+                  <hr style={{ borderTop: "3px solid black", width: "140%" }} />
                   <p style={{ width: "100%" }}>
                     <strong
                       style={{
@@ -190,17 +190,13 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                     ) : (
                       <>
                         <th scope="col">
-                          <p>
-                            <strong>
-                              {productToPrepare ? "Prepared" : 1} <br />
-                            </strong>
-                            portion
-                            <br /> {data.servingSize.EU.PortionSize} g
-                          </p>
+                          {productToPrepare ? "Prepared" : 1} <br />
+                          portion
+                          <br /> {data.servingSize.EU.PortionSize} g
                         </th>
-                        <td scope="col" style={{ borderRight: "none" }}>
+                        <th scope="col" style={{ borderRight: "none" }}>
                           % RI*
-                        </td>
+                        </th>
                       </>
                     )}
                   </tr>
@@ -260,13 +256,20 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 {locationPlan.location === "EU" ? (
                   data.nutritionData.map((element, index) => (
                     <tr key={index}>
-                      <th
+                      <td
                         className="thtd"
                         scope="row"
                         style={{ textAlign: "left" }}
                       >
-                        <b>{element.name}</b>
-                      </th>
+                        <p
+                          style={{
+                            fontWeight: element.bold === "Yes" ? "bold" : "",
+                            marginLeft: element.leftSpacing + "px",
+                          }}
+                        >
+                          {element.name}
+                        </p>
+                      </td>
                       <td className="thtd td">{element.per100g}</td>
                       {locationPlan.plan === "Basic" ? (
                         <></>
@@ -288,42 +291,51 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 )}
                 {locationPlan.location === "NA" ? (
                   data.nutritionData.map((element, index) => (
-                    <tr key={index} scope="row">
-                      <td
-                        style={{
-                          borderBottom: "1px solid rgb(190, 190, 190)",
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "100%",
-                        }}
-                      >
-                        <p
+                    <tr
+                      key={index}
+                      scope="row"
+                      style={{
+                        borderBottom: "1px solid rgb(190, 190, 190)",
+                      }}
+                    >
+                      <td>
+                        <div
                           style={{
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
-                            gap: "4px",
-                            textAlign: "left",
+                            gap: "10px",
                           }}
                         >
-                          {element.name}
+                          <p
+                            style={{
+                              fontWeight: element.bold === "Yes" ? "bold" : "",
+                              marginLeft: element.leftSpacing + "px",
+                            }}
+                          >
+                            {element.name}
+                          </p>
                           <p>
                             {element.quantity}
                             {element.unit === "Grams" ? "g" : "mg"}
                           </p>
+                        </div>
+                      </td>
+                      <td
+                        style={{
+                          textAlign: "right",
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "end",
+                        }}
+                      >
+                        <p>
+                          <strong>
+                            {element.dailyValue ? element.dailyValue : 0}
+                          </strong>
                         </p>
-                        <strong
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {element.dailyValue ? element.dailyValue : 0} %
-                        </strong>
+                        <strong>%</strong>
                       </td>
                     </tr>
                   ))
@@ -382,13 +394,19 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 locationPlan.plan != "Basic" ? (
                   data.vitamins.map((element, index) => (
                     <tr key={index}>
-                      <th
+                      <td
                         className="thtd"
                         scope="row"
                         style={{ textAlign: "left" }}
                       >
-                        <b>{element.name}</b>
-                      </th>
+                        <p
+                          style={{
+                            marginLeft: element.LeftSpacing + "px",
+                          }}
+                        >
+                          {element.name}
+                        </p>
+                      </td>
                       <td className="thtd td">{element.per100g}</td>
                       {locationPlan.plan === "Basic" ? (
                         <></>
@@ -414,13 +432,19 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 locationPlan.plan != "Basic" ? (
                   data.minerals.map((element, index) => (
                     <tr key={index}>
-                      <th
+                      <td
                         className="thtd"
                         scope="row"
                         style={{ textAlign: "left" }}
                       >
-                        <b>{element.name}</b>
-                      </th>
+                        <p
+                          style={{
+                            marginLeft: element.LeftSpacing + "px",
+                          }}
+                        >
+                          {element.name}
+                        </p>
+                      </td>
                       <td className="thtd td">{element.per100g}</td>
                       <td className="thtd td"> {element.perportion}</td>
                       <td
@@ -438,39 +462,50 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 )}
                 {locationPlan.location === "NA" ? (
                   data.vitamins.map((element, index) => (
-                    <tr key={index} scope="row">
-                      <td
-                        style={{
-                          borderBottom: "1px solid rgb(190, 190, 190)",
-                          textAlign: "left",
-                        }}
-                      >
-                        <p
+                    <tr
+                      key={index}
+                      scope="row"
+                      style={{
+                        borderBottom: "1px solid rgb(190, 190, 190)",
+                      }}
+                    >
+                      <td>
+                        <div
                           style={{
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
-                            gap: "4px",
+                            gap: "10px",
                           }}
                         >
-                          {element.name}
+                          <p
+                            style={{
+                              marginLeft: element.LeftSpacing + "px",
+                            }}
+                          >
+                            {element.name}
+                          </p>
                           <p>
                             {element.quantity}
                             {element.unit === "Grams" ? "g" : "mg"}
                           </p>
-                        </p>
+                        </div>
                       </td>
-                      <td style={{ textAlign: "right" }}>
-                        <strong
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {element.dailyValue ? element.dailyValue : 0} %
-                        </strong>
+                      <td
+                        style={{
+                          textAlign: "right",
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "right",
+                        }}
+                      >
+                        <p>
+                          <strong>
+                            {element.dailyValue ? element.dailyValue : 0}
+                          </strong>
+                        </p>
+                        <strong>%</strong>
                       </td>
                     </tr>
                   ))
@@ -479,39 +514,50 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 )}
                 {locationPlan.location === "NA" ? (
                   data.minerals.map((element, index) => (
-                    <tr key={index} scope="row">
-                      <td
-                        style={{
-                          borderBottom: "1px solid rgb(190, 190, 190)",
-                          textAlign: "left",
-                        }}
-                      >
-                        <p
+                    <tr
+                      key={index}
+                      scope="row"
+                      style={{
+                        borderBottom: "1px solid rgb(190, 190, 190)",
+                      }}
+                    >
+                      <td>
+                        <div
                           style={{
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
-                            gap: "4px",
+                            gap: "10px",
                           }}
                         >
-                          {element.name}
+                          <p
+                            style={{
+                              marginLeft: element.LeftSpacing + "px",
+                            }}
+                          >
+                            {element.name}
+                          </p>
                           <p>
                             {element.quantity}
                             {element.unit === "Grams" ? "g" : "mg"}
                           </p>
-                        </p>
+                        </div>
                       </td>
-                      <td style={{ textAlign: "right" }}>
-                        <strong
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {element.dailyValue ? element.dailyValue : 0} %
-                        </strong>
+                      <td
+                        style={{
+                          textAlign: "right",
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "right",
+                        }}
+                      >
+                        <p>
+                          <strong>
+                            {element.dailyValue ? element.dailyValue : 0}
+                          </strong>
+                        </p>
+                        <strong>%</strong>
                       </td>
                     </tr>
                   ))

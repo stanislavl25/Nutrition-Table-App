@@ -14,12 +14,10 @@
   {%- endif -%} -->
  
  
-  <!-- {%- if block.settings.vertical_alignment == "center" -%}
-<p>center</p>
-  {%- endif -%}  -->
-  <section class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadius}}px;  background-color:{{block.settings.Table_background_color}}; background-image:{{block.settings.image_picker}};background-size:cover;
-  background-repeat:no-repeat; ">
-
+  <section class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadius}}px;background-color:{{block.settings.Table_background_color}};  ">
+    {%- if block.settings.back_ground_image-%}
+        <img src="{{block.settings.back_ground_image | img_url: 'large'}}" class="backGroundImage" alt="" width="" height="">
+    {%- endif -%} 
     <header class="performance-facts__header" style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};">
       <div class="performance-facts__header_title">
         <div class="header_container">
@@ -316,7 +314,7 @@
    },
    {
     "type": "image_picker",
-    "id": "BackGroundImage",
+    "id": "back_ground_image",
     "label": "Table Background"
   },
   {

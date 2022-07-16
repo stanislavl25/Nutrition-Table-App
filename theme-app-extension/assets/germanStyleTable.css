@@ -32,11 +32,21 @@ body {
 p {
   margin: 0;
 }
-
+.backGroundImage{
+  /* pointer-events: none; */
+  position: absolute;
+  height: 100%;
+  width:100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: -1;
+}
 .performance-facts {
   margin: 20px;
-  float: left;
   padding: 0.5rem;
+  overflow: hidden;
+  position:relative;
+  z-index:1000000000;
 }
 .performance-facts table {
   border-collapse: collapse;

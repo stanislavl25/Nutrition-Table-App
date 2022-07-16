@@ -166,7 +166,6 @@ function MyLablesTable({
   };
   const handleBulkDelete = () => {
     productsArray.forEach((element, index) => {
-      console.log(selectedResources.includes(element.name));
       if (selectedResources.includes(element.name)) {
         removeFormFields(index);
       }
