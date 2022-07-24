@@ -45,7 +45,7 @@ function ServingSize({
       <Card title="Serving Size">
         <Card.Section>
           {locationPlan.location === "CA" ? (
-            <Stack wrap={false}>
+            <Stack>
               <Stack.Item fill>
                 <TextField
                   label="Serving size"
@@ -74,14 +74,38 @@ function ServingSize({
                 />
               </Stack.Item>
               <Stack.Item>
-                <SelectElement
-                  val={servingSize.CA.unitBasic}
-                  handleChange={handleChange}
-                  tag="servingSize"
-                  secondTag="CA"
-                  name="unitBasic"
-                />
+                <div style={{ width: "80px" }}>
+                  <Select
+                    label="Unit"
+                    options={[
+                      { label: "liters", value: "liters" },
+                      { label: "Milliliters", value: "Milliliters" },
+                    ]}
+                    onChange={(e) => {
+                      handleChange(e, "servingSize", "unitBasic", "CA");
+                    }}
+                    value={servingSize.CA.unitBasic}
+                  />
+                </div>
               </Stack.Item>
+              {productToPrepare ? (
+                <></>
+              ) : (
+                <Stack.Item>
+                  <TextField
+                    label="Calories per serving"
+                    onChange={(e) => {
+                      handleChange(
+                        e,
+                        "servingSize",
+                        "caloriesPerServingBasic",
+                        "CA"
+                      );
+                    }}
+                    value={servingSize.CA.caloriesPerServingBasic}
+                  />
+                </Stack.Item>
+              )}
             </Stack>
           ) : (
             <></>
@@ -231,25 +255,6 @@ function ServingSize({
           ) : (
             <></>
           )}
-
-          {/* {locationPlan.location === "CA" ? (
-            <div>
-              <label style={{ minWidth: "100px", marginBottom: "30px" }}>
-                Calories per serving
-              </label>
-              <Stack>
-                <TextField
-                  size="small"
-                  value={servingSizeCA.caloriesPerServingBasic || ""}
-                  onChange={(e) =>
-                    handleServingSizeChange(e, "caloriesPerServingBasic")
-                  }
-                />
-              </Stack>
-            </div>
-          ) : (
-            <></>
-          )} */}
         </Card.Section>
         {productToPrepare && locationPlan.location === "CA" ? (
           <>

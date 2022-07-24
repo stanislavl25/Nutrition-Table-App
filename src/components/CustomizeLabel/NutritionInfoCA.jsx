@@ -55,7 +55,7 @@ const PopOverComponent = ({
               label="Bold Name"
             />
           </Stack.Item>
-          <Stack.Item>
+          {/* <Stack.Item>
             <TextField
               label="Order"
               type="number"
@@ -66,7 +66,7 @@ const PopOverComponent = ({
               onChange={(e) => handleChange(e, "nutritionData", "order", index)}
               multiline={false}
             />
-          </Stack.Item>
+          </Stack.Item> */}
         </Stack>
         <TextField
           label="Left Spacing (Table)"
@@ -131,9 +131,16 @@ function NutritionInfoCA({
     { label: "MilliGrams", value: "MilliGrams" },
   ];
   return (
-    <Card Sectioned>
+    <Card>
       <Card.Section>
-        <Stack distribution="equalSpacing">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Heading>Nutrition Informaion</Heading>
           <Button
             variant="contained"
@@ -145,24 +152,27 @@ function NutritionInfoCA({
           >
             Add
           </Button>
-        </Stack>
+        </div>
       </Card.Section>
       <Card.Section>
-        <div>
+        <div
+          style={{
+            borderCollapse: "separate",
+            display: "inline-table",
+            borderSpacing: "1em .5em",
+            marginBottom: "10px",
+          }}
+        >
           <div
             style={{
-              display: "flex",
-              flexDirection: "row",
+              display: "table-header-group",
               width: "100%",
-              marginBottom: "10px",
             }}
           >
             {formLables.map((lableTitle, index) => (
               <label
                 style={{
-                  flex: "1 0 0 auto",
-                  verticalAlign: "bottom",
-                  textAlign: "start",
+                  display: "table-cell",
                 }}
                 key={index}
               >
@@ -170,22 +180,21 @@ function NutritionInfoCA({
               </label>
             ))}
           </div>
-          <div>
+
+          <div
+            style={{
+              display: "table-row-group",
+              width: "100%",
+            }}
+          >
             {formValues.map((element, index) => (
               <div
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  width: "100%",
-                  gap: "5px",
-                  marginBottom: "10px",
+                  display: "table-row",
+                  paddingTop: "10px",
                 }}
-                // distribution="fill"
-                // spacing="loose"
-                // key={index}
-                // wrap={false}
               >
-                <div style={{ flex: "1 0 0 auto" }}>
+                <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
                   <TextField
                     value={element.name || ""}
                     name="name"
@@ -195,7 +204,7 @@ function NutritionInfoCA({
                     autoComplete="off"
                   />
                 </div>
-                <div style={{ flex: "1 0 0 auto" }}>
+                <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
                   <TextField
                     value={element.quantity || 0}
                     name="quantity"
@@ -206,7 +215,13 @@ function NutritionInfoCA({
                     autoComplete="off"
                   />
                 </div>
-                <div style={{ width: "100px", flex: "1 0 0 auto" }}>
+                <div
+                  style={{
+                    maxWidth: "80px",
+                    flex: "1 0 0 auto",
+                    display: "table-cell",
+                  }}
+                >
                   <Select
                     value={element.Unit || ""}
                     onChange={(e) =>
@@ -216,7 +231,7 @@ function NutritionInfoCA({
                     name="Unit"
                   />
                 </div>
-                <div style={{ flex: "1 0 0 auto" }}>
+                <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
                   <TextField
                     value={element.dailyValue || 0}
                     name="dailyValue"

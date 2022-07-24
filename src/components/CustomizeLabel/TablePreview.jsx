@@ -156,13 +156,14 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                     gap: "10px",
                   }}
                 >
-                  <hr style={{ borderTop: "3px solid black", width: "140%" }} />
-                  <p style={{ width: "100%" }}>
+                  <hr style={{ borderTop: "3px solid black", width: "130%" }} />
+                  <p style={{ width: "100%", textAlign: "end" }}>
                     <strong
                       style={{
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
+                        textAlign: "end",
                       }}
                     >
                       % valeur quotidienne*

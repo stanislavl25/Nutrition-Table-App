@@ -1,5 +1,6 @@
 import { Shopify } from "@shopify/shopify-api";
-
+import Products from "../models/productModel.js";
+import Stores from "../models/storeModel.js";
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js";
 
 export default function applyAuthMiddleware(app) {
@@ -36,7 +37,6 @@ export default function applyAuthMiddleware(app) {
       })
     );
   });
-
   app.get("/auth/callback", async (req, res) => {
     try {
       const session = await Shopify.Auth.validateAuthCallback(
@@ -53,6 +53,38 @@ export default function applyAuthMiddleware(app) {
         })
       );
 
+      const AuthenticatedShop = session.shop;
+
+      const checkNewShop = await Stores.exists({ shop_id: AuthenticatedShop });
+      if (!checkNewShop) {
+        var newShop = Stores();
+        newShop.shop_id = AuthenticatedShop;
+        newShop.shop_plan = "Basic";
+        await newShop.save(function (err, data) {
+          if (err) console.error(err);
+          else console.log("Added new Store");
+        });
+        const { Product } = await import(
+          `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+        );
+        const newProducts = await Product.all({
+          session: session,
+        });
+        newProducts.forEach(async (prod) => {
+          var newProduct = Products();
+          newProduct.productId = prod.id;
+          newProduct.name = prod.title;
+          newProduct.store_id = session.shop;
+          newProduct.image = prod.images && prod.images.length ? prod.images[0].src : null;
+          await newProduct.save(function (err, data) {
+            if (err) console.log(err);
+            else console.log("Added product");
+          });
+        });
+      } else {
+        console.log("known shop");
+      }
+
       const response = await Shopify.Webhooks.Registry.register({
         shop: session.shop,
         accessToken: session.accessToken,
@@ -68,8 +100,8 @@ export default function applyAuthMiddleware(app) {
 
       // Redirect to app with shop parameter upon auth
       res.redirect(`/?shop=${session.shop}&host=${host}`);
-    } catch (e) {
-      switch (true) {
+    } catch (e) {  
+	switch (true) {
         case e instanceof Shopify.Errors.InvalidOAuthError:
           res.status(400);
           res.send(e.message);

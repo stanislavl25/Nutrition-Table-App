@@ -193,19 +193,15 @@ export async function createServer(
         fields: "id,title,product_type,images",
       });
       const shop = await checkShopExist(storeProducts[0]["session"].shop);
-      if (storeProducts.length > 0) {
-        for (var i = 0; i < storeProducts.length; i++) {
-          checkProductsExist(storeProducts[i], shop.shop_id);
-        }
-      }
       res
         .status(200)
-        .send({ data: shop, success: true, message: "data is back!" });
+        .send({ data: shop, success: true, message: "shop data back!" });
     } catch (err) {
       res.status(400).send("Something wrong happend");
       console.log(err);
     }
   });
+
   /***
    * handle recommended intake save
    */
@@ -295,11 +291,15 @@ export async function createServer(
 
   /**check if the store exist */
   const checkShopExist = async (storeId) => {
-    const check = await StoreModel.findOne({ shop_id: storeId }).exec();
+    const check = await StoreModel.findOne(
+      { shop_id: storeId },
+      "-_id -shop_id"
+    ).exec();
     const data = check;
     if (check) return data;
     else return false;
   };
+
   /** check if the products exist */
   const checkProductsExist = async (product, shopId) => {
     const check = await Products.find({ productId: product.id });
@@ -464,6 +464,7 @@ export async function createServer(
     // include a shop in the query parameters.
     if (!checkShop && shop !== undefined) {
       res.redirect(`/auth?shop=${shop}`);
+      console.log("index.js", `/auth?shop=${shop}`);
     } else {
       next();
     }
