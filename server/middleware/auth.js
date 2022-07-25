@@ -69,13 +69,18 @@ export default function applyAuthMiddleware(app) {
         );
         const newProducts = await Product.all({
           session: session,
+          fields: "id,title,product_type,images",
         });
         newProducts.forEach(async (prod) => {
           var newProduct = Products();
           newProduct.productId = prod.id;
           newProduct.name = prod.title;
           newProduct.store_id = session.shop;
-          newProduct.image = prod.images && prod.images.length ? prod.images[0].src : null;
+          newProduct.product_type = prod.product_type
+            ? prod.product_type
+            : null;
+          newProduct.image =
+            prod.images && prod.images.length ? prod.images[0].src : null;
           await newProduct.save(function (err, data) {
             if (err) console.log(err);
             else console.log("Added product");
@@ -100,8 +105,8 @@ export default function applyAuthMiddleware(app) {
 
       // Redirect to app with shop parameter upon auth
       res.redirect(`/?shop=${session.shop}&host=${host}`);
-    } catch (e) {  
-	switch (true) {
+    } catch (e) {
+      switch (true) {
         case e instanceof Shopify.Errors.InvalidOAuthError:
           res.status(400);
           res.send(e.message);

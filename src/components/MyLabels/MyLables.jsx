@@ -20,6 +20,7 @@ function MyLables({
   selectedResources,
   allResourcesSelected,
   handleSelectionChange,
+  shop_plan,
 }) {
   return (
     <div>
@@ -63,7 +64,32 @@ function MyLables({
                 </div>
               </div>
               <div>
-                <Button primary>Get the Advanced plan</Button>
+                {shop_plan && shop_plan === "Basic" ? (
+                  <Button
+                    primary
+                    onClick={() => {
+                      handleTabChange(5);
+                    }}
+                  >
+                    Get the Advanced plan
+                  </Button>
+                ) : (
+                  <></>
+                )}
+                {shop_plan &&
+                shop_plan === "Advanced" &&
+                productsArray?.length > 999 ? (
+                  <Button
+                    primary
+                    onClick={() => {
+                      handleTabChange(5);
+                    }}
+                  >
+                    Get the Entreprise plan
+                  </Button>
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
           </Card>

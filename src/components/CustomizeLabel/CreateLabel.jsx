@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-} from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import TablePreview from "./TablePreview";
 import ProductInfo from "./ProductInfo";
 import ServingSize from "./ServingSize";
@@ -70,10 +65,11 @@ function CreateLabel({
   handleAddMinerals,
   handleRemoveMinerals,
   productsAredifferent,
+  shop_plan,
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
-    plan: "Advanced",
+    plan: shop_plan,
   });
 
   const [formValues, setFormValues] = useState([]);

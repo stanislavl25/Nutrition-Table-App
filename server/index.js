@@ -184,17 +184,10 @@ export async function createServer(
    */
 
   app.get("/store-data", verifyRequest(app), async (req, res) => {
-    console.log("save products");
+    console.log("get store data");
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-    const { Product } = await import(
-      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-    );
     try {
-      const storeProducts = await Product.all({
-        session,
-        fields: "id,title,product_type,images",
-      });
-      const shop = await checkShopExist(storeProducts[0]["session"].shop);
+      const shop = await checkShopExist(session.shop);
       res
         .status(200)
         .send({ data: shop, success: true, message: "shop data back!" });

@@ -297,13 +297,18 @@ function MyLablesTable({
                 marginLeft: "10px",
               }}
             >
-              <Select
-                labelInline
-                label="Categories"
-                options={categorieOptions}
-                value={sortValue}
-                onChange={(e) => handleSortChange(e)}
-              />
+              {categorieOptions?.length > 0 ? (
+                <Select
+                  labelInline
+                  label="Categories"
+                  options={categorieOptions}
+                  value={sortValue}
+                  onChange={(e) => handleSortChange(e)}
+                  key={sortValue}
+                />
+              ) : (
+                <></>
+              )}
             </div>
           </div>
 

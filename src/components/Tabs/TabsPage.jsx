@@ -65,7 +65,7 @@ function TabsPage() {
   const [toastMessage, setToastMessage] = useState("");
   const [defaultSet, setDefaultSet] = useState(false);
   const [productsAredifferent, setProductsAredifferent] = useState(false);
-
+  const [shop_plan, setShopPlan] = useState("");
   const [recommendedIntakeData, setRecommendedIntakeData] = useState(
     storeData.recommendedIntake
   );
@@ -137,7 +137,7 @@ function TabsPage() {
         shopData.data.recommendedIntake = recommendedIntakeRows;
       }
       setStoreData(shopData.data);
-      // console.log(shopData);
+      setShopPlan(shopData.shop_plan);
     }
   };
 
@@ -193,8 +193,8 @@ function TabsPage() {
   const fetchProducts = async () => {
     try {
       const data = await fetch("products-list").then((res) => res.json());
+
       if (data.success) {
-        console.log(data.data);
         setProductsArray(data.data);
         setArrayData(defaultData);
         setDefaultSet(true);
@@ -209,7 +209,7 @@ function TabsPage() {
         data.data.forEach((elem) => handlecategories(elem));
         const unique = array.filter((element) => {
           const isDuplicate = uniqueValues.includes(element.label);
-          if (!isDuplicate) {
+          if (!isDuplicate && element.value !== null) {
             uniqueValues.push(element.label);
             return true;
           }
@@ -510,7 +510,7 @@ function TabsPage() {
       await fetchProducts();
       handleRecommendedIntakeData();
     }, 200);
-  }, []);
+  }, [shop_plan]);
 
   /** handle memo set for filter functionality */
   const handleMemo = () => {
@@ -755,6 +755,7 @@ function TabsPage() {
           selectedResources={selectedResources}
           allResourcesSelected={allResourcesSelected}
           handleSelectionChange={handleSelectionChange}
+          shop_plan={shop_plan}
         />
       ),
     },
@@ -787,6 +788,7 @@ function TabsPage() {
           handleAddMinerals={handleAddMinerals}
           handleRemoveMinerals={handleRemoveMinerals}
           productsAredifferent={productsAredifferent}
+          shop_plan={shop_plan}
         />
       ),
     },
