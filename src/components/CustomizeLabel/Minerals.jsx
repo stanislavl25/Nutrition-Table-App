@@ -48,14 +48,14 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
           value={element.LeftSpacing || ""}
           onChange={(e) => handleChange(e, "minerals", "LeftSpacing", index)}
         />
-        <TextField
+        {/* <TextField
           label="Order"
           type="number"
           name="Name"
           value={element.order || ""}
           onChange={(e) => handleChange(e, "minerals", "order", index)}
           inputMode="numeric"
-        />
+        /> */}
         <Button
           destructive
           outline
@@ -137,155 +137,164 @@ function Minerals({
           <p>Click add to create a new Mineral</p>
         </div>
       ) : (
-        <form>
+        <div
+          style={{
+            borderCollapse: "separate",
+            display: "inline-table",
+            borderSpacing: "1em .5em",
+            marginBottom: "10px",
+            width: "100%",
+          }}
+        >
           {locationPlan.location === "CA" || locationPlan.location === "NA" ? (
-            <div style={{ display: "flex", padding: "0px 20px 0px 20px " }}>
-              <label style={{ marginRight: "170px" }}>Name</label>
-              <label style={{ marginRight: "110px" }}>Quantity</label>
-              <label style={{ marginRight: "70px" }}>Unit</label>
-              <label style={{ marginRight: "20px" }}>% Daily value*</label>
+            <div style={{ display: "table-header-group", width: "100%" }}>
+              <label style={{ display: "table-cell" }}>Name</label>
+              <label style={{ display: "table-cell" }}>Quantity</label>
+              <label style={{ display: "table-cell" }}>Unit</label>
+              <label style={{ display: "table-cell" }}>% Daily value*</label>
             </div>
           ) : (
-            <div style={{ display: "flex", padding: "0px 20px 0px 20px " }}>
-              <label style={{ marginRight: "170px" }}>Name</label>
-              <label style={{ marginRight: "110px" }}>Per 100 g</label>
-              <label style={{ marginRight: "70px" }}>Per portion 25 g</label>
-              <label style={{ marginRight: "20px" }}>Unit</label>
+            <div style={{ display: "table-header-group", width: "100%" }}>
+              <label style={{ display: "table-cell" }}>Name</label>
+              <label style={{ display: "table-cell" }}>Per 100 g</label>
+              <label style={{ display: "table-cell" }}>Per portion 25 g</label>
+              <label style={{ display: "table-cell" }}>Unit</label>
             </div>
           )}
-          <hr style={{ borderTop: "1px solid #cecece" }} />
-          {locationPlan.location === "CA" || locationPlan.location === "NA"
-            ? data.map((element, index) => (
-                <div
-                  className="form-inline"
-                  key={index}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: "20px 20px 10px 20px",
-                  }}
-                >
-                  <div style={{ maxWidth: "200px", marginRight: "20px" }}>
-                    <TextField
-                      size="small"
-                      style={{ width: "150px", marginRight: "10px" }}
-                      type="text"
-                      variant="outlined"
-                      name="Name"
-                      value={element.name || ""}
-                      onChange={(e) =>
-                        handleChange(e, "minerals", "name", index)
-                      }
-                    />
+          {/* <hr style={{ borderTop: "1px solid #cecece" }} /> */}
+          <div
+            style={{
+              display: "table-row-group",
+              width: "100%",
+            }}
+          >
+            {locationPlan.location === "CA" || locationPlan.location === "NA"
+              ? data.map((element, index) => (
+                  <div
+                    className="form-inline"
+                    key={index}
+                    style={{
+                      display: "table-row",
+                      paddingTop: "10px",
+                    }}
+                  >
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        size="small"
+                        type="text"
+                        variant="outlined"
+                        name="Name"
+                        value={element.name || ""}
+                        onChange={(e) =>
+                          handleChange(e, "minerals", "name", index)
+                        }
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        size="small"
+                        variant="outlined"
+                        type="text"
+                        name="quantity"
+                        value={element.quantity || ""}
+                        onChange={(e) =>
+                          handleChange(e, "minerals", "quantity", index)
+                        }
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <SelectElement
+                        unit={element.unit}
+                        handleChange={handleChange}
+                        index={index}
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        size="small"
+                        variant="outlined"
+                        type="text"
+                        name="dailyValue"
+                        value={element.dailyValue || ""}
+                        onChange={(e) =>
+                          handleChange(e, "minerals", "dailyValue", index)
+                        }
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto" }}>
+                      <PopoverElement
+                        element={element}
+                        removeFormFields={handleRemoveMinerals}
+                        handleChange={handleChange}
+                        index={index}
+                      />
+                    </div>
                   </div>
-                  <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                    <TextField
-                      size="small"
-                      style={{ width: "90px", marginRight: "10px" }}
-                      variant="outlined"
-                      type="text"
-                      name="quantity"
-                      value={element.quantity || ""}
-                      onChange={(e) =>
-                        handleChange(e, "minerals", "quantity", index)
-                      }
-                    />
+                ))
+              : data.map((element, index) => (
+                  <div
+                    className="form-inline"
+                    key={index}
+                    style={{
+                      display: "table-row",
+                      paddingTop: "10px",
+                    }}
+                  >
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        size="small"
+                        type="text"
+                        variant="outlined"
+                        name="Name"
+                        value={element.name || ""}
+                        onChange={(e) =>
+                          handleChange(e, "minerals", "name", index)
+                        }
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        size="small"
+                        variant="outlined"
+                        type="text"
+                        name="per100g"
+                        value={element.per100g || ""}
+                        onChange={(e) =>
+                          handleChange(e, "minerals", "per100g", index)
+                        }
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        size="small"
+                        variant="outlined"
+                        type="text"
+                        name="perportion"
+                        value={element.perportion || ""}
+                        onChange={(e) =>
+                          handleChange(e, "minerals", "perportion", index)
+                        }
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <SelectElement
+                        unit={element.unit}
+                        handleChange={handleChange}
+                        index={index}
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto" }}>
+                      <PopoverElement
+                        element={element}
+                        removeFormFields={handleRemoveMinerals}
+                        handleChange={handleChange}
+                        index={index}
+                      />
+                    </div>
                   </div>
-                  <div style={{ maxWidth: "80px", marginRight: "20px" }}>
-                    <SelectElement
-                      unit={element.unit}
-                      handleChange={handleChange}
-                      index={index}
-                    />
-                  </div>
-                  <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                    <TextField
-                      style={{ width: "130px", marginRight: "10px" }}
-                      size="small"
-                      variant="outlined"
-                      type="text"
-                      name="dailyValue"
-                      value={element.dailyValue || ""}
-                      onChange={(e) =>
-                        handleChange(e, "minerals", "dailyValue", index)
-                      }
-                    />
-                  </div>
-                  <PopoverElement
-                    element={element}
-                    removeFormFields={handleRemoveMinerals}
-                    handleChange={handleChange}
-                    index={index}
-                  />
-                </div>
-              ))
-            : data.map((element, index) => (
-                <div
-                  className="form-inline"
-                  key={index}
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: "20px 20px 10px 20px",
-                  }}
-                >
-                  <div style={{ maxWidth: "200px", marginRight: "20px" }}>
-                    <TextField
-                      size="small"
-                      style={{ width: "150px", marginRight: "10px" }}
-                      type="text"
-                      variant="outlined"
-                      name="Name"
-                      value={element.name || ""}
-                      onChange={(e) =>
-                        handleChange(e, "minerals", "name", index)
-                      }
-                    />
-                  </div>
-                  <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                    <TextField
-                      size="small"
-                      style={{ width: "90px", marginRight: "10px" }}
-                      variant="outlined"
-                      type="text"
-                      name="per100g"
-                      value={element.per100g || ""}
-                      onChange={(e) =>
-                        handleChange(e, "minerals", "per100g", index)
-                      }
-                    />
-                  </div>
-                  <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                    <TextField
-                      style={{ width: "130px", marginRight: "10px" }}
-                      size="small"
-                      variant="outlined"
-                      type="text"
-                      name="perportion"
-                      value={element.perportion || ""}
-                      onChange={(e) =>
-                        handleChange(e, "minerals", "perportion", index)
-                      }
-                    />
-                  </div>
-                  <div style={{ maxWidth: "75px", marginRight: "20px" }}>
-                    <SelectElement
-                      unit={element.unit}
-                      handleChange={handleChange}
-                      index={index}
-                    />
-                  </div>
-                  <PopoverElement
-                    element={element}
-                    removeFormFields={handleRemoveMinerals}
-                    handleChange={handleChange}
-                    index={index}
-                  />
-                </div>
-              ))}
-        </form>
+                ))}
+          </div>
+        </div>
       )}
     </Card>
   );

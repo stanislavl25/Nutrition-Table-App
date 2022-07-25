@@ -31,7 +31,6 @@ function ProductInfo({
   removeTag,
   productsAredifferent,
 }) {
-  console.log(selectedOptions);
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
   const [selectedNutriScore, setSelectedNutriScore] = useState("");

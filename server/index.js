@@ -101,6 +101,8 @@ export async function createServer(
   /** handle food products save */
   app.post("/save_foodProducts", verifyRequest(app), async (req, res) => {
     console.log(req.body);
+    const session = await Shopify.Utils.loadCurrentSession(req, res);
+    console.log(session);
     res.status(200).send({ message: "updates saved!", success: true });
   });
 
@@ -181,7 +183,7 @@ export async function createServer(
    * returns the list of products on that specific shopify store
    */
 
-  app.get("/products-save", verifyRequest(app), async (req, res) => {
+  app.get("/store-data", verifyRequest(app), async (req, res) => {
     console.log("save products");
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const { Product } = await import(
@@ -225,60 +227,61 @@ export async function createServer(
 
   /*** handle deleted store products */
 
-  app.get("/deleted-store-products", verifyRequest(app), async (req, res) => {
-    console.log("deleted store products");
-    let array = [];
-    let comparisonArray = [];
-    try {
-      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-      const productsDatabase = await Products.find({
-        store_id: session.shop,
-      }).lean();
-      const { Product } = await import(
-        `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-      );
-      const storeProducts = await Product.all({
-        session,
-        fields: "id,title,product_type,images",
-      });
-      if (storeProducts) {
-        storeProducts.forEach((elem) => {
-          let num = elem.id;
-          let text = num.toString();
-          array.push(text);
-        });
-      }
-      if (productsDatabase) {
-        productsDatabase.forEach((elem) => {
-          comparisonArray.push(elem.productId);
-        });
-        comparisonArray.forEach(async (elem) => {
-          if (!array.includes(elem)) {
-            const deleteElement = await Products.findOneAndDelete({
-              productId: elem,
-            });
-          } else {
-            // do something
-          }
-        });
-      }
-      res.status(200).send({ success: true, message: "products deleted!" });
-    } catch (err) {
-      res
-        .status(400)
-        .send({ success: false, message: "products not deleted!" });
-    }
-  });
+  // app.get("/deleted-store-products", verifyRequest(app), async (req, res) => {
+  //   console.log("deleted store products");
+  //   let array = [];
+  //   let comparisonArray = [];
+  //   try {
+  //     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+  //     const productsDatabase = await Products.find({
+  //       store_id: session.shop,
+  //     }).lean();
+  //     const { Product } = await import(
+  //       `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+  //     );
+  //     const storeProducts = await Product.all({
+  //       session,
+  //       fields: "id,title,product_type,images",
+  //     });
+  //     if (storeProducts) {
+  //       storeProducts.forEach((elem) => {
+  //         let num = elem.id;
+  //         let text = num.toString();
+  //         array.push(text);
+  //       });
+  //     }
+  //     if (productsDatabase) {
+  //       productsDatabase.forEach((elem) => {
+  //         comparisonArray.push(elem.productId);
+  //       });
+  //       comparisonArray.forEach(async (elem) => {
+  //         if (!array.includes(elem)) {
+  //           const deleteElement = await Products.findOneAndDelete({
+  //             productId: elem,
+  //           });
+  //         } else {
+  //           // do something
+  //         }
+  //       });
+  //     }
+  //     res.status(200).send({ success: true, message: "products deleted!" });
+  //   } catch (err) {
+  //     res
+  //       .status(400)
+  //       .send({ success: false, message: "products not deleted!" });
+  //   }
+  // });
   /***
    * get all products with the same shop_id
    */
   app.get("/products-list", verifyRequest(app), async (req, res) => {
-    console.log("get products");
     try {
       const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-      const productsDatabase = await Products.find({
+      const query = Products.find({
         store_id: session.shop,
-      }).lean();
+      }).select("-store_id -productId -is_deleted");
+      const productsDatabase = await query.exec();
+
       res.status(200).send({
         data: productsDatabase,
         message: "found products!",
@@ -300,57 +303,57 @@ export async function createServer(
     else return false;
   };
 
-  /** check if the products exist */
-  const checkProductsExist = async (product, shopId) => {
-    const check = await Products.find({ productId: product.id });
-    try {
-      /** check if product has an updated name or image and update according to those */
-      if (check) {
-        if (product.images.length > 0) {
-          if (
-            check.length > 0 &&
-            check[0].image === null &&
-            check[0].image !== product.images[0].src
-          ) {
-            const update = await Products.findOneAndUpdate(
-              { productId: product.id },
-              { image: product.images[0].src },
-              { returnOriginal: false }
-            );
-          }
-        }
-        if (
-          !product.images.length > 0 &&
-          check.length > 0 &&
-          check[0].image !== null
-        ) {
-          const update = await Products.findOneAndUpdate(
-            { productId: product.id },
-            { image: null },
-            { returnOriginal: false }
-          );
-        }
-        if (check.length > 0 && check[0].name !== product.title) {
-          const update = await Products.findOneAndUpdate(
-            { productId: product.id },
-            { name: product.title },
-            { returnOriginal: false }
-          );
-        }
-      }
-      if (!check.length) {
-        const productCreation = await Products.create({
-          name: product.title,
-          store_id: shopId,
-          productId: product.id,
-          image: product.images.length ? product.images[0].src : null,
-          product_type: product.product_type,
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // /** check if the products exist */
+  // const checkProductsExist = async (product, shopId) => {
+  //   const check = await Products.find({ productId: product.id });
+  //   try {
+  //     /** check if product has an updated name or image and update according to those */
+  //     if (check) {
+  //       if (product.images.length > 0) {
+  //         if (
+  //           check.length > 0 &&
+  //           check[0].image === null &&
+  //           check[0].image !== product.images[0].src
+  //         ) {
+  //           const update = await Products.findOneAndUpdate(
+  //             { productId: product.id },
+  //             { image: product.images[0].src },
+  //             { returnOriginal: false }
+  //           );
+  //         }
+  //       }
+  //       if (
+  //         !product.images.length > 0 &&
+  //         check.length > 0 &&
+  //         check[0].image !== null
+  //       ) {
+  //         const update = await Products.findOneAndUpdate(
+  //           { productId: product.id },
+  //           { image: null },
+  //           { returnOriginal: false }
+  //         );
+  //       }
+  //       if (check.length > 0 && check[0].name !== product.title) {
+  //         const update = await Products.findOneAndUpdate(
+  //           { productId: product.id },
+  //           { name: product.title },
+  //           { returnOriginal: false }
+  //         );
+  //       }
+  //     }
+  //     if (!check.length) {
+  //       const productCreation = await Products.create({
+  //         name: product.title,
+  //         store_id: shopId,
+  //         productId: product.id,
+  //         image: product.images.length ? product.images[0].src : null,
+  //         product_type: product.product_type,
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   app.post("/recurring-subscribtion", verifyRequest(app), async (req, res) => {
     console.log(req.body);

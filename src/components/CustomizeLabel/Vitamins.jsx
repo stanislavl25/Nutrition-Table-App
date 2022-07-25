@@ -6,7 +6,6 @@ import {
   FormLayout,
   Select,
   TextField,
-  Stack,
   TextContainer,
   Banner,
 } from "@shopify/polaris";
@@ -50,13 +49,13 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
           value={element.LeftSpacing || ""}
           onChange={(e) => handleChange(e, "vitamins", "LeftSpacing", index)}
         />
-        <TextField
+        {/* <TextField
           label="Order"
           type="text"
           name="Name"
           value={element.order || ""}
           onChange={(e) => handleChange(e, "vitamins", "order", index)}
-        />
+        /> */}
         <Button destructive outline onClick={() => removeFormFields(index)}>
           Delete
         </Button>
@@ -132,35 +131,61 @@ function Vitamins({
           <p>Click add to create a new Vitamin</p>
         </div>
       ) : (
-        <form>
+        <div
+          style={{
+            borderCollapse: "separate",
+            display: "inline-table",
+            borderSpacing: "1em .5em",
+            marginBottom: "10px",
+            width: "100%",
+          }}
+        >
           {locationPlan.location === "CA" || locationPlan.location === "NA" ? (
-            <div style={{ display: "flex", padding: "0px 20px 0px 20px" }}>
-              <label style={{ marginRight: "170px" }}>Name</label>
-              <label style={{ marginRight: "110px" }}>Quantity</label>
-              <label style={{ marginRight: "80px" }}>Unit</label>
-              <label style={{ marginRight: "20px" }}>% Daily value*</label>
+            <div
+              style={{
+                display: "table-header-group",
+                width: "100%",
+              }}
+            >
+              <label style={{ display: "table-cell" }}>Name</label>
+              <label style={{ display: "table-cell" }}>Quantity</label>
+              <label style={{ display: "table-cell" }}>Unit</label>
+              <label style={{ display: "table-cell" }}>% Daily value*</label>
             </div>
           ) : (
-            <div style={{ display: "flex", padding: "0px 20px 0px 20px" }}>
-              <label style={{ marginRight: "170px" }}>Name</label>
-              <label style={{ marginRight: "110px" }}>Per 100 g</label>
-              <label style={{ marginRight: "80px" }}>Per portion 25 g</label>
-              <label style={{ marginRight: "20px" }}>Unit</label>
+            <div
+              style={{
+                display: "table-header-group",
+                width: "100%",
+              }}
+            >
+              <label style={{ display: "table-cell" }}>Name</label>
+              <label style={{ display: "table-cell" }}>Per 100 g</label>
+              <label style={{ display: "table-cell" }}>Per portion 25 g</label>
+              <label style={{ display: "table-cell" }}>Unit</label>
             </div>
           )}
-          <hr style={{ borderTop: "1px solid #cecece", width: "100%" }} />
-          <div style={{ padding: "20px 20px 20px 20px", marginRight: "10px" }}>
+          <div
+            style={{
+              marginRight: "10px",
+              display: "table-row-group",
+              width: "100%",
+            }}
+          >
             {locationPlan.location === "CA" || locationPlan.location === "NA"
               ? data.map((element, index) => (
                   <div
                     key={index}
                     style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      marginBottom: "20px",
+                      display: "table-row",
                     }}
                   >
-                    <div style={{ maxWidth: "200px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <TextField
                         type="text"
                         name="name"
@@ -170,7 +195,12 @@ function Vitamins({
                         }
                       />
                     </div>
-                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <TextField
                         type="text"
                         name="quantity"
@@ -180,14 +210,24 @@ function Vitamins({
                         }
                       />
                     </div>
-                    <div style={{ maxWidth: "75px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <SelectElement
                         index={index}
                         handleChange={handleChange}
                         unit={element.unit}
                       />
                     </div>
-                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <TextField
                         type="text"
                         name="dailyValue"
@@ -197,26 +237,29 @@ function Vitamins({
                         }
                       />
                     </div>
-                    <Stack.Item fill>
+                    <div style={{ flex: "1 0 0 auto" }}>
                       <PopoverElement
                         element={element}
                         removeFormFields={handleRemoveVitamins}
                         handleChange={handleChange}
                         index={index}
                       />
-                    </Stack.Item>
+                    </div>
                   </div>
                 ))
               : data.map((element, index) => (
                   <div
                     key={index}
                     style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      marginBottom: "20px",
+                      display: "table-row",
                     }}
                   >
-                    <div style={{ maxWidth: "200px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <TextField
                         type="text"
                         name="name"
@@ -226,7 +269,12 @@ function Vitamins({
                         }
                       />
                     </div>
-                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <TextField
                         type="text"
                         name="per100g"
@@ -236,7 +284,12 @@ function Vitamins({
                         }
                       />
                     </div>
-                    <div style={{ maxWidth: "150px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <TextField
                         type="text"
                         name="perportion"
@@ -246,25 +299,30 @@ function Vitamins({
                         }
                       />
                     </div>
-                    <div style={{ maxWidth: "75px", marginRight: "20px" }}>
+                    <div
+                      style={{
+                        flex: "1 0 0 auto",
+                        display: "table-cell",
+                      }}
+                    >
                       <SelectElement
                         index={index}
                         handleChange={handleChange}
                         unit={element.unit}
                       />
                     </div>
-                    <Stack.Item fill>
+                    <div style={{ flex: "1 0 0 auto" }}>
                       <PopoverElement
                         element={element}
                         removeFormFields={handleRemoveVitamins}
                         handleChange={handleChange}
                         index={index}
                       />
-                    </Stack.Item>
+                    </div>
                   </div>
                 ))}
           </div>
-        </form>
+        </div>
       )}
     </Card>
   );

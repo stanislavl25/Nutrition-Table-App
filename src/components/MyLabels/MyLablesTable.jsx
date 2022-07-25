@@ -5,7 +5,6 @@ import {
   Spinner,
   TextStyle,
   Thumbnail,
-  useIndexResourceState,
   FormLayout,
   Popover,
   Combobox,
@@ -14,7 +13,7 @@ import {
 } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../../App";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { SearchMinor } from "@shopify/polaris-icons";
 
 const PopOverElem = ({ index, productId, removeFormFields }) => {
@@ -132,11 +131,11 @@ function MyLablesTable({
 
   const optionsMarkup =
     memoOptions?.length > 0
-      ? memoOptions?.map((option) => {
+      ? memoOptions?.map((option, index) => {
           const { label, value } = option;
           return (
             <Listbox.Option
-              key={`${value}`}
+              key={index}
               value={value}
               selected={selectedResources.includes(value)}
               accessibilityLabel={label}
@@ -211,7 +210,7 @@ function MyLablesTable({
         ) => (
           <IndexTable.Row
             id={name}
-            key={_id}
+            key={index}
             selected={selectedResources.includes(name)}
             position={index}
           >

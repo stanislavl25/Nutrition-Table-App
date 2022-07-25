@@ -4,35 +4,36 @@ import AppSession from "./models/AppSessionModel.js";
 
 export async function storeCallback(session) {
   try {
-//   console.log("Running storeCallback");
+    //   console.log("Running storeCallback");
     const payload = { ...session };
- //   console.log("StoreCallback session===============================");
-   // console.log(session);
+    //   console.log("StoreCallback session===============================");
+    // console.log(session);
 
-
-    const check = await AppSession.exists({ id: session.id })
-    if(check){
-        const update = await AppSession.updateOne({ id: session.id },  {
-                state: session.state,
-                isOnline: session.isOnline,
-                scope: session.scope,
-                expires: session.expires,
-                accessToken: session.accessToken,
-                onlineAccessInfo: session.onlineAccessInfo,
-              })
-    }else{
-
-        const mynewsession = AppSession({ 
-            id: session.id,
-            shop: session.shop,
-            state: payload.state,
-            isOnline: payload.isOnline,
-            scope: payload.scope,
-            expires: payload.expires,
-            accessToken: payload.accessToken,
-            onlineAccessInfo: payload.onlineAccessInfo,
-        })
-        await mynewsession.save();
+    const check = await AppSession.exists({ id: session.shop });
+    if (check) {
+      const update = await AppSession.updateOne(
+        { id: session.shop },
+        {
+          state: session.state,
+          isOnline: session.isOnline,
+          scope: session.scope,
+          expires: session.expires,
+          accessToken: session.accessToken,
+          onlineAccessInfo: session.onlineAccessInfo,
+        }
+      );
+    } else if (!check) {
+      const mynewsession = AppSession({
+        id: session.id,
+        shop: session.shop,
+        state: payload.state,
+        isOnline: payload.isOnline,
+        scope: payload.scope,
+        expires: payload.expires,
+        accessToken: payload.accessToken,
+        onlineAccessInfo: payload.onlineAccessInfo,
+      });
+      await mynewsession.save();
     }
 
     return true;
@@ -45,7 +46,7 @@ export async function storeCallback(session) {
 export async function loadCallback(session) {
   try {
     //console.log("loadCallback mysession===============================");
-    	 console.log(session);
+    console.log(session);
     const data = await AppSession.findOne({ id: session }).exec();
     //console.log("DATA FROM loadCallback\n\n");
     //console.log(data);

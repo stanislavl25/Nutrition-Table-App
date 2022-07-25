@@ -652,7 +652,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
             {data.richText.notesText.length > 0 ? (
               <div style={{ marginBottom: "10px", width: "100%" }}>
                 <div style={{ paddingRight: "10px", paddingLeft: "10px" }}>
-                  <Markup content={data.richText.notesText} />
+                  <Markup content={data?.richText?.notesText} />
                 </div>
               </div>
             ) : (
@@ -689,7 +689,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                   borderTop: "1px solid rgb(190, 190, 190)",
                 }}
               />
-              <Markup content={data.richText.ingredientsText} />
+              <Markup content={data?.richText?.ingredientsText} />
             </div>
 
             <div
@@ -723,7 +723,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                   borderTop: "1px solid rgb(190, 190, 190)",
                 }}
               />
-              <Markup content={data.richText.allergyInfoText} />
+              <Markup content={data?.richText?.allergyInfoText} />
             </div>
             <hr
               style={{
@@ -734,7 +734,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
               className="LEGAL_NOTICE"
               style={{ marginTop: "10px", padding: "10px" }}
             >
-              <Markup content={data.richText.lEGALNOTICEText} />
+              <Markup content={data?.richText?.lEGALNOTICEText} />
             </div>
           </div>
         </div>

@@ -161,6 +161,7 @@ function NutritionInfoCA({
             display: "inline-table",
             borderSpacing: "1em .5em",
             marginBottom: "10px",
+            width: "100%",
           }}
         >
           <div
@@ -193,6 +194,7 @@ function NutritionInfoCA({
                   display: "table-row",
                   paddingTop: "10px",
                 }}
+                key={index}
               >
                 <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
                   <TextField

@@ -200,7 +200,12 @@ function CreateLabel({
       primaryAction={{
         content: "Save Label",
         onAction: () => {
-          handleSaveSelectedProducts(selectedProducts, nonFoodProduct, data);
+          handleSaveSelectedProducts(
+            selectedProducts,
+            nonFoodProduct,
+            data,
+            selectedOptions
+          );
         },
       }}
       fullWidth
@@ -349,7 +354,7 @@ function CreateLabel({
                 style={{ margin: "4px" }}
                 type="button"
                 className="button remove"
-                onClick={() => console.log("clicked")}
+                onClick={() => {}}
               >
                 Delete Label
               </Button>
@@ -362,7 +367,8 @@ function CreateLabel({
                   handleSaveSelectedProducts(
                     selectedProducts,
                     nonFoodProduct,
-                    data
+                    data,
+                    selectedOptions
                   )
                 }
               >

@@ -54,7 +54,7 @@ const PopOverComponent = ({
               onChange={(e) => handleChange(e, "nutritionData", "bold", index)}
             />
           </Stack.Item>
-          <Stack.Item>
+          {/* <Stack.Item>
             <TextField
               label="Order"
               onChange={(e) => handleChange(e, "nutritionData", "order", index)}
@@ -63,7 +63,7 @@ const PopOverComponent = ({
               min={0}
               max={dataLength}
             />
-          </Stack.Item>
+          </Stack.Item> */}
         </Stack>
         <TextField
           label="Left Spacing (Table)"
@@ -139,56 +139,83 @@ function NutritionInfoNA({
     { label: "MilliGrams", value: "MilliGrams" },
   ];
   return (
-    <Card>
-      <Card.Section>
-        <Stack distribution="equalSpacing">
-          <Heading>Nutrition Informaion</Heading>
-          <Button
-            variant="contained"
-            className="button add"
-            type="button"
-            onClick={() => handleAddNutritionData()}
-            style={{ margin: "4px" }}
-            primary
-          >
-            Add
-          </Button>
-        </Stack>
-      </Card.Section>
-      <Card.Section>
+    <Card sectioned>
+      <Stack distribution="equalSpacing">
+        <Heading>Nutrition Informaion</Heading>
+        <Button
+          variant="contained"
+          className="button add"
+          type="button"
+          onClick={() => handleAddNutritionData()}
+          style={{ margin: "4px" }}
+          primary
+        >
+          Add
+        </Button>
+      </Stack>
+      <div
+        style={{
+          borderCollapse: "separate",
+          display: "inline-table",
+          borderSpacing: "1em .5em",
+          marginBottom: "10px",
+          width: "100%",
+        }}
+      >
         <div
           style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "flex-start",
-            gap: "150px",
+            display: "table-header-group",
+            width: "100%",
           }}
         >
           {formLabels.map((elem, index) => (
-            <label key={index}>{elem}</label>
+            <label
+              style={{
+                display: "table-cell",
+              }}
+              key={index}
+            >
+              {elem}
+            </label>
           ))}
         </div>
-        {formValues.map((elem, index) => (
-          <Stack wrap={false} key={index}>
-            <Stack.Item>
-              <TextField
-                value={elem.name || ""}
-                onChange={(e) =>
-                  handleChange(e, "nutritionData", "name", index)
-                }
-              />
-            </Stack.Item>
-            <Stack.Item fill>
-              <TextField
-                value={elem.quantity || ""}
-                onChange={(e) =>
-                  handleChange(e, "nutritionData", "quantity", index)
-                }
-              />
-            </Stack.Item>
-            <Stack.Item>
-              <div style={{ maxWidth: "80px" }}>
+        <div
+          style={{
+            display: "table-row-group",
+            width: "100%",
+          }}
+        >
+          {formValues.map((elem, index) => (
+            <div
+              key={index}
+              style={{
+                display: "table-row",
+                paddingTop: "10px",
+              }}
+            >
+              <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                <TextField
+                  value={elem.name || ""}
+                  onChange={(e) =>
+                    handleChange(e, "nutritionData", "name", index)
+                  }
+                />
+              </div>
+              <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                <TextField
+                  value={elem.quantity || ""}
+                  onChange={(e) =>
+                    handleChange(e, "nutritionData", "quantity", index)
+                  }
+                />
+              </div>
+              <div
+                style={{
+                  flex: "1 0 0 auto",
+                  display: "table-cell",
+                  maxWidth: "80px",
+                }}
+              >
                 <Select
                   options={options}
                   value={elem.unit || ""}
@@ -197,28 +224,28 @@ function NutritionInfoNA({
                   }
                 />
               </div>
-            </Stack.Item>
-            <Stack.Item fill>
-              <TextField
-                value={elem.dailyValue || ""}
-                onChange={(e) =>
-                  handleChange(e, "nutritionData", "dailyValue", index)
-                }
-              />
-            </Stack.Item>
-            <Stack.Item>
-              <PopOverComponent
-                element={elem}
-                index={index}
-                handleChange={handleChange}
-                removeFormFields={handleRemoveNutritionData}
-                productToPrepare={productToPrepare}
-                dataLength={dataLength}
-              />
-            </Stack.Item>
-          </Stack>
-        ))}
-      </Card.Section>
+              <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                <TextField
+                  value={elem.dailyValue || ""}
+                  onChange={(e) =>
+                    handleChange(e, "nutritionData", "dailyValue", index)
+                  }
+                />
+              </div>
+              <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                <PopOverComponent
+                  element={elem}
+                  index={index}
+                  handleChange={handleChange}
+                  removeFormFields={handleRemoveNutritionData}
+                  productToPrepare={productToPrepare}
+                  dataLength={dataLength}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </Card>
   );
 }

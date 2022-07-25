@@ -128,16 +128,10 @@ function TabsPage() {
       }, 1000);
     }
   }, [storeData]);
-  /***  hqndle deleted products from the store admin and removing from the app's database  */
-  const handleDeletedStoreProducts = async () => {
-    const data = await fetch("deleted-store-products").then((res) =>
-      res.json()
-    );
-    // console.log(data);
-  };
-  /*** save store products if not saved and get store needed data */
+
+  /*** get store needed data */
   const saveProductsGetStoreData = async () => {
-    const shopData = await fetch("products-save").then((res) => res.json());
+    const shopData = await fetch("/store-data").then((res) => res.json());
     if (shopData.success) {
       if (shopData.data.recommendedIntake.length === 0) {
         shopData.data.recommendedIntake = recommendedIntakeRows;
@@ -152,7 +146,7 @@ function TabsPage() {
     try {
       const data = await fetch("/locations").then((res) => res.json());
       setlocationObj(data);
-      setLocation("CA");
+      setLocation("EU");
       return;
       if (data.length) {
         const countryCode = data[0].country_code;
@@ -200,7 +194,7 @@ function TabsPage() {
     try {
       const data = await fetch("products-list").then((res) => res.json());
       if (data.success) {
-        // console.log(data.data);
+        console.log(data.data);
         setProductsArray(data.data);
         setArrayData(defaultData);
         setDefaultSet(true);
@@ -333,8 +327,7 @@ function TabsPage() {
     }
   };
   /** saving food products */
-  const handleSaveProducts = async (products) => {
-    // console.log(products, "handle save");
+  const handleSaveProducts = async (products, data) => {
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -342,19 +335,19 @@ function TabsPage() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ products, shop_id: storeData.shop_id }),
+      body: JSON.stringify({ products, data }),
     };
     try {
-      // const data = await fetch("/save_foodProducts", fetchOptions)
-      //   .then((res) => res.json())
-      //   .then(async (response) => {
-      //     if (response.success) {
-      //       await fetchProducts();
-      //       setSelected(0);
-      //       setToastMessage(response.message);
-      //       toggleActive();
-      //     }
-      //    });
+      const data = await fetch("/save_foodProducts", fetchOptions)
+        .then((res) => res.json())
+        .then(async (response) => {
+          if (response.success) {
+            await fetchProducts();
+            setSelected(0);
+            setToastMessage(response.message);
+            toggleActive();
+          }
+        });
     } catch (err) {
       console.log(err);
     }
@@ -364,18 +357,28 @@ function TabsPage() {
   const handleSaveSelectedProducts = async (
     selectedProducts,
     nonFoodProduct,
-    data
+    data,
+    selectedOptions
   ) => {
+    if (!selectedProducts && !selectedOptions) {
+      setToastMessage("No products selected!");
+      toggleActive();
+      return;
+    }
     if (nonFoodProduct) {
-      handleSaveNonFoodProducts(selectedProducts);
+      handleSaveNonFoodProducts(
+        selectedProducts ? selectedProducts : selectedOptions
+      );
     }
     if (!nonFoodProduct) {
-      handleSaveProducts(selectedProducts);
+      handleSaveProducts(
+        selectedProducts ? selectedProducts : selectedOptions,
+        data
+      );
     }
   };
 
   const handleSelectedProducts = (selectedPro) => {
-    console.log(selectedPro);
     setSelectedOptions(selectedPro);
     const products = productsArray;
     setProductsArray("none");
@@ -492,17 +495,21 @@ function TabsPage() {
     useIndexResourceState(productsArray, {
       resourceIDResolver,
     });
-
+  const handleRecommendedIntakeData = () => {
+    // recommendedIntakeData.forEach((elem, index) => {
+    //   console.log(elem.name);
+    // });
+  };
   // todo clean up after the use effect
   useEffect(async () => {
     await fetchLocations();
     await saveProductsGetStoreData();
     await fetchLang();
-    await handleDeletedStoreProducts();
     handleSettingDefaultData();
     setTimeout(async () => {
       await fetchProducts();
-    }, 500);
+      handleRecommendedIntakeData();
+    }, 200);
   }, []);
 
   /** handle memo set for filter functionality */

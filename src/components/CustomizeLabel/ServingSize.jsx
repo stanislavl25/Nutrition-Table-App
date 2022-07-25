@@ -35,7 +35,6 @@ function ServingSize({
   data,
   handleChange,
 }) {
-  // console.log(data);
   return (
     <div
       style={{
@@ -45,53 +44,55 @@ function ServingSize({
       <Card title="Serving Size">
         <Card.Section>
           {locationPlan.location === "CA" ? (
-            <Stack>
-              <Stack.Item fill>
-                <TextField
-                  label="Serving size"
-                  value={data.servingSize.CA.servingSizeBasic}
-                  onChange={(e) =>
-                    handleChange(e, "servingSize", "servingSizeBasic", "CA")
-                  }
-                />
-              </Stack.Item>
-              <Stack.Item>
-                <TextField
-                  label="Serving reference"
-                  value={servingSize.CA.servingRefBasic}
-                  onChange={(e) =>
-                    handleChange(e, "servingSize", "servingRefBasic", "CA")
-                  }
-                />
-              </Stack.Item>
-              <Stack.Item fill>
-                <TextField
-                  label="Bilingual reference"
-                  value={servingSize.CA.bilingualRefBasic}
-                  onChange={(e) =>
-                    handleChange(e, "servingSize", "bilingualRefBasic", "CA")
-                  }
-                />
-              </Stack.Item>
-              <Stack.Item>
-                <div style={{ width: "80px" }}>
-                  <Select
-                    label="Unit"
-                    options={[
-                      { label: "liters", value: "liters" },
-                      { label: "Milliliters", value: "Milliliters" },
-                    ]}
-                    onChange={(e) => {
-                      handleChange(e, "servingSize", "unitBasic", "CA");
-                    }}
-                    value={servingSize.CA.unitBasic}
+            <>
+              <Stack>
+                <Stack.Item>
+                  <TextField
+                    label="Serving size"
+                    value={data.servingSize.CA.servingSizeBasic}
+                    onChange={(e) =>
+                      handleChange(e, "servingSize", "servingSizeBasic", "CA")
+                    }
                   />
-                </div>
-              </Stack.Item>
+                </Stack.Item>
+                <Stack.Item fill>
+                  <TextField
+                    label="Serving reference"
+                    value={servingSize.CA.servingRefBasic}
+                    onChange={(e) =>
+                      handleChange(e, "servingSize", "servingRefBasic", "CA")
+                    }
+                  />
+                </Stack.Item>
+                <Stack.Item fill>
+                  <TextField
+                    label="Bilingual reference"
+                    value={servingSize.CA.bilingualRefBasic}
+                    onChange={(e) =>
+                      handleChange(e, "servingSize", "bilingualRefBasic", "CA")
+                    }
+                  />
+                </Stack.Item>
+                <Stack.Item>
+                  <div style={{ width: "80px" }}>
+                    <Select
+                      label="Unit"
+                      options={[
+                        { label: "liters", value: "liters" },
+                        { label: "Milliliters", value: "Milliliters" },
+                      ]}
+                      onChange={(e) => {
+                        handleChange(e, "servingSize", "unitBasic", "CA");
+                      }}
+                      value={servingSize.CA.unitBasic}
+                    />
+                  </div>
+                </Stack.Item>
+              </Stack>
               {productToPrepare ? (
                 <></>
               ) : (
-                <Stack.Item>
+                <Stack>
                   <TextField
                     label="Calories per serving"
                     onChange={(e) => {
@@ -104,14 +105,14 @@ function ServingSize({
                     }}
                     value={servingSize.CA.caloriesPerServingBasic}
                   />
-                </Stack.Item>
+                </Stack>
               )}
-            </Stack>
+            </>
           ) : (
             <></>
           )}
           {locationPlan.location === "EU" ? (
-            <Stack wrap={false}>
+            <Stack>
               <Stack.Item fill>
                 <TextField
                   label="Default Amount"
@@ -156,16 +157,15 @@ function ServingSize({
           )}
 
           {locationPlan.location === "NA" ? (
-            <Stack wrap={false}>
-              <Stack.Item fill>
-                <TextField
-                  label="Servings per container"
-                  value={servingSize.NA.Servingspercontainer}
-                  onChange={(e) =>
-                    handleChange(e, "servingSize", "Servingspercontainer", "NA")
-                  }
-                />
-              </Stack.Item>
+            <Stack distribution="fill">
+              <TextField
+                label="Servings per container"
+                value={servingSize.NA.Servingspercontainer}
+                onChange={(e) =>
+                  handleChange(e, "servingSize", "Servingspercontainer", "NA")
+                }
+              />
+
               <Stack.Item>
                 <TextField
                   label="Serving reference"
@@ -175,7 +175,7 @@ function ServingSize({
                   }
                 />
               </Stack.Item>
-              <Stack.Item fill>
+              <Stack.Item>
                 <TextField
                   label="serving size"
                   value={servingSize.NA.servingsize}
@@ -206,8 +206,10 @@ function ServingSize({
                 marginTop: "10px",
               }}
             >
-              <Stack>
-                <Stack.Item>
+              <div
+                style={{ display: "flex", flexDirection: "row", gap: "20px" }}
+              >
+                <div style={{ width: "40%" }}>
                   <TextField
                     label="Unprepared Reference"
                     onChange={(e) =>
@@ -220,8 +222,8 @@ function ServingSize({
                     }
                     value={servingSize.NA.UnpreparedReference}
                   />
-                </Stack.Item>
-                <Stack.Item>
+                </div>
+                <div style={{ width: "25%" }}>
                   <TextField
                     label="Unprepared calories"
                     onChange={(e) =>
@@ -229,10 +231,13 @@ function ServingSize({
                     }
                     value={servingSize.NA.Unpreparedcalories}
                   />
-                </Stack.Item>
-              </Stack>
-              <Stack>
-                <Stack.Item>
+                </div>
+              </div>
+
+              <div
+                style={{ display: "flex", flexDirection: "row", gap: "20px" }}
+              >
+                <div style={{ width: "40%" }}>
                   <TextField
                     label="Prepared Reference"
                     onChange={(e) =>
@@ -240,8 +245,8 @@ function ServingSize({
                     }
                     value={servingSize.NA.PreparedReference}
                   />
-                </Stack.Item>
-                <Stack.Item>
+                </div>
+                <div style={{ width: "25%" }}>
                   <TextField
                     label="Prepared calories"
                     onChange={(e) =>
@@ -249,8 +254,8 @@ function ServingSize({
                     }
                     value={servingSize.NA.Preparedcalories}
                   />
-                </Stack.Item>
-              </Stack>
+                </div>
+              </div>
             </div>
           ) : (
             <></>

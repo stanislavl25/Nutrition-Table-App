@@ -46,21 +46,15 @@ const PopOverComponent = ({
       preferredAlignment="center"
     >
       <FormLayout>
-        <Stack>
-          <Stack.Item fill>
-            <div style={{ maxWidth: "80px" }}>
-              <Select
-                onChange={(e) =>
-                  handleChange(e, "nutritionData", "bold", index)
-                }
-                value={element.bold || ""}
-                options={options}
-                name="bold"
-                label="Bold Name"
-              />
-            </div>
-          </Stack.Item>
-          <Stack.Item>
+        <Select
+          onChange={(e) => handleChange(e, "nutritionData", "bold", index)}
+          value={element.bold || ""}
+          options={options}
+          name="bold"
+          label="Bold Name"
+        />
+
+        {/* <Stack.Item>
             <TextField
               label="Order"
               type="number"
@@ -73,8 +67,8 @@ const PopOverComponent = ({
               }}
               multiline={false}
             />
-          </Stack.Item>
-        </Stack>
+          </Stack.Item> */}
+
         <TextField
           label="Left Spacing (Table)"
           type="number"
@@ -172,117 +166,104 @@ function NutritionInfo({
             </Stack>
           </div>
 
-          <div>
-            <form>
-              <div
+          <div
+            style={{
+              borderCollapse: "separate",
+              display: "inline-table",
+              borderSpacing: "1em .5em",
+              marginBottom: "10px",
+              width: "100%",
+            }}
+          >
+            <div
+              style={{
+                display: "table-header-group",
+                width: "100%",
+              }}
+            >
+              <label style={{ display: "table-cell" }}>Name</label>
+              <label style={{ display: "table-cell" }}>Per 100 g</label>
+              <label
                 style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  padding: "0px 20px 0px 20px ",
-                  width: "100%",
+                  color: locationPlan.plan == "Basic" ? "#8c9196" : "black",
+                  display: "table-cell",
                 }}
               >
-                <label style={{ marginRight: "170px" }}>Name</label>
-                <label style={{ marginRight: "110px" }}>Per 100 g</label>
-                <label
-                  style={{
-                    color: locationPlan.plan == "Basic" ? "#8c9196" : "black",
-                    maxWidth: "123px",
-                    marginRight: "100px",
-                  }}
-                >
-                  Per portion
-                </label>
-                <label style={{ marginRight: "20px" }}>Unit</label>
-              </div>
-              <hr
-                style={{
-                  borderTop: "1px solid #cecece",
-                  width: "100%",
-                  padding: "0px",
-                }}
-              />
-
-              <div style={{ padding: "0px 20px 20px 20px", width: "100%" }}>
-                {data.nutritionData && data.nutritionData.length > 0 ? (
-                  data.nutritionData.map((element, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        flexDirection: "row",
-                        marginTop: "20px",
-                      }}
-                    >
-                      <div style={{ maxWidth: "200px", marginRight: "20px" }}>
-                        <TextField
-                          value={element.name}
-                          name="Name"
-                          onChange={(e) =>
-                            handleChange(e, "nutritionData", "name", index)
-                          }
-                          label=""
-                          autoComplete="off"
-                        />
-                      </div>
-                      <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                        <TextField
-                          value={element.per100g || 0}
-                          name="Per100g"
-                          onChange={(e) =>
-                            handleChange(e, "nutritionData", "per100g", index)
-                          }
-                          inputMode="number"
-                          autoComplete="off"
-                        />
-                      </div>
-                      <div style={{ maxWidth: "150px", marginRight: "20px" }}>
-                        <TextField
-                          value={element.perportion || 0}
-                          name="Perportion"
-                          onChange={(e) =>
-                            handleChange(
-                              e,
-                              "nutritionData",
-                              "perportion",
-                              index
-                            )
-                          }
-                          autoComplete="off"
-                          inputMode="number"
-                          disabled={
-                            locationPlan.plan === "Basic" ? true : false
-                          }
-                        />
-                      </div>
-
-                      <div style={{ maxWidth: "75px", marginRight: "20px" }}>
-                        <Select
-                          value={element.unit}
-                          onChange={(e) =>
-                            handleChange(e, "nutritionData", "unit", index)
-                          }
-                          options={options}
-                          name="unit"
-                        />
-                      </div>
-
-                      <div style={{ maxWidth: "100px" }}>
-                        <PopOverComponent
-                          element={element}
-                          handleChange={handleChange}
-                          removeFormFields={handleRemoveNutritionData}
-                          index={index}
-                          dataLength={data.length}
-                        />
-                      </div>
+                Per portion
+              </label>
+              <label style={{ display: "table-cell" }}>Unit</label>
+            </div>
+            <div style={{ display: "table-row-group", width: "100%" }}>
+              {data.nutritionData && data.nutritionData.length > 0 ? (
+                data.nutritionData.map((element, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "table-row",
+                      paddingTop: "10px",
+                    }}
+                  >
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        value={element.name}
+                        name="Name"
+                        onChange={(e) =>
+                          handleChange(e, "nutritionData", "name", index)
+                        }
+                        label=""
+                        autoComplete="off"
+                      />
                     </div>
-                  ))
-                ) : (
-                  <></>
-                )}
-              </div>
-            </form>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        value={element.per100g || 0}
+                        name="Per100g"
+                        onChange={(e) =>
+                          handleChange(e, "nutritionData", "per100g", index)
+                        }
+                        inputMode="number"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <TextField
+                        value={element.perportion || 0}
+                        name="Perportion"
+                        onChange={(e) =>
+                          handleChange(e, "nutritionData", "perportion", index)
+                        }
+                        autoComplete="off"
+                        inputMode="number"
+                        disabled={locationPlan.plan === "Basic" ? true : false}
+                      />
+                    </div>
+
+                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                      <Select
+                        value={element.unit}
+                        onChange={(e) =>
+                          handleChange(e, "nutritionData", "unit", index)
+                        }
+                        options={options}
+                        name="unit"
+                      />
+                    </div>
+
+                    <div style={{ flex: "1 0 0 auto" }}>
+                      <PopOverComponent
+                        element={element}
+                        handleChange={handleChange}
+                        removeFormFields={handleRemoveNutritionData}
+                        index={index}
+                        dataLength={data.length}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <></>
+              )}
+            </div>
           </div>
         </Card>
       ) : (
