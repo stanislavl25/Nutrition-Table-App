@@ -349,26 +349,47 @@ export async function createServer(
   // };
 
   app.post("/recurring-subscribtion", verifyRequest(app), async (req, res) => {
-    console.log(req.body);
     const plan = req.body.planType;
-    const store = req.body.store;
-    const accessToken = await AppSession.findOne({ shop: store })
-      .select("accessToken -_id")
-      .exec();
+    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+    const store = session.shop;
+    // const accessToken = await AppSession.findOne({ shop: store })
+    //   .select("accessToken -_id")
+    //   .exec();
     let plan_price;
     if (plan === "Basic") {
-      console.log("Basic");
       plan_price = 10;
+      try {
+        const data = await StoreModel.findOneAndUpdate(
+          { shop_id: store },
+          { shop_plan: plan }
+        );
+      } catch (err) {
+        console.log(err);
+      }
     }
     if (plan === "Advanced") {
-      console.log("Advanced");
-      plan_price = 20;
+      plan_price = 25;
+      try {
+        const data = await StoreModel.findOneAndUpdate(
+          { shop_id: store },
+          { shop_plan: plan }
+        );
+      } catch (err) {
+        console.log(err);
+      }
     }
     if (plan === "Entreprise") {
-      console.log("Entreprise");
       plan_price = 100;
+      try {
+        const data = await StoreModel.findOneAndUpdate(
+          { shop_id: store },
+          { shop_plan: plan }
+        );
+      } catch (err) {
+        console.log(err);
+      }
     }
-    console.log(plan_price);
+    // console.log(plan_price);
     //     const client = new Shopify.Clients.Graphql(store, accessToken.accessToken);
     //     const data = await client.query({
     //    data: {
@@ -406,7 +427,6 @@ export async function createServer(
     res.status(200).send({
       success: true,
       message: "Plan updated successfully!",
-      accessToken,
     });
   });
 

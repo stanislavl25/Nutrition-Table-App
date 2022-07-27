@@ -137,7 +137,7 @@ function TabsPage() {
         shopData.data.recommendedIntake = recommendedIntakeRows;
       }
       setStoreData(shopData.data);
-      setShopPlan(shopData.shop_plan);
+      setShopPlan(shopData.data.shop_plan);
     }
   };
 
@@ -699,25 +699,25 @@ function TabsPage() {
   };
 
   const handlePlan = async (planType) => {
-    const store = storeData.shop_id,
-      fetchOptions = {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ planType, store }),
-      };
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ planType }),
+    };
     try {
       const data = await fetch("/recurring-subscribtion", fetchOptions)
         .then((res) => res.json())
         .then(async (response) => {
           if (response.success) {
-            console.log("## /// plan /// ##");
-            console.log(response);
+            setToastMessage(response.message);
+            toggleActive();
           }
         });
+      setShopPlan(planType);
     } catch (err) {
       console.log(err);
     }
@@ -756,6 +756,8 @@ function TabsPage() {
           allResourcesSelected={allResourcesSelected}
           handleSelectionChange={handleSelectionChange}
           shop_plan={shop_plan}
+          setToastMessage={setToastMessage}
+          toggleActive={toggleActive}
         />
       ),
     },
@@ -818,7 +820,7 @@ function TabsPage() {
     {
       id: "PricinPlans",
       content: "Pricing Plans",
-      tab: <PricinPlans plan={storeData.shop_plan} handlePlan={handlePlan} />,
+      tab: <PricinPlans plan={shop_plan} handlePlan={handlePlan} />,
     },
   ];
 

@@ -21,10 +21,15 @@ function MyLables({
   allResourcesSelected,
   handleSelectionChange,
   shop_plan,
+  toggleActive,
+  setToastMessage,
 }) {
   return (
     <div>
-      {checkPlan ? (
+      {checkPlan &&
+      shop_plan &&
+      shop_plan === "Basic" &&
+      productsArray?.length < 999 ? (
         <div style={{ marginBottom: "10px" }}>
           <Card sectioned>
             <div
@@ -64,32 +69,72 @@ function MyLables({
                 </div>
               </div>
               <div>
-                {shop_plan && shop_plan === "Basic" ? (
-                  <Button
-                    primary
-                    onClick={() => {
-                      handleTabChange(5);
-                    }}
-                  >
-                    Get the Advanced plan
-                  </Button>
-                ) : (
-                  <></>
-                )}
-                {shop_plan &&
-                shop_plan === "Advanced" &&
-                productsArray?.length > 999 ? (
-                  <Button
-                    primary
-                    onClick={() => {
-                      handleTabChange(5);
-                    }}
-                  >
-                    Get the Entreprise plan
-                  </Button>
-                ) : (
-                  <></>
-                )}
+                <Button
+                  primary
+                  onClick={() => {
+                    handleTabChange(5);
+                  }}
+                >
+                  Get the Advanced plan
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ) : (
+        <></>
+      )}
+      {checkPlan &&
+      shop_plan &&
+      shop_plan === "Advanced" &&
+      productsArray?.length > 999 ? (
+        <div style={{ marginBottom: "10px" }}>
+          <Card sectioned>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              {/* //Todo star position */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={star}
+                  alt=""
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    marginRight: "4px",
+                  }}
+                />
+                <div>
+                  <Heading element="h5">
+                    Take advantage of the priceless benefits of the Entreprise
+                    Plan.
+                  </Heading>
+                  <p>
+                    Customize your Label, add Vitamins and Minerals, and more!
+                  </p>
+                </div>
+              </div>
+              <div>
+                <Button
+                  primary
+                  onClick={() => {
+                    handleTabChange(5);
+                  }}
+                >
+                  Get the Entreprise plan
+                </Button>
               </div>
             </div>
           </Card>
@@ -103,7 +148,14 @@ function MyLables({
         title="Products"
         primaryAction={{
           content: "Create Label",
-          onAction: () => handleTabChange(1),
+          onAction: () => {
+            if (!selectedResources || !selectedResources.length) {
+              setToastMessage("No products selected!");
+              toggleActive();
+              return;
+            }
+            handleSelectedProducts(selectedResources);
+          },
         }}
       >
         <div style={{ marginTop: "10px" }}>

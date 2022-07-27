@@ -4,7 +4,6 @@ import "../../assets/previewStyles.css";
 import { Markup } from "interweave";
 function TablePreview({ data, productToPrepare, locationPlan }) {
   const [bannerDismissed, setBannerDismissed] = useState(true);
-
   return (
     <Card title="Label Preview">
       <div style={{ padding: "10px" }}>
@@ -15,10 +14,10 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
               setBannerDismissed(false);
             }}
           >
-            <p>You can costumize how your label looks on the theme editor!</p>
+            <p>You can customize how your label looks on the theme editor!</p>
           </Banner>
         ) : null}
-        <div className="table_container">
+        <div className="table_container" style={{ wordBreak: "break-word" }}>
           <div style={{ padding: "10px" }}>
             <div
               className="table_header"
@@ -48,7 +47,10 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
               >
                 <strong>
                   A prepared portion is equivalent to{" "}
-                  {data.servingSize.EU.PortionSize} g
+                  {data.servingSize.EU.PortionSize}
+                  {data.servingSize.EU.PortionSizeUnit === "MilliGrams"
+                    ? "mg"
+                    : "g"}
                 </strong>
               </div>
             ) : (
@@ -177,15 +179,24 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
 
             <table
               className="table_cont"
-              style={{ borderCollapse: "collapse", marginBottom: "10px" }}
+              style={{
+                borderCollapse: "collapse",
+                marginBottom: "10px",
+                overflow: "hidden",
+              }}
             >
               <thead className="thead">
                 {locationPlan.location === "EU" ? (
-                  <tr>
+                  <tr style={{ wordBreak: "break-word" }}>
                     <th scope="col" style={{ textAlign: "left" }}>
                       Serving size
                     </th>
-                    <th scope="col">Per 100 g</th>
+                    <th scope="col">
+                      Per {data.servingSize.EU.DefaultAmount}{" "}
+                      {data.servingSize.EU.DefaultAmountUnit === "MilliGrams"
+                        ? "mg"
+                        : "g"}
+                    </th>
                     {locationPlan.plan === "Basic" ? (
                       <></>
                     ) : (
@@ -193,7 +204,10 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                         <th scope="col">
                           {productToPrepare ? "Prepared" : 1} <br />
                           portion
-                          <br /> {data.servingSize.EU.PortionSize} g
+                          <br /> {data.servingSize.EU.PortionSize}{" "}
+                          {data.servingSize.EU.PortionSizeUnit === "MilliGrams"
+                            ? "mg"
+                            : "g"}
                         </th>
                         <th scope="col" style={{ borderRight: "none" }}>
                           % RI*
