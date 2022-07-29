@@ -2,7 +2,7 @@ import { Banner, Card, Heading } from "@shopify/polaris";
 import React, { useState } from "react";
 import "../../assets/previewStyles.css";
 import { Markup } from "interweave";
-function TablePreview({ data, productToPrepare, locationPlan }) {
+function TablePreview({ data, productToPrepare, locationPlan, langState }) {
   const [bannerDismissed, setBannerDismissed] = useState(true);
   return (
     <Card title="Label Preview">
@@ -29,7 +29,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 justifyContent: "space-between",
               }}
             >
-              <Heading>Nutrition Information</Heading>
+              <Heading>{langState.NutritionInformation}</Heading>
               <p style={{ marginRight: "30px" }}>
                 <i className="arrow up"></i>
               </p>
@@ -46,7 +46,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                 }}
               >
                 <strong>
-                  A prepared portion is equivalent to{" "}
+                  {langState.aPreparedPortionIsEquivalentTo}{" "}
                   {data.servingSize.EU.PortionSize}
                   {data.servingSize.EU.PortionSizeUnit === "MilliGrams"
                     ? "mg"
@@ -70,7 +70,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                     justifyContent: "space-between",
                   }}
                 >
-                  <strong>Serving size</strong>
+                  <strong>{langState.servingSize}</strong>
                   <strong>
                     {data.servingSize.NA.Servingreference}(
                     {data.servingSize.NA.servingsize})
@@ -192,7 +192,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                       Serving size
                     </th>
                     <th scope="col">
-                      Per {data.servingSize.EU.DefaultAmount}{" "}
+                      {langState.per} {data.servingSize.EU.DefaultAmount}{" "}
                       {data.servingSize.EU.DefaultAmountUnit === "MilliGrams"
                         ? "mg"
                         : "g"}
@@ -202,9 +202,17 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                     ) : (
                       <>
                         <th scope="col">
-                          {productToPrepare ? "Prepared" : 1} <br />
-                          portion
-                          <br /> {data.servingSize.EU.PortionSize}{" "}
+                          {productToPrepare ? langState.preparedPortion : 1}{" "}
+                          <br />
+                          {productToPrepare ? (
+                            <></>
+                          ) : (
+                            <>
+                              {" "}
+                              {langState.portion} <br />
+                            </>
+                          )}
+                          {data.servingSize.EU.PortionSize}{" "}
                           {data.servingSize.EU.PortionSizeUnit === "MilliGrams"
                             ? "mg"
                             : "g"}
@@ -240,8 +248,8 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                       </th>
                       <td className="thtd td">
                         <div>
-                          <div>{data.calsEnergyInfo.energyKj100}</div>
-                          <div>{data.calsEnergyInfo.energyKcal100}</div>
+                          <div>{data.calsEnergyInfo.energyKj100}kj</div>
+                          <div>{data.calsEnergyInfo.energyKcal100}kcal</div>
                         </div>
                       </td>
                       {locationPlan.plan === "Basic" ? (
@@ -250,8 +258,8 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                         <>
                           <td className="thtd td">
                             <div>
-                              <div>{data.calsEnergyInfo.energyKj25}</div>
-                              <div>{data.calsEnergyInfo.energyKcal25}</div>
+                              <div>{data.calsEnergyInfo.energyKj25}kj</div>
+                              <div>{data.calsEnergyInfo.energyKcal25}kcal</div>
                             </div>
                           </td>
                           <td
@@ -285,12 +293,18 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                           {element.name}
                         </p>
                       </td>
-                      <td className="thtd td">{element.per100g}</td>
+                      <td className="thtd td">
+                        {element.per100g}{" "}
+                        {element.unit === "MilliGrams" ? "mg" : "g"}
+                      </td>
                       {locationPlan.plan === "Basic" ? (
                         <></>
                       ) : (
                         <>
-                          <td className="thtd td"> {element.perportion}</td>
+                          <td className="thtd td">
+                            {element.perportion}{" "}
+                            {element.unit === "MilliGrams" ? "mg" : "g"}
+                          </td>
                           <td
                             className="thtd td"
                             style={{ borderRight: "none" }}
@@ -422,12 +436,19 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                           {element.name}
                         </p>
                       </td>
-                      <td className="thtd td">{element.per100g}</td>
+                      {/* //ddd!! todo tansech Mg unit */}
+                      <td className="thtd td">
+                        {element.per100g}{" "}
+                        {element.unit === "Milligrams" ? "mg" : "g"}
+                      </td>
                       {locationPlan.plan === "Basic" ? (
                         <></>
                       ) : (
                         <>
-                          <td className="thtd td"> {element.perportion}</td>
+                          <td className="thtd td">
+                            {element.perportion}{" "}
+                            {element.unit === "Milligrams" ? "mg" : "g"}
+                          </td>
                           <td
                             className="thtd td"
                             style={{
@@ -460,8 +481,15 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                           {element.name}
                         </p>
                       </td>
-                      <td className="thtd td">{element.per100g}</td>
-                      <td className="thtd td"> {element.perportion}</td>
+                      <td className="thtd td">
+                        {element.per100g}{" "}
+                        {element.unit === "Milligrams" ? "mg" : "g"}
+                      </td>
+                      <td className="thtd td">
+                        {" "}
+                        {element.perportion}{" "}
+                        {element.unit === "Milligrams" ? "mg" : "g"}
+                      </td>
                       <td
                         className="thtd td"
                         style={{
@@ -691,7 +719,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                   width: "90%",
                 }}
               >
-                <Heading>Ingredients</Heading>
+                <Heading>{langState.Ingredients}</Heading>
                 <p>
                   <i className="arrow up"></i>
                 </p>
@@ -725,7 +753,7 @@ function TablePreview({ data, productToPrepare, locationPlan }) {
                   width: "90%",
                 }}
               >
-                <Heading>Allergy information</Heading>
+                <Heading>{langState.AllergyInformation}</Heading>
                 <p>
                   <i className="arrow up"></i>
                 </p>

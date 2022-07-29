@@ -84,10 +84,7 @@ function MyLables({
       ) : (
         <></>
       )}
-      {checkPlan &&
-      shop_plan &&
-      shop_plan === "Advanced" &&
-      productsArray?.length > 999 ? (
+      {checkPlan && shop_plan && shop_plan === "Advanced" ? (
         <div style={{ marginBottom: "10px" }}>
           <Card sectioned>
             <div
@@ -118,11 +115,11 @@ function MyLables({
                 />
                 <div>
                   <Heading element="h5">
-                    Take advantage of the priceless benefits of the Entreprise
-                    Plan.
+                    You have more than 999 products in your online store.
                   </Heading>
                   <p>
-                    Customize your Label, add Vitamins and Minerals, and more!
+                    stores with more than 999 products are only supported with
+                    the Enterprise Plan. Upgrade now.
                   </p>
                 </div>
               </div>

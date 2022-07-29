@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
@@ -32,7 +32,6 @@ function RichTextEditor({ text, handleTextChange }) {
       "Table",
       "TableToolbar",
     ],
-    // plugins: ["Bold", "Italic", "Link"],
     toolbar: ["Bold", "Italic", "|", "Link"],
   };
   return (

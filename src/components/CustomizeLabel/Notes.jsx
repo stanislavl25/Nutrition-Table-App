@@ -10,9 +10,10 @@ function Notes({ notesText, handleTextChange }) {
           flexDirection: "row",
           alignItems: "center",
           marginBottom: "10px",
+          gap: "4px",
         }}
       >
-        <Subheading>Nutrition notes </Subheading>
+        <Subheading>Nutrition notes </Subheading>{" "}
         <TextStyle variation="subdued">(leave empty for none)</TextStyle>
       </div>
       <RichTextEditor text={notesText} handleTextChange={handleTextChange} />

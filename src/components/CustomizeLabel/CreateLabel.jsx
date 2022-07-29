@@ -275,6 +275,8 @@ function CreateLabel({
                   <CalsEnergyInfos
                     data={data ? data : {}}
                     handleChange={handleChange}
+                    energyKj100={data.calsEnergyInfo.energyKj100}
+                    langState={langState.values}
                   />
                 ) : (
                   <></>
@@ -305,6 +307,7 @@ function CreateLabel({
                       handleAddVitamins={handleAddVitamins}
                       handleRemoveVitamins={handleRemoveVitamins}
                       handleChange={handleChange}
+                      allData={data}
                     />
                     <Minerals
                       data={data.minerals}
@@ -312,6 +315,7 @@ function CreateLabel({
                       handleAddMinerals={handleAddMinerals}
                       handleRemoveMinerals={handleRemoveMinerals}
                       handleChange={handleChange}
+                      allData={data}
                     />
                   </>
                 )}
@@ -381,6 +385,7 @@ function CreateLabel({
                 data={data}
                 productToPrepare={productToPrepare}
                 locationPlan={locationPlan}
+                langState={langState.values}
               />
             )}
           </div>

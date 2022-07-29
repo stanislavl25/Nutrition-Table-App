@@ -9,7 +9,7 @@ import {
   TextContainer,
   Banner,
 } from "@shopify/polaris";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
   const [popoverActive, setPopoverActive] = useState(false);
@@ -37,15 +37,17 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
       <FormLayout>
         <TextField
           label="%RI*"
-          type="text"
+          type="number"
           name="Name"
           value={element.RI || ""}
           onChange={(e) => handleChange(e, "vitamins", "RI", index)}
         />
         <TextField
           label="Left Spacing (Table)"
-          type="text"
           name="Name"
+          type="number"
+          min={0}
+          max={30}
           value={element.LeftSpacing || ""}
           onChange={(e) => handleChange(e, "vitamins", "LeftSpacing", index)}
         />
@@ -66,12 +68,12 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
 
 const SelectElement = ({ index, handleChange, unit }) => {
   const options = [
-    { label: "Grams", value: "g" },
-    { label: "Miligrams", value: "Mg" },
+    { label: "Grams", value: "Grams" },
+    { label: "Milligrams", value: "Milligrams" },
   ];
 
   return (
-    <div style={{ minWidth: "60px" }}>
+    <div style={{ maxWidth: "80px" }}>
       <Select
         label=""
         options={options}
@@ -88,7 +90,39 @@ function Vitamins({
   handleAddVitamins,
   handleRemoveVitamins,
   handleChange,
+  allData,
 }) {
+  // const elements = data.filter((elem) => {
+  //   console.log(elem.per100g);
+  //   return elem.per100g > 0;
+  // });
+  const handleAutoCalculs = () => {
+    data.forEach((elem, index) => {
+      const division =
+        allData?.servingSize.EU.DefaultAmount /
+        allData?.servingSize.EU.PortionSize;
+      const newVitamonPortion = elem.per100g / division;
+      if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
+        handleChange(
+          Math.floor(newVitamonPortion).toString(),
+          "vitamins",
+          "perportion",
+          index
+        );
+      }
+      return;
+    });
+  };
+  useEffect(() => {
+    // console.log("hey", elements);
+    return handleAutoCalculs();
+  }, [
+    data.filter((elem) => {
+      return elem.per100g > 0;
+    }),
+  ]);
+
+  // !!!!!! the use effect is taking array of objects and its making the perportion input not updating on it's own
   return (
     <Card>
       <div
@@ -161,7 +195,12 @@ function Vitamins({
             >
               <label style={{ display: "table-cell" }}>Name</label>
               <label style={{ display: "table-cell" }}>Per 100 g</label>
-              <label style={{ display: "table-cell" }}>Per portion 25 g</label>
+              <label style={{ display: "table-cell" }}>
+                Per portion {allData?.servingSize.EU.PortionSize}{" "}
+                {allData?.servingSize.EU.PortionSizeUnit === "Grams"
+                  ? "g"
+                  : "mg"}
+              </label>
               <label style={{ display: "table-cell" }}>Unit</label>
             </div>
           )}
@@ -202,17 +241,16 @@ function Vitamins({
                       }}
                     >
                       <TextField
-                        type="text"
                         name="quantity"
                         value={element.quantity || ""}
                         onChange={(e) =>
                           handleChange(e, "vitamins", "quantity", index)
                         }
+                        type="number"
                       />
                     </div>
                     <div
                       style={{
-                        flex: "1 0 0 auto",
                         display: "table-cell",
                       }}
                     >
@@ -229,8 +267,8 @@ function Vitamins({
                       }}
                     >
                       <TextField
-                        type="text"
                         name="dailyValue"
+                        type="number"
                         value={element.dailyValue || ""}
                         onChange={(e) =>
                           handleChange(e, "vitamins", "dailyValue", index)
@@ -276,7 +314,7 @@ function Vitamins({
                       }}
                     >
                       <TextField
-                        type="text"
+                        type="number"
                         name="per100g"
                         value={element.per100g || ""}
                         onChange={(e) =>
@@ -291,7 +329,7 @@ function Vitamins({
                       }}
                     >
                       <TextField
-                        type="text"
+                        type="number"
                         name="perportion"
                         value={element.perportion || ""}
                         onChange={(e) =>
@@ -301,7 +339,6 @@ function Vitamins({
                     </div>
                     <div
                       style={{
-                        flex: "1 0 0 auto",
                         display: "table-cell",
                       }}
                     >

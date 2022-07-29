@@ -9,7 +9,7 @@ import {
   TextContainer,
   TextField,
 } from "@shopify/polaris";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
   const [popoverActive, setPopoverActive] = useState(false);
@@ -36,7 +36,7 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
       <FormLayout>
         <TextField
           label="%RI*"
-          type="text"
+          type="number"
           name="RI"
           value={element.RI || ""}
           onChange={(e) => handleChange(e, "minerals", "RI", index)}
@@ -45,6 +45,8 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
           label="Left Spacing (Table)"
           type="number"
           name="LeftSpacing"
+          min={0}
+          max={30}
           value={element.LeftSpacing || ""}
           onChange={(e) => handleChange(e, "minerals", "LeftSpacing", index)}
         />
@@ -72,12 +74,12 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
 };
 
 const options = [
-  { label: "Grams", value: "g" },
-  { label: "Miligrams", value: "Mg" },
+  { label: "Grams", value: "Grams" },
+  { label: "Milligrams", value: "Milligrams" },
 ];
 const SelectElement = ({ unit, handleChange, index }) => {
   return (
-    <div>
+    <div style={{ width: "80px" }}>
       <Select
         label=""
         options={options}
@@ -94,7 +96,32 @@ function Minerals({
   handleAddMinerals,
   handleRemoveMinerals,
   handleChange,
+  allData,
 }) {
+  const handleAutoCalculs = () => {
+    data.forEach((elem, index) => {
+      const division =
+        allData?.servingSize.EU.DefaultAmount /
+        allData?.servingSize.EU.PortionSize;
+      const newVitamonPortion = elem.per100g / division;
+      if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
+        handleChange(
+          Math.floor(newVitamonPortion).toString(),
+          "minerals",
+          "perportion",
+          index
+        );
+      }
+      return;
+    });
+  };
+  useEffect(() => {
+    return handleAutoCalculs();
+  }, [
+    data.filter((elem) => {
+      return elem.per100g;
+    }),
+  ]);
   return (
     <Card>
       <div
@@ -157,7 +184,12 @@ function Minerals({
             <div style={{ display: "table-header-group", width: "100%" }}>
               <label style={{ display: "table-cell" }}>Name</label>
               <label style={{ display: "table-cell" }}>Per 100 g</label>
-              <label style={{ display: "table-cell" }}>Per portion 25 g</label>
+              <label style={{ display: "table-cell" }}>
+                Per portion {allData?.servingSize.EU.PortionSize}{" "}
+                {allData?.servingSize.EU.PortionSizeUnit === "Grams"
+                  ? "g"
+                  : "mg"}
+              </label>
               <label style={{ display: "table-cell" }}>Unit</label>
             </div>
           )}
@@ -194,7 +226,7 @@ function Minerals({
                       <TextField
                         size="small"
                         variant="outlined"
-                        type="text"
+                        type="number"
                         name="quantity"
                         value={element.quantity || ""}
                         onChange={(e) =>
@@ -202,7 +234,7 @@ function Minerals({
                         }
                       />
                     </div>
-                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                    <div style={{ display: "table-cell" }}>
                       <SelectElement
                         unit={element.unit}
                         handleChange={handleChange}
@@ -213,7 +245,7 @@ function Minerals({
                       <TextField
                         size="small"
                         variant="outlined"
-                        type="text"
+                        type="number"
                         name="dailyValue"
                         value={element.dailyValue || ""}
                         onChange={(e) =>
@@ -256,7 +288,7 @@ function Minerals({
                       <TextField
                         size="small"
                         variant="outlined"
-                        type="text"
+                        type="number"
                         name="per100g"
                         value={element.per100g || ""}
                         onChange={(e) =>
@@ -268,7 +300,7 @@ function Minerals({
                       <TextField
                         size="small"
                         variant="outlined"
-                        type="text"
+                        type="number"
                         name="perportion"
                         value={element.perportion || ""}
                         onChange={(e) =>
@@ -276,7 +308,7 @@ function Minerals({
                         }
                       />
                     </div>
-                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
+                    <div style={{ display: "table-cell" }}>
                       <SelectElement
                         unit={element.unit}
                         handleChange={handleChange}

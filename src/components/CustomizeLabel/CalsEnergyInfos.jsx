@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   TextStyle,
@@ -8,7 +8,32 @@ import {
   Icon,
 } from "@shopify/polaris";
 import { CircleInformationMajor } from "@shopify/polaris-icons";
-function CalsEnergyInfos({ data, handleChange }) {
+function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
+  const handleAutoCalculs = () => {
+    const division =
+      data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
+    const newEnergyKj25 = data?.calsEnergyInfo.energyKj100 / division;
+    const newEnergyKcal100 = data?.calsEnergyInfo.energyKj100 * 0.239006;
+    const newEnergyKcal25 = data?.calsEnergyInfo?.energyKcal100 / division;
+    handleChange(
+      Math.floor(newEnergyKj25).toString(),
+      "calsEnergyInfo",
+      "energyKj25"
+    );
+    handleChange(
+      Math.floor(newEnergyKcal25).toString(),
+      "calsEnergyInfo",
+      "energyKcal25"
+    );
+    handleChange(
+      Math.floor(newEnergyKcal100).toString(),
+      "calsEnergyInfo",
+      "energyKcal100"
+    );
+  };
+  useEffect(() => {
+    handleAutoCalculs();
+  }, [energyKj100]);
   return (
     <div style={{ marginTop: "20px" }}>
       <Card title="Calories/Energy Information" sectioned>
@@ -19,36 +44,56 @@ function CalsEnergyInfos({ data, handleChange }) {
         <div style={{ marginTop: "10px" }}>
           <Stack distribution="fillEvenly">
             <TextField
-              label="Energy (KJ) per 100 g"
+              label={`${langState.energy} (KJ) per ${
+                data?.servingSize.EU.DefaultAmount
+              } ${
+                data?.servingSize.EU.DefaultAmountUnit === "Grams" ? "g" : "mg"
+              }`}
               value={data?.calsEnergyInfo?.energyKj100}
               onChange={(e) => {
                 handleChange(e, "calsEnergyInfo", "energyKj100");
               }}
+              type="number"
             />
             <TextField
-              label="Energy (KJ) per 25 g"
+              label={`${langState.energy} (KJ) per ${
+                data?.servingSize.EU.PortionSize
+              } ${
+                data?.servingSize.EU.PortionSizeUnit === "Grams" ? "g" : "mg"
+              }`}
               value={data?.calsEnergyInfo?.energyKj25}
               onChange={(e) => {
                 handleChange(e, "calsEnergyInfo", "energyKj25");
               }}
+              type="number"
             />
           </Stack>
         </div>
         <div style={{ marginTop: "10px" }}>
           <Stack distribution="fillEvenly">
             <TextField
-              label="Energy (Kcal) per 100 g"
+              label={`${langState.energy} (Kcal) per ${
+                data?.servingSize.EU.DefaultAmount
+              } ${
+                data?.servingSize.EU.DefaultAmountUnit === "Grams" ? "g" : "mg"
+              }`}
               value={data?.calsEnergyInfo?.energyKcal100}
               onChange={(e) => {
                 handleChange(e, "calsEnergyInfo", "energyKcal100");
               }}
+              type="number"
             />
             <TextField
-              label="Energy (Kcal) per 25 g"
+              label={`${langState.energy} (Kcal) per ${
+                data?.servingSize.EU.PortionSize
+              } ${
+                data?.servingSize.EU.PortionSizeUnit === "Grams" ? "g" : "mg"
+              }`}
               value={data?.calsEnergyInfo?.energyKcal25}
               onChange={(e) => {
                 handleChange(e, "calsEnergyInfo", "energyKcal25");
               }}
+              type="number"
             />
           </Stack>
         </div>
@@ -67,6 +112,7 @@ function CalsEnergyInfos({ data, handleChange }) {
               onChange={(e) => {
                 handleChange(e, "calsEnergyInfo", "Ri");
               }}
+              type="number"
             />
             <Tooltip
               dismissOnMouseOut

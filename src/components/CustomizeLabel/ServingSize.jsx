@@ -140,6 +140,7 @@ function ServingSize({
                     handleChange(e, "servingSize", "PortionSize", "EU")
                   }
                   disabled={locationPlan.plan === "Basic" ? true : false}
+                  type="number"
                 />
               </Stack.Item>
               <Stack.Item>
@@ -230,6 +231,7 @@ function ServingSize({
                       handleChange(e, "servingSize", "Unpreparedcalories", "NA")
                     }
                     value={servingSize.NA.Unpreparedcalories}
+                    type="number"
                   />
                 </div>
               </div>
@@ -253,6 +255,7 @@ function ServingSize({
                       handleChange(e, "servingSize", "Preparedcalories", "NA")
                     }
                     value={servingSize.NA.Preparedcalories}
+                    type="number"
                   />
                 </div>
               </div>
@@ -307,6 +310,7 @@ function ServingSize({
                       handleChange(e, "servingSize", "unpreparedCalories", "CA")
                     }
                     value={servingSize.CA.unpreparedCalories}
+                    type="number"
                   />
                 </Stack.Item>
               </Stack>
@@ -349,6 +353,7 @@ function ServingSize({
                       handleChange(e, "servingSize", "preparedCalories", "CA")
                     }
                     value={servingSize.CA.preparedCalories}
+                    type="number"
                   />
                 </Stack.Item>
               </Stack>

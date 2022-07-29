@@ -17,7 +17,6 @@ const PopOverComponent = ({
   index,
   element,
   removeFormFields,
-  dataLength,
 }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
@@ -72,9 +71,9 @@ const PopOverComponent = ({
         <TextField
           label="Left Spacing (Table)"
           type="number"
-          value={element.leftSpacing || ""}
           min={0}
           max={30}
+          value={element.leftSpacing || ""}
           name="leftSpacing"
           onChange={(e) =>
             handleChange(e, "nutritionData", "leftSpacing", index)
@@ -115,6 +114,30 @@ function NutritionInfo({
   handleChange,
   productToPrepare,
 }) {
+  const handleAutoCalculs = () => {
+    data.nutritionData.forEach((elem, index) => {
+      const division =
+        data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
+      const newVitamonPortion = elem.per100g / division;
+      if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
+        handleChange(
+          Math.floor(newVitamonPortion).toString(),
+          "nutritionData",
+          "perportion",
+          index
+        );
+      }
+      return;
+    });
+  };
+  useEffect(() => {
+    return handleAutoCalculs();
+  }, [
+    data.nutritionData.filter((elem) => {
+      return elem.per100g;
+    }),
+  ]);
+
   const options = [
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
@@ -189,7 +212,8 @@ function NutritionInfo({
                   display: "table-cell",
                 }}
               >
-                Per portion
+                Per portion {data?.servingSize.EU.PortionSize}{" "}
+                {data?.servingSize.EU.PortionSizeUnit === "Grams" ? "g" : "mg"}
               </label>
               <label style={{ display: "table-cell" }}>Unit</label>
             </div>
@@ -223,6 +247,7 @@ function NutritionInfo({
                         }
                         inputMode="number"
                         autoComplete="off"
+                        type="number"
                       />
                     </div>
                     <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
@@ -234,19 +259,21 @@ function NutritionInfo({
                         }
                         autoComplete="off"
                         inputMode="number"
+                        type="number"
                         disabled={locationPlan.plan === "Basic" ? true : false}
                       />
                     </div>
-
-                    <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
-                      <Select
-                        value={element.unit}
-                        onChange={(e) =>
-                          handleChange(e, "nutritionData", "unit", index)
-                        }
-                        options={options}
-                        name="unit"
-                      />
+                    <div style={{ display: "table-cell", flex: "1 0 0 auto" }}>
+                      <div style={{ width: "80px" }}>
+                        <Select
+                          value={element.unit}
+                          onChange={(e) =>
+                            handleChange(e, "nutritionData", "unit", index)
+                          }
+                          options={options}
+                          name="unit"
+                        />
+                      </div>
                     </div>
 
                     <div style={{ flex: "1 0 0 auto" }}>
