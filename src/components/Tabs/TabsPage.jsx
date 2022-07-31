@@ -248,7 +248,7 @@ function TabsPage() {
   /**
    * Handle recommended intake save to backend
    *
-   * @param {recommendedIntake data, store id}
+   * @param {recommendedIntake data}
    */
 
   const saveRecomIntake = async (formVal) => {
@@ -261,16 +261,13 @@ function TabsPage() {
       },
       body: JSON.stringify({ formVal }),
     };
-    console.log(formVal);
     const data = await fetch("/recommendedIntake_save", fetchOptions)
       .then((res) => res.json())
       .then((response) => {
-        console.log(response);
         setToastMessage(response.message);
         toggleActive();
       })
       .catch((err) => {
-        console.log(err);
         handleSnackToggle("Something wrong happend!");
       });
   };

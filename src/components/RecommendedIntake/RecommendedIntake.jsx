@@ -17,7 +17,6 @@ const Edit = ({
   handleDelete,
   saveRecomIntake,
   recommendedIntake,
-  recommendedIntakeData,
 }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
@@ -108,7 +107,7 @@ function RecommendedIntake({
       });
       setStoreData(newStoreData);
     } else {
-      setToastMessage("You have an empty row!");
+      setToastMessage("You have an empty Refernce!");
       toggleActive();
     }
   };
