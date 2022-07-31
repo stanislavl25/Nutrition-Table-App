@@ -114,30 +114,18 @@ function NutritionInfo({
   handleChange,
   productToPrepare,
 }) {
-  const handleAutoCalculs = () => {
-    data.nutritionData.forEach((elem, index) => {
-      const division =
-        data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
-      const newVitamonPortion = elem.per100g / division;
-      if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
-        handleChange(
-          Math.floor(newVitamonPortion).toString(),
-          "nutritionData",
-          "perportion",
-          index
-        );
-      }
-      return;
-    });
-  };
-  useEffect(() => {
-    return handleAutoCalculs();
-  }, [
-    data.nutritionData.filter((elem) => {
-      return elem.per100g;
-    }),
-  ]);
-
+  const handleAutoCalculsOnChange = useCallback((val, index) => {
+    handleChange(val, "nutritionData", "per100g", index);
+    const division =
+      data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
+    const newNutritionPortion = data.nutritionData[index].per100g / division;
+    handleChange(
+      Math.floor(newNutritionPortion).toString(),
+      "nutritionData",
+      "perportion",
+      index
+    );
+  });
   const options = [
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
@@ -242,9 +230,7 @@ function NutritionInfo({
                       <TextField
                         value={element.per100g || 0}
                         name="Per100g"
-                        onChange={(e) =>
-                          handleChange(e, "nutritionData", "per100g", index)
-                        }
+                        onChange={(e) => handleAutoCalculsOnChange(e, index)}
                         inputMode="number"
                         autoComplete="off"
                         type="number"

@@ -92,37 +92,20 @@ function Vitamins({
   handleChange,
   allData,
 }) {
-  // const elements = data.filter((elem) => {
-  //   console.log(elem.per100g);
-  //   return elem.per100g > 0;
-  // });
-  const handleAutoCalculs = () => {
-    data.forEach((elem, index) => {
-      const division =
-        allData?.servingSize.EU.DefaultAmount /
-        allData?.servingSize.EU.PortionSize;
-      const newVitamonPortion = elem.per100g / division;
-      if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
-        handleChange(
-          Math.floor(newVitamonPortion).toString(),
-          "vitamins",
-          "perportion",
-          index
-        );
-      }
-      return;
-    });
-  };
-  useEffect(() => {
-    // console.log("hey", elements);
-    return handleAutoCalculs();
-  }, [
-    data.filter((elem) => {
-      return elem.per100g > 0;
-    }),
-  ]);
+  const handleAutoCalculsOnChange = useCallback((val, index) => {
+    handleChange(val, "vitamins", "per100g", index);
+    const division =
+      allData?.servingSize.EU.DefaultAmount /
+      allData?.servingSize.EU.PortionSize;
+    const newVitamonPortion = data[index].per100g / division;
+    handleChange(
+      Math.floor(newVitamonPortion).toString(),
+      "vitamins",
+      "perportion",
+      index
+    );
+  });
 
-  // !!!!!! the use effect is taking array of objects and its making the perportion input not updating on it's own
   return (
     <Card>
       <div
@@ -318,7 +301,8 @@ function Vitamins({
                         name="per100g"
                         value={element.per100g || ""}
                         onChange={(e) =>
-                          handleChange(e, "vitamins", "per100g", index)
+                          // handleChange(e, "vitamins", "per100g", index)
+                          handleAutoCalculsOnChange(e, index)
                         }
                       />
                     </div>

@@ -6,7 +6,6 @@ import "dotenv/config";
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 import db from "./db.js";
-import ProductsLabels from "./models/productsLabels.js";
 import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
 import AppSession from "./models/AppSessionModel.js";
@@ -202,16 +201,17 @@ export async function createServer(
    */
   app.post("/recommendedIntake_save", verifyRequest(app), async (req, res) => {
     console.log(req.body);
+    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     try {
       const update = await StoreModel.findOneAndUpdate(
         {
-          shop_id: req.body.storeId,
+          shop_id: session.shop,
         },
         {
           recommendedIntake: req.body.formVal,
         }
       );
-      res.status(200).send({ message: "data updated" });
+      res.status(200).send({ message: "Recommended Intake updated!" });
     } catch (err) {
       console.log(err);
       res.status(400).send({ message: "something wrong happened" });
@@ -444,9 +444,21 @@ export async function createServer(
   });
 
   app.post("/product_delete", verifyRequest(app), async (req, res) => {
-    console.log(req.body);
-    const session = await Shopify.Utils.loadCurrentSession(req, res);
-    res.status(200).send("hsy");
+    console.log("product deleted!");
+    const update = Products.findOneAndDelete(
+      { _id: req.body.productId },
+      (err, docs) => {
+        if (err) {
+          res
+            .status(400)
+            .send({ success: false, message: "Something wrong happend!" });
+        } else {
+          res
+            .status(200)
+            .send({ success: true, message: "Label deleted successfully!" });
+        }
+      }
+    );
   });
 
   app.post("/graphql", verifyRequest(app), async (req, res) => {

@@ -16,10 +16,8 @@ import { userLoggedInFetch } from "../../App";
 import React, { useCallback, useState } from "react";
 import { SearchMinor } from "@shopify/polaris-icons";
 
-const PopOverElem = ({ index, productId, removeFormFields }) => {
+const PopOverElem = ({ index, productId, handleProductRemove }) => {
   const [popoverActive, setPopoverActive] = useState(false);
-  const app = useAppBridge();
-  const fetch = userLoggedInFetch(app);
 
   const togglePopoverActive = useCallback(
     () => setPopoverActive((popoverActive) => !popoverActive),
@@ -30,26 +28,7 @@ const PopOverElem = ({ index, productId, removeFormFields }) => {
       More
     </Button>
   );
-  const handleProductRemove = async () => {
-    const fetchOptions = {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ productId }),
-    };
-    removeFormFields(index);
-    const data = await fetch("/product_delete", fetchOptions)
-      .then((res) => res.text())
-      .then((messages) => {
-        console.log(messages);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+
   return (
     <div style={{ marginLeft: "15px" }}>
       <Popover
@@ -61,7 +40,11 @@ const PopOverElem = ({ index, productId, removeFormFields }) => {
         ariaHaspopup={false}
       >
         <FormLayout>
-          <Button plain destructive onClick={handleProductRemove}>
+          <Button
+            plain
+            destructive
+            onClick={() => handleProductRemove(productId, index)}
+          >
             Delete Label
           </Button>
         </FormLayout>
@@ -72,7 +55,7 @@ const PopOverElem = ({ index, productId, removeFormFields }) => {
 
 function MyLablesTable({
   productsArray,
-  setProductArray,
+  setProductsArray,
   handleSelectedProducts,
   categories,
   handleEditProduct,
@@ -90,6 +73,8 @@ function MyLablesTable({
 
   const [sortValue, setSortValue] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const app = useAppBridge();
+  const fetch = userLoggedInFetch(app);
   const updateText = useCallback(
     (value) => {
       setInputValue(value);
@@ -161,14 +146,49 @@ function MyLablesTable({
   let removeFormFields = (i) => {
     let newproductsValues = [...productsArray];
     newproductsValues.splice(i, 1);
-    setProductArray(newproductsValues);
+    setProductsArray(newproductsValues);
+  };
+
+  //!!!!! todo message to inform that products are deleted
+  //!!!!! todo also update selected products A.splice(0,A.length)
+  const handleProductRemove = async (productId, index) => {
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ productId }),
+    };
+    if (typeof index == "number") {
+      removeFormFields(index);
+      selectedResources.splice(0, selectedResources.length);
+    }
+    const data = await fetch("/product_delete", fetchOptions)
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.success) {
+          console.log(response.message);
+        } else {
+          console.warn(response.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   const handleBulkDelete = () => {
-    productsArray.forEach((element, index) => {
+    productsArray.forEach((element) => {
       if (selectedResources.includes(element.name)) {
-        removeFormFields(index);
+        handleProductRemove(element._id, "");
       }
     });
+    const neProductsArray = productsArray.filter(
+      (value) => !selectedResources.includes(value.name)
+    );
+    setProductsArray(neProductsArray);
+    selectedResources.splice(0, selectedResources.length);
   };
   const categorieOptions = categories;
   const bulkActions = [];
@@ -244,7 +264,7 @@ function MyLablesTable({
                 <PopOverElem
                   index={index}
                   productId={_id}
-                  removeFormFields={removeFormFields}
+                  handleProductRemove={handleProductRemove}
                 />
               </div>
             </IndexTable.Cell>

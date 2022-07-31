@@ -251,7 +251,7 @@ function TabsPage() {
    * @param {recommendedIntake data, store id}
    */
 
-  const saveRecomIntake = async (formVal, storeId) => {
+  const saveRecomIntake = async (formVal) => {
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -259,18 +259,19 @@ function TabsPage() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ formVal, storeId }),
+      body: JSON.stringify({ formVal }),
     };
-    // console.log(formVal, storeId);
+    console.log(formVal);
     const data = await fetch("/recommendedIntake_save", fetchOptions)
       .then((res) => res.json())
       .then((response) => {
         console.log(response);
-        // handleSnackToggle(messages.message);
+        setToastMessage(response.message);
+        toggleActive();
       })
       .catch((err) => {
         console.log(err);
-        // handleSnackToggle("Something wrong happend!");
+        handleSnackToggle("Something wrong happend!");
       });
   };
 
@@ -290,7 +291,8 @@ function TabsPage() {
         .then((res) => res.json())
         .then((response) => {
           // console.log(response, "translation data saved");
-          // handleSnackToggle(messages.message);
+          setToastMessage(response.message);
+          toggleActive();
         })
         .catch((err) => {
           console.log(err);
@@ -800,10 +802,11 @@ function TabsPage() {
       tab: (
         <RecommendedIntake
           saveRecomIntake={saveRecomIntake}
-          rows={storeData.recommendedIntake}
           setStoreData={setStoreData}
           storeData={storeData}
           recommendedIntakeData={recommendedIntakeData}
+          setToastMessage={setToastMessage}
+          toggleActive={toggleActive}
         />
       ),
     },

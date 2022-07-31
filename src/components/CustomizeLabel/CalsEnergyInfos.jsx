@@ -103,32 +103,36 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
               display: "flex",
               flexDirection: "row",
               alignItems: "start",
-              justifyContent: "start",
+              position: "relative",
             }}
           >
-            <TextField
-              label="% RI* Recommended intake"
-              value={data?.calsEnergyInfo?.Ri}
-              onChange={(e) => {
-                handleChange(e, "calsEnergyInfo", "Ri");
-              }}
-              type="number"
-            />
-            <Tooltip
-              dismissOnMouseOut
-              content={
-                <p>
-                  The RI* percentage is automatically calculated based on your
-                  country standard %RI*: you can still edit these valueson{" "}
-                  <a href="#" style={{ textDecoration: "none" }}>
-                    the Recommended Intake page
-                  </a>
-                  .
-                </p>
-              }
-            >
-              <Icon source={CircleInformationMajor} color="base" />
-            </Tooltip>
+            <div>
+              <TextField
+                label="% RI* Recommended intake"
+                value={data?.calsEnergyInfo?.Ri}
+                onChange={(e) => {
+                  handleChange(e, "calsEnergyInfo", "Ri");
+                }}
+                type="number"
+              />
+            </div>
+            <div style={{ position: "absolute", marginLeft: "178px" }}>
+              <Tooltip
+                dismissOnMouseOut
+                content={
+                  <p>
+                    The RI* percentage is automatically calculated based on your
+                    country standard %RI*: you can still edit these valueson{" "}
+                    <a href="#" style={{ textDecoration: "none" }}>
+                      the Recommended Intake page
+                    </a>
+                    .
+                  </p>
+                }
+              >
+                <Icon source={CircleInformationMajor} color="base" />
+              </Tooltip>
+            </div>
           </div>
         </div>
         <div>

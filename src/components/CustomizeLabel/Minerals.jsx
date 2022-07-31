@@ -98,30 +98,40 @@ function Minerals({
   handleChange,
   allData,
 }) {
-  const handleAutoCalculs = () => {
-    data.forEach((elem, index) => {
-      const division =
-        allData?.servingSize.EU.DefaultAmount /
-        allData?.servingSize.EU.PortionSize;
-      const newVitamonPortion = elem.per100g / division;
-      if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
-        handleChange(
-          Math.floor(newVitamonPortion).toString(),
-          "minerals",
-          "perportion",
-          index
-        );
-      }
-      return;
-    });
-  };
-  useEffect(() => {
-    return handleAutoCalculs();
-  }, [
-    data.filter((elem) => {
-      return elem.per100g;
-    }),
-  ]);
+  // const handleAutoCalculsOnload = () => {
+  //   data.forEach((elem, index) => {
+  //     const division =
+  //       allData?.servingSize.EU.DefaultAmount /
+  //       allData?.servingSize.EU.PortionSize;
+  //     const newVitamonPortion = elem.per100g / division;
+  //     if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
+  //       handleChange(
+  //         Math.floor(newVitamonPortion).toString(),
+  //         "minerals",
+  //         "perportion",
+  //         index
+  //       );
+  //     }
+  //     return;
+  //   });
+  // };
+  const handleAutoCalculsOnChange = useCallback((val, index) => {
+    handleChange(val, "minerals", "per100g", index);
+    const division =
+      allData?.servingSize.EU.DefaultAmount /
+      allData?.servingSize.EU.PortionSize;
+    const newVitamonPortion = data[index].per100g / division;
+    handleChange(
+      Math.floor(newVitamonPortion).toString(),
+      "minerals",
+      "perportion",
+      index
+    );
+  });
+
+  // useEffect(() => {
+  //   handleAutoCalculsOnload();
+  // }, []);
   return (
     <Card>
       <div
@@ -292,7 +302,8 @@ function Minerals({
                         name="per100g"
                         value={element.per100g || ""}
                         onChange={(e) =>
-                          handleChange(e, "minerals", "per100g", index)
+                          // handleChange(e, "minerals", "per100g", index)
+                          handleAutoCalculsOnChange(e, index)
                         }
                       />
                     </div>

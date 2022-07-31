@@ -8,14 +8,13 @@ import {
   Select,
   TextField,
 } from "@shopify/polaris";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 const Edit = ({
   index,
   element,
   handleChange,
   handleDelete,
-  storeId,
   saveRecomIntake,
   recommendedIntake,
   recommendedIntakeData,
@@ -48,7 +47,7 @@ const Edit = ({
           label="Name"
           value={element.name}
           onChange={(e) => handleChange(e, index, "name")}
-          onBlur={(e) => saveRecomIntake(recommendedIntake, storeId)}
+          onBlur={() => saveRecomIntake(recommendedIntake)}
           autoComplete="off"
           inputMode="text"
         />
@@ -56,7 +55,7 @@ const Edit = ({
           label="Quantity"
           value={element.quantity}
           onChange={(e) => handleChange(e, index, "quantity")}
-          onBlur={(e) => saveRecomIntake(recommendedIntake, storeId)}
+          onBlur={() => saveRecomIntake(recommendedIntake)}
           autoComplete="off"
           inputMode="number"
           type="number"
@@ -65,7 +64,7 @@ const Edit = ({
           label="Show all customers where:"
           value={element.unit}
           onChange={(e) => handleChange(e, index, "unit")}
-          onBlur={(e) => saveRecomIntake(recommendedIntake, storeId)}
+          onBlur={() => saveRecomIntake(recommendedIntake)}
           options={["Grams", "Milligrams", "Micrograms"]}
         />
         <Button
@@ -73,8 +72,8 @@ const Edit = ({
           outline
           onClick={() => {
             handleDelete(index);
-            console.log(recommendedIntakeData);
-            // saveRecomIntake(rows, storeId);
+            console.log(recommendedIntake);
+            saveRecomIntake(recommendedIntake);
           }}
         >
           Delete
@@ -84,27 +83,39 @@ const Edit = ({
   );
 };
 
-const newRow = { name: "", quantity: "", unit: "Grams" };
 function RecommendedIntake({
-  rows,
   setStoreData,
   storeData,
   saveRecomIntake,
   recommendedIntakeData,
+  toggleActive,
+  setToastMessage,
 }) {
   const handleChange = useCallback((value, i, tag) => {
-    let newValues = { ...storeData };
-    newValues["recommendedIntake"][i][tag] = value;
-    setStoreData(newValues);
+    let newSotreData = { ...storeData };
+    newSotreData.recommendedIntake[i][tag] = value;
+    setStoreData(newSotreData);
   }, []);
 
   const handleAddNewRow = () => {
-    setStoreData([...storeData.recommendedIntake, newRow]);
+    let length = storeData.recommendedIntake.length - 1;
+    if (storeData.recommendedIntake[length].name.length > 0) {
+      const newStoreData = { ...storeData };
+      newStoreData.recommendedIntake.push({
+        name: "",
+        quantity: "",
+        unit: "Grams",
+      });
+      setStoreData(newStoreData);
+    } else {
+      setToastMessage("You have an empty row!");
+      toggleActive();
+    }
   };
   const handleDelete = async (i) => {
-    let newValues = [...storeData.recommendedIntake];
-    newValues.splice(i, 1);
-    setStoreData(() => ({ ...storeData, recommendedIntake: newValues }));
+    let newSotreData = { ...storeData };
+    newSotreData.recommendedIntake.splice(i, 1);
+    setStoreData(newSotreData);
   };
   return (
     <div>
@@ -159,7 +170,7 @@ function RecommendedIntake({
                   width: "100%",
                 }}
               >
-                {rows.map((elem, index) => (
+                {storeData?.recommendedIntake?.map((elem, index) => (
                   <tr
                     style={{
                       borderTop: "1px solid #E1E3E5",
@@ -182,6 +193,8 @@ function RecommendedIntake({
                     ) : (
                       <>
                         <td>New Reference</td>
+                        <td></td>
+                        <td></td>
                       </>
                     )}
                     <td
@@ -194,7 +207,6 @@ function RecommendedIntake({
                         element={elem}
                         handleChange={handleChange}
                         handleDelete={handleDelete}
-                        storeId={storeData.shop_id}
                         saveRecomIntake={saveRecomIntake}
                         recommendedIntake={storeData.recommendedIntake}
                         recommendedIntakeData={recommendedIntakeData}
