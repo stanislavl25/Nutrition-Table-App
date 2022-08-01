@@ -4,6 +4,7 @@
     color: #222222;
   }
 {% endstyle %}
+{% assign body_font_size = block.settings.body_font_size%}
 <nutrition-Table class="container_performance-facts" data-id="{{ block.id }}" style="align-items:{{block.settings.vertical_alignment}};"  >
   <!-- {%- if block.settings.heading -%}
     <h1>{{ block.settings.heading }}</h1>
@@ -13,37 +14,65 @@
     <p>{{ block.settings.description }}</p>
   {%- endif -%} -->
  
+ <script>
+  const fetchProducts = ()=>{
+    fetch("/test",{
+      method:"GET",
+      headers:{
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    }).then((res)=>res.text()).then((response)=>
+    console.log(response)
+    )
+  }
+  const handleBackGroundImage =()=>{
+    var width = window.innerWidth;
+    const element = document.getElementById('container')
+    var imageElem = document.createElement("img");
+    imageElem.setAttribute("class", "backGroundImage");
+    imageElem.setAttribute("height", "");
+    imageElem.setAttribute("width", "");
+    imageElem.setAttribute("alt", "");
+    if(width>700){
+      imageElem.src = "{{block.settings.back_ground_image | img_url: 'large'}}";
+      element.prepend(imageElem)
+    }else{
+      imageElem.src = "{{block.settings.MobileView | img_url: 'large'}}";
+      element.prepend(imageElem)
+    }
+  }
+  handleBackGroundImage()
+  window.addEventListener('resize',handleBackGroundImage)
+ </script>
+  <section id="container" class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadiusMainTable}}px;background-color:{{block.settings.Table_background_color}};  ">
  
-  <section class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadius}}px;background-color:{{block.settings.Table_background_color}};  ">
-    {%- if block.settings.back_ground_image-%}
-        <img src="{{block.settings.back_ground_image | img_url: 'large'}}" class="backGroundImage" alt="" width="" height="">
-    {%- endif -%} 
     <header class="performance-facts__header" style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};">
       <div class="performance-facts__header_title">
-        <div class="header_container">
-          <h2 class="performance-facts__title header_container" style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Nutrition Facts</h2>
-          <p>
-            <i className="arrow up"></i>
-          </p>
+        <div class="header_container" style="border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
+          <h2 class="performance-facts__title header_container" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Nutrition Facts</h2>
+          {%- if block.settings.custom_accordion_icon-%}
+          <img src="{{block.settings.custom_accordion_icon | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;color:{{block.settings.Accordion_icon_color}}">
+          {%- endif -%}
         </div>
       </div>
       <hr style="margin:0"/>
-        <h4 style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">6 serving per container</h4>
+        <h4 style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">6 serving per container</h4>
         <div class="performance-facts_secondaryHeader" >
-          <h3 style="margin:0; font-weight: bold;font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">Serving size </h3>
-          <h3 style="margin:0; font-weight: bold;font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">1 cup (230g) </h3>
+          <h3 style="margin:0; font-weight: bold;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">Serving size </h3>
+          <h3 style="margin:0; font-weight: bold;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">1 cup (230g) </h3>
         </div>
     </header>
     <table class="performance-facts__table">
       <thead>
         <tr>
-          <th colspan="3" class="small-info" id="servingstuff" style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+          <th colspan="3" class="small-info" id="servingstuff" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
             Amount Per Serving
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <th colspan="2">
             <b>Calories</b>
             200
@@ -53,12 +82,12 @@
             130
           </td>
         </tr>
-        <tr class="thick-row" style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr class="thick-row" style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <td colspan="3" class="small-info">
             <b>% Daily Value*</b>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <th colspan="2">
             <b>Total Fat</b>
             14g
@@ -67,7 +96,7 @@
             <b>22%</b>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <td class="blank-cell">
           </td>
           <th>
@@ -78,7 +107,7 @@
             <b>22%</b>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <td class="blank-cell">
           </td>
           <th>
@@ -88,7 +117,7 @@
           <td>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <th colspan="2">
             <b>Cholesterol</b>
             55mg
@@ -97,7 +126,7 @@
             <b>18%</b>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <th colspan="2">
             <b>Sodium</b>
             40mg
@@ -106,7 +135,7 @@
             <b>2%</b>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <th colspan="2">
             <b>Total Carbohydrate</b>
             17g
@@ -115,7 +144,7 @@
             <b>6%</b>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <td class="blank-cell">
           </td>
           <th>
@@ -126,7 +155,7 @@
             <b>4%</b>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <td class="blank-cell">
           </td>
           <th>
@@ -136,7 +165,7 @@
           <td>
           </td>
         </tr>
-        <tr style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <th colspan="2">
             <b>Protein</b>
             3g
@@ -148,7 +177,7 @@
     </table>
     <table class="performance-facts__table--grid">
       <tbody>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <td colspan="2" >
             Vitamin A
             10%
@@ -158,7 +187,7 @@
             0%
           </td>
         </tr>
-        <tr class="thin-end" style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+        <tr class="thin-end" style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
           <td colspan="2">
             Calcium
             10%
@@ -170,44 +199,117 @@
         </tr>
       </tbody>
     </table>
-    <p style="border-bottom:1px solid black;font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">Salt content is exclusively due to the presence of naturally occurring sodium.</p>
-    <p style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">*Reference intake of an average adult (8 400 kJ / 2 000 kcal)</p>
-    <div class="header_container">
-      <h2 class="performance-facts__title" style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Ingredients</h2>
-      <p>
-        <i className="arrow up"></i>
-      </p>
+    <p style="border-bottom:1px solid black;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">Salt content is exclusively due to the presence of naturally occurring sodium.</p>
+    <p style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">*Reference intake of an average adult (8 400 kJ / 2 000 kcal)</p>
+    <div class="header_container" style="border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
+      <h2 class="performance-facts__title" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Ingredients</h2>
+      {%- if block.settings.custom_accordion_icon-%}
+      <img src="{{block.settings.custom_accordion_icon | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;color:{{block.settings.Accordion_icon_color}}">
+      {%- endif -%}
     </div>
     <div style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;display:flex;
-    flex-wrap:wrap;font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">Mandarin Oranges (37.9%)</p>
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">Light Whipping Cream (<strong>Milk</strong>),</p>
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">Peras (12.4%)</p>
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">Peaches (7.7%)</p>
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">Thompson Seedles Grapes (7.6%)</p>
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">Apple (7.5%)</p>
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">Banana (5.9%)</p>
-      <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">English Walnuts <strong>(Tree Nuts)</strong></p>
+    flex-wrap:wrap;gap:5px;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;margin-bottom:10px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Mandarin Oranges (37.9%)</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Light Whipping Cream (<strong>Milk</strong>)</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peras (12.4%)</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peaches (7.7%)</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Thompson Seedles Grapes (7.6%)</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Apple (7.5%)</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Banana (5.9%)</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_ingredient_icon-%}
+      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%}
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">English Walnuts <strong>(Tree Nuts)</strong></p>
+    </div>
       </div>
-    <div class="header_container">
-      <h2 class="performance-facts__title" style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Allergy Information</h2>
-      <p>
-        <i className="arrow up"></i>
-      </p>
+    <div class="header_container" style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
+      <h2 class="performance-facts__title" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Allergy Information</h2>
+      {%- if block.settings.custom_accordion_icon-%}
+      <img src="{{block.settings.custom_accordion_icon | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
+      {%- endif -%}
     </div>
     <div style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;display:flex;
-    flex-wrap:wrap;">
-    <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">! Contains Wheat</p>
-    <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">! Almond</p>
-    <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">! Peanut</p>
-    <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">! Soy</p>
-    <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">! Milk</p>
-    <p style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;border-radius:{{block.settings.cell_border_radius}};background-color:{{block.settings.cells_background_color}};height:30px;margin-left:10px">! It May contain other tree nuts</p>
+    flex-wrap:wrap;gap:5px;text-align:center;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_allergen_icon-%}
+      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%} 
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px;">Contains Wheat</p>
     </div>
-   <div  style="font-family:{{block.settings.body_font}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.body_font_size}}px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_allergen_icon-%}
+      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%} 
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Almond</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_allergen_icon-%}
+      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%} 
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peanut</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_allergen_icon-%}
+      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%} 
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Soy</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_allergen_icon-%}
+      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%} 
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Milk</p>
+    </div>
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+      {%- if block.settings.Custom_allergen_icon-%}
+      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
+      {%- endif -%} 
+      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">It May contain other tree nuts</p>
+    </div>
+    </div>
+   <div  style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;margin-top:10px;">
     <strong>
       *LEGAL NOTICE
     </strong>
+    <div>
+      {{body_font_size}}
+    </div>
      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam. 
    </div>
   </section>
@@ -298,9 +400,9 @@
    },
    {
     "type":"range",
-    "id":"borderRadius",
-    "min":-1,
-    "max":1,
+    "id":"borderRadiusMainTable",
+    "min":0,
+    "max":20,
     "step":1,
     "unit":"px",
     "label":"Border Radius",
@@ -327,7 +429,7 @@
     "content":"FONT STYLE"
    },
    {
-     "type": "font_picker",
+    "type": "font_picker",
     "id": "body_font",
     "label": "Body Font",
     "default": "helvetica_n4"
@@ -342,7 +444,7 @@
     "type": "range",
     "id": "body_font_size",
     "min": 2,
-    "max": 14,
+    "max": 18,
     "step": 1,
     "unit": "px",
     "label": "Body font size",
@@ -352,7 +454,7 @@
     "type": "range",
     "id": "acorddions_headings_font_size",
     "min": 4,
-    "max": 18,
+    "max": 22,
     "step": 1,
     "unit": "px",
     "label": "Acorddions headings font size",
@@ -372,7 +474,7 @@
     "type": "range",
     "id": "cell_border_radius",
     "min": 0,
-    "max": 5,
+    "max": 20,
     "step": 1,
     "unit": "px",
     "label": "Cell border radius",
@@ -383,18 +485,18 @@
     "content":"ICONS AND DETAILS"
   },
    {
-     "type": "range",
-     "id": "Ingredients_allergens_border_radius",
-     "min": 0,
-    "max": 3.5,
-    "step": 0.5,
+    "type": "range",
+    "id": "Ingredients_allergens_border_radius",
+    "min": 0,
+    "max": 20,
+    "step": 1,
     "unit": "px",
     "label": "Ingredients and allergens border radius",
-    "default": 3
+    "default": 0
   },
   {
     "type": "color",
-    "id": "Ingredients_allergens_background_color",
+    "id": "Ingredients_allergens_color",
     "label": "Body font color",
     "default": "#F3F3F3"
   },

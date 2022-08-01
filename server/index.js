@@ -99,10 +99,34 @@ export async function createServer(
 
   /** handle food products save */
   app.post("/save_foodProducts", verifyRequest(app), async (req, res) => {
-    console.log(req.body);
     const session = await Shopify.Utils.loadCurrentSession(req, res);
-    console.log(session);
-    res.status(200).send({ message: "updates saved!", success: true });
+    const store = session.shop;
+    const products = req.body.products;
+    try {
+      products.forEach((elem) => {
+        const update = Products.findByIdAndUpdate(
+          { store_id: store, name: elem },
+          req.body.data,
+          (err, docs) => {
+            if (err) {
+              console.log("######### error");
+              res
+                .status(400)
+                .send({ message: "Something wrong happend!", success: false });
+            } else {
+              console.log("######### success");
+              res
+                .status(200)
+                .send({ message: "updates saved!", success: true });
+            }
+          }
+        );
+      });
+    } catch (e) {
+      res
+        .status(400)
+        .send({ message: "Something wrong happend!", success: false });
+    }
   });
 
   /***handle non food save  */

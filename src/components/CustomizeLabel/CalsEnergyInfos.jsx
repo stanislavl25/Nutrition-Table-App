@@ -13,8 +13,8 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
     const division =
       data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
     const newEnergyKj25 = data?.calsEnergyInfo.energyKj100 / division;
-    const newEnergyKcal100 = data?.calsEnergyInfo.energyKj100 * 0.239006;
-    const newEnergyKcal25 = data?.calsEnergyInfo?.energyKcal100 / division;
+    const newEnergyKcal100 = data?.calsEnergyInfo.energyKj100 / 4.184;
+    const newEnergyKcal25 = newEnergyKcal100 / division;
     handleChange(
       Math.floor(newEnergyKj25).toString(),
       "calsEnergyInfo",

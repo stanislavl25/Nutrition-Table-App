@@ -336,6 +336,7 @@ function TabsPage() {
       },
       body: JSON.stringify({ products, data }),
     };
+    console.log(typeof data);
     try {
       const data = await fetch("/save_foodProducts", fetchOptions)
         .then((res) => res.json())
@@ -343,6 +344,9 @@ function TabsPage() {
           if (response.success) {
             await fetchProducts();
             setSelected(0);
+            setToastMessage(response.message);
+            toggleActive();
+          } else {
             setToastMessage(response.message);
             toggleActive();
           }

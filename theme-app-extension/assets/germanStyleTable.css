@@ -46,7 +46,7 @@ p {
   padding: 0.5rem;
   overflow: hidden;
   position:relative;
-  z-index:1000000000;
+  z-index:1;
 }
 .performance-facts table {
   border-collapse: collapse;
@@ -149,7 +149,7 @@ p {
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
-  width: 90%;
+  width: 100%;
 }
 .arrow {
   border: solid #949494;

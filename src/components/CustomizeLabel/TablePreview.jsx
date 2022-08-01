@@ -700,6 +700,22 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
             ) : (
               <></>
             )}
+            <hr
+              style={{
+                width: "95%",
+                borderTop: "1px solid rgb(190, 190, 190)",
+              }}
+            />
+            <div
+              style={{
+                paddingRight: "10px",
+                paddingLeft: "10px",
+                marginBottom: "10px",
+              }}
+            >
+              {langState.referenceIntakeDisclaimer}
+            </div>
+
             <div
               style={{
                 borderTop: "1px solid rgb(190, 190, 190)",
