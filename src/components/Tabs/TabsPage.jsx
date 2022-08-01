@@ -327,30 +327,34 @@ function TabsPage() {
   };
   /** saving food products */
   const handleSaveProducts = async (products, data) => {
-    const fetchOptions = {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ products, data }),
-    };
-    console.log(typeof data);
     try {
-      const data = await fetch("/save_foodProducts", fetchOptions)
-        .then((res) => res.json())
-        .then(async (response) => {
-          if (response.success) {
-            await fetchProducts();
-            setSelected(0);
-            setToastMessage(response.message);
-            toggleActive();
-          } else {
-            setToastMessage(response.message);
-            toggleActive();
-          }
-        });
+      productsArray.forEach(async (elem) => {
+        if (products.includes(elem.name)) {
+          console.log(elem);
+          const fetchOptions = {
+            method: "POST",
+            mode: "cors",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: elem._id, data: data }),
+          };
+          const update = await fetch("/save_foodProducts", fetchOptions)
+            .then((res) => res.json())
+            .then(async (response) => {
+              if (response.success) {
+                await fetchProducts();
+                setSelected(0);
+                setToastMessage(response.message);
+                toggleActive();
+              } else {
+                setToastMessage(response.message);
+                toggleActive();
+              }
+            });
+        }
+      });
     } catch (err) {
       console.log(err);
     }

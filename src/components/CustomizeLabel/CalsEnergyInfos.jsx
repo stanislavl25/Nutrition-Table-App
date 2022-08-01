@@ -12,9 +12,12 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
   const handleAutoCalculs = () => {
     const division =
       data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
-    const newEnergyKj25 = data?.calsEnergyInfo.energyKj100 / division;
-    const newEnergyKcal100 = data?.calsEnergyInfo.energyKj100 / 4.184;
+    const newEnergyKj25 = data.calsEnergyInfo.energyKj100 / division;
+    const newEnergyKcal100 = data.calsEnergyInfo.energyKj100 / 4.184;
     const newEnergyKcal25 = newEnergyKcal100 / division;
+    // console.log(data.calsEnergyInfo);
+    // console.log(newEnergyKcal100);
+    // console.log(division);
     handleChange(
       Math.floor(newEnergyKj25).toString(),
       "calsEnergyInfo",
