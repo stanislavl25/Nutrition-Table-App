@@ -66,6 +66,7 @@ function CreateLabel({
   handleRemoveMinerals,
   productsAredifferent,
   shop_plan,
+  portionSizeModalCheckBox,
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
@@ -270,6 +271,7 @@ function CreateLabel({
                   locationPlan={locationPlan}
                   data={data}
                   handleChange={handleChange}
+                  portionSizeModalCheckBox={portionSizeModalCheckBox}
                 />
                 {locationPlan.location === "EU" ? (
                   <CalsEnergyInfos

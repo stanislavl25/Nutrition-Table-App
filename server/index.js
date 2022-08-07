@@ -290,9 +290,9 @@ export async function createServer(
       const session = await Shopify.Utils.loadCurrentSession(req, res, true);
       const query = Products.find({
         store_id: session.shop,
+        hideProducts: false,
       }).select("-store_id -productId -is_deleted");
       const productsDatabase = await query.exec();
-
       res.status(200).send({
         data: productsDatabase,
         message: "found products!",

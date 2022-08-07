@@ -2,7 +2,6 @@ import {
   Button,
   IndexTable,
   Select,
-  Spinner,
   TextStyle,
   Thumbnail,
   FormLayout,
@@ -18,6 +17,49 @@ import { userLoggedInFetch } from "../../App";
 import React, { useCallback, useState } from "react";
 import { SearchMinor } from "@shopify/polaris-icons";
 
+const ResetProducts = () => {
+  const [active, setActive] = useState(false);
+
+  const handleChange = () => {
+    setActive(!active);
+  };
+
+  const activator = (
+    <div style={{ width: "164px" }} onClick={handleChange}>
+      <TextStyle variation="negative">Reset products</TextStyle>
+    </div>
+  );
+
+  return (
+    <Modal
+      activator={activator}
+      open={active}
+      onClose={handleChange}
+      title="Reset products"
+      primaryAction={{
+        content: "Reset products",
+        onAction: handleChange,
+        destructive: true,
+      }}
+      secondaryActions={[
+        {
+          content: "Cancel",
+          onAction: handleChange,
+        },
+      ]}
+    >
+      <Modal.Section>
+        <TextContainer>
+          <p>
+            Do you really want to delete all data for the selected products. The
+            data for the selected products will all be reset to zero. This
+            action is irreversible.
+          </p>
+        </TextContainer>
+      </Modal.Section>
+    </Modal>
+  );
+};
 const HideLablesModal = () => {
   const [active, setActive] = useState(false);
 
@@ -35,27 +77,35 @@ const HideLablesModal = () => {
     <Modal
       activator={activator}
       open={active}
-      onClose={() => {
-        console.log("clicked");
-        handleChange();
-      }}
-      title="Reach more shoppers with Instagram product tags"
+      onClose={handleChange}
+      title="Hide Labels"
       primaryAction={{
-        content: "Add Instagram",
+        content: "Hide Labels",
         onAction: handleChange,
+        destructive: true,
       }}
       secondaryActions={[
         {
-          content: "Learn more",
+          content: "Cancel",
           onAction: handleChange,
         },
       ]}
     >
       <Modal.Section>
-        <TextContainer>
+        <TextContainer spacing="loose">
           <p>
-            Use Instagram posts to share your products with millions of people.
-            Let shoppers buy from your store without leaving Instagram.
+            We will mark these products as non-food products, so that no
+            nutrition table is displayed for the selected products in your
+            online store.
+          </p>
+          <p>
+            The information for the selected products will not be deleted from
+            our database by this action. If you want to display a nutritional
+            value table for the selected products later on, this is possible.
+            Just select the products you want, go to the Customize Label page
+            and uncheck the checkbox "This is a non-food product". This will
+            again display a nutritional value table for the selected products in
+            your store.
           </p>
         </TextContainer>
       </Modal.Section>
@@ -90,9 +140,22 @@ const PopOverElem = ({ index, productId, handleProductRemove }) => {
           <Button
             plain
             destructive
-            onClick={() => handleProductRemove(productId, index)}
+            onClick={() => {
+              //  handleProductRemove(productId, index)
+              console.log("clicked");
+            }}
           >
-            Delete Label
+            Hidel label
+          </Button>
+          <Button
+            plain
+            destructive
+            onClick={() => {
+              //  handleProductRemove(productId, index)
+              console.log("clicked");
+            }}
+          >
+            Reset products
           </Button>
         </FormLayout>
       </Popover>
@@ -251,14 +314,11 @@ function MyLablesTable({
           content: <HideLablesModal />,
           onAction: () => {
             // handleBulkDelete()
+            console.log("heyyyy#######################");
           },
         },
         {
-          content: (
-            <div style={{ width: "164px" }}>
-              <TextStyle variation="negative">Reset products</TextStyle>
-            </div>
-          ),
+          content: <ResetProducts />,
           onAction: () => {
             console.log("clicked");
           },
@@ -398,6 +458,9 @@ function MyLablesTable({
       </IndexTable>
       <div style={{ marginTop: "20px", cursor: "pointer" }}>
         <HideLablesModal />
+      </div>
+      <div style={{ marginTop: "20px", cursor: "pointer" }}>
+        <ResetProducts />
       </div>
     </div>
   );

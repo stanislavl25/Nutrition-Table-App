@@ -798,6 +798,7 @@ function TabsPage() {
           handleRemoveMinerals={handleRemoveMinerals}
           productsAredifferent={productsAredifferent}
           shop_plan={shop_plan}
+          portionSizeModalCheckBox={storeData.portionSizeModalCheckBox}
         />
       ),
     },

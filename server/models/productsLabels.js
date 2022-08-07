@@ -20,6 +20,7 @@ const customFieldSchema = new Schema(
     per100g: { type: String },
     perportion: { type: String },
     RI: { type: String },
+    hideProducts: { type: Boolean, default: false },
   },
   {
     timestamps: true,

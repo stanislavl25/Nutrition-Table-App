@@ -1,12 +1,71 @@
 import {
   Card,
+  Checkbox,
   Heading,
   Layout,
+  Modal,
   Select,
   Stack,
+  TextContainer,
   TextField,
+  TextStyle,
 } from "@shopify/polaris";
 import React from "react";
+import { useState } from "react";
+
+const PortionSizeModal = () => {
+  const [active, setActive] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const handleChange = () => {
+    setActive(!active);
+  };
+  const handleCheckBoxChange = () => {
+    setChecked(!checked);
+  };
+  const activator = (
+    <div style={{ width: "164px" }} onClick={handleChange} id="portionSizeID">
+      <TextStyle variation="negative">Hide lables</TextStyle>
+    </div>
+  );
+
+  return (
+    <Modal
+      activator={activator}
+      open={active}
+      onClose={handleChange}
+      title="Hide Labels"
+      primaryAction={{
+        content: "Accept",
+        onAction: handleChange,
+      }}
+      secondaryActions={[
+        {
+          content: "Cancel",
+          onAction: handleChange,
+        },
+      ]}
+      footer={
+        <Checkbox
+          label="Don't show me this checkbox again."
+          checked={checked}
+          onChange={handleCheckBoxChange}
+        />
+      }
+    >
+      <Modal.Section>
+        <TextContainer spacing="loose">
+          <p>
+            When you change the portion size, we will automatically recalculate
+            the nutritional values per serving size for all macronutrients,
+            vitamins and minerals and adjust them to the new serving size.
+            Please double check the individual values for correctness to ensure
+            that all information meets your expectations.
+          </p>
+        </TextContainer>
+      </Modal.Section>
+    </Modal>
+  );
+};
 
 const SelectElement = ({ val, tag, handleChange, secondTag, name }) => {
   const options = [
@@ -34,6 +93,7 @@ function ServingSize({
   locationPlan,
   data,
   handleChange,
+  portionSizeModalCheckBox,
 }) {
   return (
     <div
@@ -136,9 +196,11 @@ function ServingSize({
                 <TextField
                   label="Portion Size"
                   value={data.servingSize.EU.PortionSize}
-                  onChange={(e) =>
-                    handleChange(e, "servingSize", "PortionSize", "EU")
-                  }
+                  onChange={(e) => {
+                    handleChange(e, "servingSize", "PortionSize", "EU");
+                    if (portionSizeModalCheckBox)
+                      document.getElementById("portionSizeID").click();
+                  }}
                   disabled={locationPlan.plan === "Basic" ? true : false}
                   type="number"
                 />
@@ -152,6 +214,7 @@ function ServingSize({
                   name="PortionSizeUnit"
                 />
               </Stack.Item>
+              <PortionSizeModal />
             </Stack>
           ) : (
             <></>

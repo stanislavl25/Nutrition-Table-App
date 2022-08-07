@@ -6,6 +6,7 @@ import {
   Page,
   Popover,
   Select,
+  TextContainer,
   TextField,
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
@@ -120,12 +121,20 @@ function RecommendedIntake({
     <div>
       <div style={{ margin: "0px 30px 0px 30px" }}>
         <Banner status="warning">
-          <p>
-            Please make sure that the names you give the nutrients on this page
-            exactly match the names of the nutrients you want to use on the
-            label pages. This is the only way we can automatically calculate the
-            recommended daily intake properly.
-          </p>
+          <TextContainer spacing="tight">
+            <p>
+              Please make sure that the names you give the nutrients on this
+              page exactly match the names of the nutrients you want to use on
+              the label pages. This is the only way we can automatically
+              calculate the recommended daily intace properly.
+            </p>
+            <p>
+              If you change the calculation basis for the daily recommended
+              intake on this page, we will automatically recalculate the
+              percentage recommended intake for all of your products. The values
+              will be changed automatically for all your products.
+            </p>
+          </TextContainer>
         </Banner>
       </div>
       <Page
