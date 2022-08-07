@@ -37,6 +37,9 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
   useEffect(() => {
     handleAutoCalculs();
   }, [energyKj100]);
+  useEffect(() => {
+    handleAutoCalculs();
+  }, []);
   return (
     <div style={{ marginTop: "20px" }}>
       <Card title="Calories/Energy Information" sectioned>

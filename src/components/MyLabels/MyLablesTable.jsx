@@ -10,11 +10,58 @@ import {
   Combobox,
   Listbox,
   Icon,
+  Modal,
+  TextContainer,
 } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../../App";
 import React, { useCallback, useState } from "react";
 import { SearchMinor } from "@shopify/polaris-icons";
+
+const HideLablesModal = () => {
+  const [active, setActive] = useState(false);
+
+  const handleChange = () => {
+    setActive(!active);
+  };
+
+  const activator = (
+    <div style={{ width: "164px" }} onClick={handleChange}>
+      <TextStyle variation="negative">Hide lables</TextStyle>
+    </div>
+  );
+
+  return (
+    <Modal
+      activator={activator}
+      open={active}
+      onClose={() => {
+        console.log("clicked");
+        handleChange();
+      }}
+      title="Reach more shoppers with Instagram product tags"
+      primaryAction={{
+        content: "Add Instagram",
+        onAction: handleChange,
+      }}
+      secondaryActions={[
+        {
+          content: "Learn more",
+          onAction: handleChange,
+        },
+      ]}
+    >
+      <Modal.Section>
+        <TextContainer>
+          <p>
+            Use Instagram posts to share your products with millions of people.
+            Let shoppers buy from your store without leaving Instagram.
+          </p>
+        </TextContainer>
+      </Modal.Section>
+    </Modal>
+  );
+};
 
 const PopOverElem = ({ index, productId, handleProductRemove }) => {
   const [popoverActive, setPopoverActive] = useState(false);
@@ -201,12 +248,20 @@ function MyLablesTable({
       title: "More actions",
       actions: [
         {
+          content: <HideLablesModal />,
+          onAction: () => {
+            // handleBulkDelete()
+          },
+        },
+        {
           content: (
             <div style={{ width: "164px" }}>
-              <TextStyle variation="negative">Delete</TextStyle>
+              <TextStyle variation="negative">Reset products</TextStyle>
             </div>
           ),
-          onAction: () => handleBulkDelete(),
+          onAction: () => {
+            console.log("clicked");
+          },
         },
       ],
     },
@@ -277,85 +332,73 @@ function MyLablesTable({
 
   return (
     <div>
-      {productsArray === "none" ? (
+      <div style={{ padding: "16px", display: "flex" }}>
+        <div style={{ flex: 1 }}>
+          <Combobox
+            activator={
+              <Combobox.TextField
+                prefix={<Icon source={SearchMinor} />}
+                onChange={updateText}
+                label="Filter"
+                labelHidden
+                value={inputValue}
+                placeholder="Filter"
+              />
+            }
+          >
+            {memoOptions?.length > 0 ? (
+              <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
+            ) : null}
+          </Combobox>
+        </div>
         <div
           style={{
-            paddingTop: "40px",
-            paddingBottom: "40px",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
+            paddingLeft: "0.25rem",
+            maxWidth: "130px",
+            marginLeft: "10px",
           }}
         >
-          <Spinner accessibilityLabel="Spinner example" size="large" />
+          {categorieOptions?.length > 0 ? (
+            <Select
+              labelInline
+              label="Categories"
+              options={categorieOptions}
+              value={sortValue}
+              onChange={(e) => handleSortChange(e)}
+              key={sortValue}
+            />
+          ) : (
+            <></>
+          )}
         </div>
-      ) : (
-        <div>
-          <div style={{ padding: "16px", display: "flex" }}>
-            <div style={{ flex: 1 }}>
-              <Combobox
-                activator={
-                  <Combobox.TextField
-                    prefix={<Icon source={SearchMinor} />}
-                    onChange={updateText}
-                    label="Filter"
-                    labelHidden
-                    value={inputValue}
-                    placeholder="Filter"
-                  />
-                }
-              >
-                {memoOptions?.length > 0 ? (
-                  <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
-                ) : null}
-              </Combobox>
-            </div>
-            <div
-              style={{
-                paddingLeft: "0.25rem",
-                maxWidth: "130px",
-                marginLeft: "10px",
-              }}
-            >
-              {categorieOptions?.length > 0 ? (
-                <Select
-                  labelInline
-                  label="Categories"
-                  options={categorieOptions}
-                  value={sortValue}
-                  onChange={(e) => handleSortChange(e)}
-                  key={sortValue}
-                />
-              ) : (
-                <></>
-              )}
-            </div>
-          </div>
+      </div>
 
-          <IndexTable
-            resourceName={resourceName}
-            itemCount={productsArray.length}
-            selectedItemsCount={
-              allResourcesSelected ? "All" : selectedResources.length
-            }
-            bulkActions={bulkActions}
-            promotedBulkActions={promotedBulkActions}
-            onSelectionChange={handleSelectionChange}
-            headings={[
-              { title: "" },
-              { title: "Products" },
-              { title: "Calories" },
-              { title: "Total Fat" },
-              { title: "Carbohydrate" },
-              { title: "Protein" },
-              { title: "Salt" },
-              { title: "Food Product" },
-            ]}
-          >
-            {rowMarkup}
-          </IndexTable>
-        </div>
-      )}
+      <IndexTable
+        loading={productsArray === "none" ? true : false}
+        resourceName={resourceName}
+        itemCount={productsArray.length}
+        selectedItemsCount={
+          allResourcesSelected ? "All" : selectedResources.length
+        }
+        bulkActions={bulkActions}
+        promotedBulkActions={promotedBulkActions}
+        onSelectionChange={handleSelectionChange}
+        headings={[
+          { title: "" },
+          { title: "Products" },
+          { title: "Calories" },
+          { title: "Total Fat" },
+          { title: "Carbohydrate" },
+          { title: "Protein" },
+          { title: "Salt" },
+          { title: "Food Product" },
+        ]}
+      >
+        {rowMarkup}
+      </IndexTable>
+      <div style={{ marginTop: "20px", cursor: "pointer" }}>
+        <HideLablesModal />
+      </div>
     </div>
   );
 }
