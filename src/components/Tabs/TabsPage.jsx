@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Toast,
   Card,
-  Page,
   Tabs,
   Frame,
   useIndexResourceState,
@@ -70,6 +69,7 @@ function TabsPage() {
     storeData.recommendedIntake
   );
   const [arraydata, setArrayData] = useState({});
+  const [productExist, setProductExist] = useState(false);
   const [defaultData, setDefaultData] = useState({
     richText: {
       ingredientsText:
@@ -122,15 +122,17 @@ function TabsPage() {
 
   // ! fix recommended intake late update for useState
   useEffect(async () => {
+    let isSubscribed = true;
     if (storeData.recommendedIntake !== recommendedIntakeData) {
       setTimeout(async () => {
         await setRecommendedIntakeData(storeData.recommendedIntake);
       }, 1000);
     }
+    return () => (isSubscribed = false);
   }, [storeData]);
 
   /*** get store needed data */
-  const saveProductsGetStoreData = async () => {
+  const getStoreData = async () => {
     const shopData = await fetch("/store-data").then((res) => res.json());
     if (shopData.success) {
       if (shopData.data.recommendedIntake.length === 0) {
@@ -509,15 +511,25 @@ function TabsPage() {
   };
   // todo clean up after the use effect
   useEffect(async () => {
+    let isSubscribed = true;
     await fetchLocations();
-    await saveProductsGetStoreData();
+    await getStoreData();
     await fetchLang();
+    return () => (isSubscribed = false);
+  }, []);
+  useEffect(async () => {
+    let isSubscribed = true;
+    await getStoreData();
+    return () => (isSubscribed = false);
+  }, [storeData?.portionSizeModalCheckBox, shop_plan]);
+
+  useEffect(async () => {
+    let isSubscribed = true;
+    await fetchProducts();
     handleSettingDefaultData();
-    setTimeout(async () => {
-      await fetchProducts();
-      handleRecommendedIntakeData();
-    }, 200);
-  }, [shop_plan]);
+    handleRecommendedIntakeData();
+    return () => (isSubscribed = false);
+  }, []);
 
   /** handle memo set for filter functionality */
   const handleMemo = () => {
@@ -729,7 +741,27 @@ function TabsPage() {
       console.log(err);
     }
   };
-
+  const handlePortionSizeModal = async (boolean) => {
+    if (boolean) {
+      const newStoreData = { ...storeData };
+      newStoreData.portionSizeModalCheckBox = boolean;
+      setStoreData(boolean);
+    }
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ check: boolean }),
+    };
+    if (boolean) {
+      const update = await fetch("/portionSizeModal", fetchOptions)
+        .then((res) => res.json)
+        .then((response) => console.log(response));
+    }
+  };
   const toastMarkup = active ? (
     <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />
   ) : null;
@@ -799,6 +831,9 @@ function TabsPage() {
           productsAredifferent={productsAredifferent}
           shop_plan={shop_plan}
           portionSizeModalCheckBox={storeData.portionSizeModalCheckBox}
+          handlePortionSizeModal={handlePortionSizeModal}
+          productExist={productExist}
+          setProductExist={setProductExist}
         />
       ),
     },

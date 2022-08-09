@@ -25,7 +25,7 @@ const ResetProducts = () => {
   };
 
   const activator = (
-    <div style={{ width: "164px" }} onClick={handleChange}>
+    <div style={{ width: "164px" }} id="Reset_products" onClick={handleChange}>
       <TextStyle variation="negative">Reset products</TextStyle>
     </div>
   );
@@ -68,7 +68,7 @@ const HideLablesModal = () => {
   };
 
   const activator = (
-    <div style={{ width: "164px" }} onClick={handleChange}>
+    <div style={{ width: "164px" }} id="Hide_Lables" onClick={handleChange}>
       <TextStyle variation="negative">Hide lables</TextStyle>
     </div>
   );
@@ -311,16 +311,15 @@ function MyLablesTable({
       title: "More actions",
       actions: [
         {
-          content: <HideLablesModal />,
+          content: "Hide Labels",
           onAction: () => {
-            // handleBulkDelete()
-            console.log("heyyyy#######################");
+            document.getElementById("Hide_Lables").click();
           },
         },
         {
-          content: <ResetProducts />,
+          content: "Reset products",
           onAction: () => {
-            console.log("clicked");
+            document.getElementById("Reset_products").click();
           },
         },
       ],
@@ -456,10 +455,8 @@ function MyLablesTable({
       >
         {rowMarkup}
       </IndexTable>
-      <div style={{ marginTop: "20px", cursor: "pointer" }}>
+      <div style={{ display: "none" }}>
         <HideLablesModal />
-      </div>
-      <div style={{ marginTop: "20px", cursor: "pointer" }}>
         <ResetProducts />
       </div>
     </div>

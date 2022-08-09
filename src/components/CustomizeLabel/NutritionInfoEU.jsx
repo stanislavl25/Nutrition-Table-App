@@ -130,7 +130,26 @@ function NutritionInfo({
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
   ];
-
+  const handleAutoCalculsOnPortionChange = () => {
+    const division =
+      data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
+    data?.nutritionData.forEach((elem, index) => {
+      const newNutritionPortion = elem.per100g / division;
+      handleChange(
+        Math.floor(newNutritionPortion).toString(),
+        "nutritionData",
+        "perportion",
+        index
+      );
+    });
+  };
+  useEffect(() => {
+    let isSubscribed = true;
+    if (data?.nutritionData.length === 0 || locationPlan.location !== "EU")
+      return;
+    handleAutoCalculsOnPortionChange();
+    return () => (isSubscribed = false);
+  }, [data?.servingSize.EU.PortionSize]);
   return (
     <div style={{ marginTop: "20px", marginBottom: "20px" }}>
       {locationPlan.location === "CA" ? (

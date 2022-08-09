@@ -13,9 +13,8 @@ import {
 import React from "react";
 import { useState } from "react";
 
-const PortionSizeModal = () => {
+const PortionSizeModal = ({ checked, setChecked, handlePortionSizeModal }) => {
   const [active, setActive] = useState(false);
-  const [checked, setChecked] = useState(false);
   const handleChange = () => {
     setActive(!active);
   };
@@ -27,7 +26,14 @@ const PortionSizeModal = () => {
       <TextStyle variation="negative">Hide lables</TextStyle>
     </div>
   );
-
+  const handleAccpet = () => {
+    handleChange();
+    if (checked) handlePortionSizeModal(checked);
+  };
+  const handleCancel = () => {
+    handleChange();
+    if (checked) setChecked(false);
+  };
   return (
     <Modal
       activator={activator}
@@ -36,12 +42,12 @@ const PortionSizeModal = () => {
       title="Hide Labels"
       primaryAction={{
         content: "Accept",
-        onAction: handleChange,
+        onAction: handleAccpet,
       }}
       secondaryActions={[
         {
           content: "Cancel",
-          onAction: handleChange,
+          onAction: handleCancel,
         },
       ]}
       footer={
@@ -94,7 +100,9 @@ function ServingSize({
   data,
   handleChange,
   portionSizeModalCheckBox,
+  handlePortionSizeModal,
 }) {
+  const [checked, setChecked] = useState(portionSizeModalCheckBox);
   return (
     <div
       style={{
@@ -198,7 +206,7 @@ function ServingSize({
                   value={data.servingSize.EU.PortionSize}
                   onChange={(e) => {
                     handleChange(e, "servingSize", "PortionSize", "EU");
-                    if (portionSizeModalCheckBox)
+                    if (!portionSizeModalCheckBox)
                       document.getElementById("portionSizeID").click();
                   }}
                   disabled={locationPlan.plan === "Basic" ? true : false}
@@ -214,7 +222,13 @@ function ServingSize({
                   name="PortionSizeUnit"
                 />
               </Stack.Item>
-              <PortionSizeModal />
+              <div style={{ display: "none" }}>
+                <PortionSizeModal
+                  checked={checked}
+                  setChecked={setChecked}
+                  handlePortionSizeModal={handlePortionSizeModal}
+                />
+              </div>
             </Stack>
           ) : (
             <></>

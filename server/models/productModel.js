@@ -79,6 +79,7 @@ const productSchema = new Schema(
       energyKcal25: { type: String, default: "152" },
       Ri: { type: String, default: "8" },
     },
+    hideProducts: { type: Boolean, default: false },
   },
   {
     timestamps: true,

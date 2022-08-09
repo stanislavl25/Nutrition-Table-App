@@ -15,9 +15,6 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
     const newEnergyKj25 = data.calsEnergyInfo.energyKj100 / division;
     const newEnergyKcal100 = data.calsEnergyInfo.energyKj100 / 4.184;
     const newEnergyKcal25 = newEnergyKcal100 / division;
-    // console.log(data.calsEnergyInfo);
-    // console.log(newEnergyKcal100);
-    // console.log(division);
     handleChange(
       Math.floor(newEnergyKj25).toString(),
       "calsEnergyInfo",
@@ -35,11 +32,16 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
     );
   };
   useEffect(() => {
+    let isSubscribed = true;
     handleAutoCalculs();
-  }, [energyKj100]);
+    return () => (isSubscribed = false);
+  }, [energyKj100, data?.servingSize.EU.PortionSize]);
   useEffect(() => {
+    let isSubscribed = true;
     handleAutoCalculs();
+    return () => (isSubscribed = false);
   }, []);
+
   return (
     <div style={{ marginTop: "20px" }}>
       <Card title="Calories/Energy Information" sectioned>

@@ -478,6 +478,26 @@ export async function createServer(
       }
     );
   });
+  app.post("/portionSizeModal", verifyRequest(app), async (req, res) => {
+    console.log("portion size modal!");
+    const session = await Shopify.Utils.loadCurrentSession(req, res);
+    const store = session.shop;
+    const update = StoreModel.findOneAndUpdate(
+      { shop_id: store },
+      { portionSizeModalCheckBox: true },
+      (err, docs) => {
+        if (err) {
+          res
+            .status(400)
+            .send({ success: false, message: "Something wrong happend!" });
+        } else {
+          res
+            .status(200)
+            .send({ success: true, message: "Portion size Modal updated!" });
+        }
+      }
+    );
+  });
 
   app.post("/graphql", verifyRequest(app), async (req, res) => {
     try {

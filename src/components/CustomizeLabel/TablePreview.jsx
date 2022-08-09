@@ -691,7 +691,7 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
           </div>
 
           <div style={{ padding: "0px" }}>
-            {data.richText.notesText.length > 0 ? (
+            {data?.richText?.notesText?.length > 0 ? (
               <div style={{ marginBottom: "10px", width: "100%" }}>
                 <div style={{ paddingRight: "10px", paddingLeft: "10px" }}>
                   <Markup content={data?.richText?.notesText} />

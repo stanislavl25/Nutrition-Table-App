@@ -105,7 +105,27 @@ function Vitamins({
       index
     );
   });
-
+  const handleAutoCalculsOnPortionChange = () => {
+    const division =
+      allData?.servingSize.EU.DefaultAmount /
+      allData?.servingSize.EU.PortionSize;
+    allData?.vitamins.forEach((elem, index) => {
+      const newVitamonPortion = elem.per100g / division;
+      handleChange(
+        Math.floor(newVitamonPortion).toString(),
+        "vitamins",
+        "perportion",
+        index
+      );
+    });
+  };
+  useEffect(() => {
+    let isSubscribed = true;
+    if (allData?.vitamins.length === 0 || locationPlan.location !== "EU")
+      return;
+    handleAutoCalculsOnPortionChange();
+    return () => (isSubscribed = false);
+  }, [allData?.servingSize.EU.PortionSize]);
   return (
     <Card>
       <div

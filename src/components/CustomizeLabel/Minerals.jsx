@@ -98,23 +98,6 @@ function Minerals({
   handleChange,
   allData,
 }) {
-  // const handleAutoCalculsOnload = () => {
-  //   data.forEach((elem, index) => {
-  //     const division =
-  //       allData?.servingSize.EU.DefaultAmount /
-  //       allData?.servingSize.EU.PortionSize;
-  //     const newVitamonPortion = elem.per100g / division;
-  //     if (Math.floor(newVitamonPortion).toString() !== elem.perportion) {
-  //       handleChange(
-  //         Math.floor(newVitamonPortion).toString(),
-  //         "minerals",
-  //         "perportion",
-  //         index
-  //       );
-  //     }
-  //     return;
-  //   });
-  // };
   const handleAutoCalculsOnChange = useCallback((val, index) => {
     handleChange(val, "minerals", "per100g", index);
     const division =
@@ -129,9 +112,27 @@ function Minerals({
     );
   });
 
-  // useEffect(() => {
-  //   handleAutoCalculsOnload();
-  // }, []);
+  const handleAutoCalculsOnPortionChange = () => {
+    const division =
+      allData?.servingSize.EU.DefaultAmount /
+      allData?.servingSize.EU.PortionSize;
+    allData?.minerals.forEach((elem, index) => {
+      const newMineralPortion = elem.per100g / division;
+      handleChange(
+        Math.floor(newMineralPortion).toString(),
+        "minerals",
+        "perportion",
+        index
+      );
+    });
+  };
+  useEffect(() => {
+    let isSubscribed = true;
+    if (allData?.minerals.length === 0 || locationPlan.location !== "EU")
+      return;
+    handleAutoCalculsOnPortionChange();
+    return () => (isSubscribed = false);
+  }, [allData?.servingSize.EU.PortionSize]);
   return (
     <Card>
       <div

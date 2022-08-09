@@ -20,6 +20,7 @@ import {
   SkeletonBodyText,
   TextContainer,
   SkeletonDisplayText,
+  Modal,
 } from "@shopify/polaris";
 import NutritionInfoEU from "./NutritionInfoEU";
 import {
@@ -40,6 +41,64 @@ const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
 const formLables = {
   formLablesCA_NA,
   formLablesEU,
+};
+
+const DeleteLabel = ({}) => {
+  const [active, setActive] = useState(false);
+  const handleChange = () => {
+    setActive(!active);
+  };
+
+  const activator = (
+    <div style={{ width: "164px" }} onClick={handleChange} id="portionSizeID">
+      <Button
+        destructive
+        outline
+        style={{ margin: "4px" }}
+        type="button"
+        className="button remove"
+        onClick={() => {
+          console.log("clicked");
+        }}
+      >
+        Delete Label
+      </Button>
+    </div>
+  );
+  const handleDelete = () => {
+    handleChange();
+  };
+  const handleCancel = () => {
+    handleChange();
+  };
+  return (
+    <Modal
+      activator={activator}
+      open={active}
+      onClose={handleChange}
+      title="Delete label"
+      primaryAction={{
+        content: "Delete",
+        onAction: handleDelete,
+        destructive: true,
+      }}
+      secondaryActions={[
+        {
+          content: "Cancel",
+          onAction: handleCancel,
+        },
+      ]}
+    >
+      <Modal.Section>
+        <TextContainer spacing="loose">
+          <p>
+            Are you sure you want to delete this label and all of its data? This
+            action is irreversible.
+          </p>
+        </TextContainer>
+      </Modal.Section>
+    </Modal>
+  );
 };
 
 function CreateLabel({
@@ -67,28 +126,19 @@ function CreateLabel({
   productsAredifferent,
   shop_plan,
   portionSizeModalCheckBox,
+  handlePortionSizeModal,
+  productExist,
+  setProductExist,
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
     plan: shop_plan,
   });
-
-  const [formValues, setFormValues] = useState([]);
   const [productToPrepare, setProductToPrepare] = useState(false);
   const [nonFoodProduct, setNonFoodProduct] = useState(false);
   const [rightSideWidth, setRightSideWidth] = useState("35%");
   const [leftSideWidth, setLeftSideWidth] = useState("60%");
   const [flexDirection, setFlexDirection] = useState("row");
-  const [productExist, setProductExist] = useState(false);
-  const handleOrderSet = () => {
-    for (var i = 0; i < data.nutritionData.length; i++) {
-      const num = i;
-      let newData = [...data.nutritionData];
-      newData[i]["order"] = num.toString();
-      setFormValues(newData);
-    }
-    setProductExist(true);
-  };
 
   const updateProducts = async () => {
     if (data.richText.notesText === undefined) {
@@ -121,8 +171,8 @@ function CreateLabel({
     if (!Object.keys(data?.calsEnergyInfo).length > 0) {
       data.calsEnergyInfo = calsEnergyInfo;
     }
-    await handleOrderSet();
     // console.log(data);
+    setProductExist(true);
   };
   useEffect(() => {
     window.addEventListener("DOMContentLoaded", updateProducts());
@@ -130,7 +180,7 @@ function CreateLabel({
     window.removeEventListener("DOMContentLoaded", () => {
       // console.log("done!");
     });
-  }, []);
+  }, [data]);
   useEffect(() => {
     window.addEventListener("resize", () => {
       if (window.innerWidth <= 960) {
@@ -146,7 +196,7 @@ function CreateLabel({
     window.removeEventListener("resize", () => {
       // console.log(window.innerWidth);
     });
-  });
+  }, []);
 
   const handleNutriScoreCheckElem = (newState) => {
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
@@ -272,10 +322,11 @@ function CreateLabel({
                   data={data}
                   handleChange={handleChange}
                   portionSizeModalCheckBox={portionSizeModalCheckBox}
+                  handlePortionSizeModal={handlePortionSizeModal}
                 />
                 {locationPlan.location === "EU" ? (
                   <CalsEnergyInfos
-                    data={data ? data : {}}
+                    data={data}
                     handleChange={handleChange}
                     energyKj100={data.calsEnergyInfo.energyKj100}
                     langState={langState.values}
@@ -350,16 +401,7 @@ function CreateLabel({
                 marginTop: "20px",
               }}
             >
-              <Button
-                destructive
-                outline
-                style={{ margin: "4px" }}
-                type="button"
-                className="button remove"
-                onClick={() => {}}
-              >
-                Delete Label
-              </Button>
+              <DeleteLabel />
               <Button
                 primary
                 style={{ margin: "4px" }}
@@ -387,7 +429,7 @@ function CreateLabel({
                 data={data}
                 productToPrepare={productToPrepare}
                 locationPlan={locationPlan}
-                langState={langState.values}
+                langState={langState?.values}
               />
             )}
           </div>
