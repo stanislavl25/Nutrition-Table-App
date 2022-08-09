@@ -379,19 +379,21 @@ function TabsPage() {
     // }
   };
 
-  const handleSelectedProducts = (selectedPro) => {
-    setSelectedOptions(selectedPro);
-    const products = productsArray;
-    setProductsArray("none");
-    setDefaultSet(false);
-    setTimeout(() => {
-      setProductsArray(products);
-      setSelected(1);
-    }, 500);
-    for (var i = 0; i < productsArray.length; i++) {
-      if (selectedPro.includes(productsArray[i].name)) {
-        setArrayData(productsArray[i]);
-        break;
+  const handleSelectedProducts = (selectedPro, boolean) => {
+    if (boolean !== false) {
+      setSelectedOptions(selectedPro);
+      const products = productsArray;
+      setProductsArray("none");
+      setDefaultSet(false);
+      setTimeout(() => {
+        setProductsArray(products);
+        setSelected(1);
+      }, 500);
+      for (var i = 0; i < productsArray.length; i++) {
+        if (selectedPro.includes(productsArray[i].name)) {
+          setArrayData(productsArray[i]);
+          break;
+        }
       }
     }
     let selectedElements = [];
@@ -480,7 +482,6 @@ function TabsPage() {
             selectedElements[i].nutritionData
         ) {
           setProductsAredifferent(true);
-          console.log("products are different");
           return;
         }
       }
@@ -827,6 +828,8 @@ function TabsPage() {
           handlePortionSizeModal={handlePortionSizeModal}
           productExist={productExist}
           setProductExist={setProductExist}
+          storeData={storeData}
+          handleSelectedProducts={handleSelectedProducts}
         />
       ),
     },

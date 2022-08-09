@@ -39,7 +39,7 @@ const PortionSizeModal = ({ checked, setChecked, handlePortionSizeModal }) => {
       activator={activator}
       open={active}
       onClose={handleChange}
-      title="Hide Labels"
+      title="Change the portion size"
       primaryAction={{
         content: "Accept",
         onAction: handleAccpet,

@@ -148,6 +148,8 @@ function CreateLabel({
   handlePortionSizeModal,
   productExist,
   setProductExist,
+  storeData,
+  handleSelectedProducts,
 }) {
   const [locationPlan, setLocationPlan] = useState({
     location: location,
@@ -321,6 +323,7 @@ function CreateLabel({
               removeTag={removeTag}
               productsAredifferent={productsAredifferent}
               setSourcePicker={setSourcePicker}
+              handleSelectedProducts={handleSelectedProducts}
             />
             {nonFoodProduct ? (
               <Card sectioned>
@@ -362,6 +365,7 @@ function CreateLabel({
                     handleChange={handleChange}
                     energyKj100={data.calsEnergyInfo.energyKj100}
                     langState={langState.values}
+                    storeData={storeData}
                   />
                 ) : (
                   <></>

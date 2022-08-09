@@ -8,7 +8,13 @@ import {
   Icon,
 } from "@shopify/polaris";
 import { CircleInformationMajor } from "@shopify/polaris-icons";
-function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
+function CalsEnergyInfos({
+  data,
+  handleChange,
+  energyKj100,
+  langState,
+  storeData,
+}) {
   const handleAutoCalculs = () => {
     const division =
       data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
@@ -39,6 +45,22 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
   useEffect(() => {
     let isSubscribed = true;
     handleAutoCalculs();
+    return () => (isSubscribed = false);
+  }, []);
+
+  const handleRiAutoCalculs = () => {
+    storeData.recommendedIntake.forEach((elem) => {
+      if (elem.name === "Energy" || elem.name === "energy") {
+        const newRI = Math.floor(
+          (data.calsEnergyInfo.energyKcal25 / elem.quantity) * 100
+        ).toString();
+        handleChange(newRI, "calsEnergyInfo", "Ri");
+      }
+    });
+  };
+  useEffect(() => {
+    let isSubscribed = true;
+    handleRiAutoCalculs();
     return () => (isSubscribed = false);
   }, []);
 
@@ -130,7 +152,7 @@ function CalsEnergyInfos({ data, handleChange, energyKj100, langState }) {
                 content={
                   <p>
                     The RI* percentage is automatically calculated based on your
-                    country standard %RI*: you can still edit these valueson{" "}
+                    country standard %RI*: you can still edit these values on{" "}
                     <a href="#" style={{ textDecoration: "none" }}>
                       the Recommended Intake page
                     </a>

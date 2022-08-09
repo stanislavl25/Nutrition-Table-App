@@ -15,6 +15,7 @@ import {
 } from "@shopify/polaris";
 import React, { useCallback, useMemo, useState } from "react";
 import { CircleInformationMajor, SearchMinor } from "@shopify/polaris-icons";
+import { useEffect } from "react";
 
 function ProductInfo({
   productToPrepare,
@@ -31,6 +32,7 @@ function ProductInfo({
   removeTag,
   productsAredifferent,
   setSourcePicker,
+  handleSelectedProducts,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
@@ -87,7 +89,10 @@ function ProductInfo({
     { label: "D", value: "D" },
     { label: "E", value: "E" },
   ];
-
+  useEffect(() => {
+    if (selectedOptions.length === 1) return;
+    handleSelectedProducts(selectedOptions, false);
+  }, [selectedOptions]);
   const optionsMarkup =
     memoOptions?.length > 0
       ? memoOptions?.map((option) => {
@@ -104,7 +109,6 @@ function ProductInfo({
           );
         })
       : null;
-  // console.log(selectedOptions);
   const tagsMarkup =
     selectedOptions?.length !== 0 ? (
       <>
@@ -115,7 +119,10 @@ function ProductInfo({
             </Tag>
           ))}
         </Stack>
-        {(productsAredifferent && !nonFoodProduct) || productsAredifferent ? (
+        {(productsAredifferent &&
+          !nonFoodProduct &&
+          selectedOptions.length > 1) ||
+        (productsAredifferent && selectedOptions.length > 1) ? (
           <Banner title="" status="critical">
             <p>
               You have made different settings in the past for the products you

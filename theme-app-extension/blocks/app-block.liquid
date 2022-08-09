@@ -26,33 +26,40 @@
     console.log(response)
     )
   }
-  const handleBackGroundImage =()=>{
-    var width = window.innerWidth;
-    const element = document.getElementById('container')
-    var imageElem = document.createElement("img");
-    imageElem.setAttribute("class", "backGroundImage");
-    imageElem.setAttribute("height", "");
-    imageElem.setAttribute("width", "");
-    imageElem.setAttribute("alt", "");
-    if(width>700){
-      imageElem.src = "{{block.settings.back_ground_image | img_url: 'large'}}";
-      element.prepend(imageElem)
-    }else{
-      imageElem.src = "{{block.settings.MobileView | img_url: 'large'}}";
-      element.prepend(imageElem)
-    }
-  }
-  handleBackGroundImage()
-  window.addEventListener('resize',handleBackGroundImage)
+  // const handleBackGroundImage =()=>{
+  //   var width = window.innerWidth;
+  //   const element = document.getElementById('container')
+  //   var imageElem = document.createElement("img");
+  //   imageElem.setAttribute("class", "backGroundImage");
+  //   imageElem.setAttribute("height", "");
+  //   imageElem.setAttribute("width", "");
+  //   imageElem.setAttribute("alt", "");
+  //   if(width>700){
+  //     imageElem.src = "{{block.settings.back_ground_image | img_url: 'large'}}";
+  //     element.prepend(imageElem)
+  //   }else{
+  //     imageElem.src = "{{block.settings.MobileView | img_url: 'large'}}";
+  //     element.prepend(imageElem)
+  //   }
+  // }
+  // handleBackGroundImage()
+  // window.addEventListener('resize',handleBackGroundImage)
  </script>
   <section id="container" class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadiusMainTable}}px;background-color:{{block.settings.Table_background_color}};  ">
- 
+    {%- if block.settings.back_ground_image-%}
+    <img class="backGroundImage" src="{{block.settings.back_ground_image | img_url: 'large'}}" alt="" height="" width="">
+    {%- endif -%}
     <header class="performance-facts__header" style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};">
       <div class="performance-facts__header_title">
         <div class="header_container" style="border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
+          <div style="display:flex;flex-direction:row;align-items:center;gap:10px;">
+            {%- if block.settings.custom_accordion_icon_opend-%}
+            <img src="{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
+            {%- endif -%}
           <h2 class="performance-facts__title header_container" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Nutrition Facts</h2>
-          {%- if block.settings.custom_accordion_icon-%}
-          <img src="{{block.settings.custom_accordion_icon | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;color:{{block.settings.Accordion_icon_color}}">
+          </div>
+          {%- if block.settings.custom_accordion_icon_closed-%}
+          <img src="{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
           {%- endif -%}
         </div>
       </div>
@@ -202,56 +209,62 @@
     <p style="border-bottom:1px solid black;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">Salt content is exclusively due to the presence of naturally occurring sodium.</p>
     <p style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">*Reference intake of an average adult (8 400 kJ / 2 000 kcal)</p>
     <div class="header_container" style="border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
-      <h2 class="performance-facts__title" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Ingredients</h2>
-      {%- if block.settings.custom_accordion_icon-%}
-      <img src="{{block.settings.custom_accordion_icon | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;color:{{block.settings.Accordion_icon_color}}">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:10px;">
+        {%- if block.settings.custom_accordion_icon_opend-%}
+        <img src="{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
+        {%- endif -%}
+        <h2 class="performance-facts__title" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Ingredients</h2>
+      </div>
+      {%- if block.settings.custom_accordion_icon_closed-%}
+      <img src="{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
       {%- endif -%}
+
     </div>
     <div style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;display:flex;
     flex-wrap:wrap;gap:5px;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;margin-bottom:10px;">
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:100px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Mandarin Oranges (37.9%)</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Light Whipping Cream (<strong>Milk</strong>)</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peras (12.4%)</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peaches (7.7%)</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Thompson Seedles Grapes (7.6%)</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Apple (7.5%)</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Banana (5.9%)</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_ingredient_icon-%}
       <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%}
@@ -259,44 +272,49 @@
     </div>
       </div>
     <div class="header_container" style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
+      <div style="display:flex;flex-direction:row;align-items:center;gap:10px;">
+        {%- if block.settings.custom_accordion_icon_opend-%}
+        <img src="{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
+        {%- endif -%}
       <h2 class="performance-facts__title" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Allergy Information</h2>
-      {%- if block.settings.custom_accordion_icon-%}
-      <img src="{{block.settings.custom_accordion_icon | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
+      </div>
+      {%- if block.settings.custom_accordion_icon_closed-%}
+      <img src="{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
       {%- endif -%}
     </div>
     <div style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;display:flex;
     flex-wrap:wrap;gap:5px;text-align:center;">
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_allergen_icon-%}
       <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%} 
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px;">Contains Wheat</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_allergen_icon-%}
       <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%} 
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Almond</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_allergen_icon-%}
       <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%} 
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peanut</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_allergen_icon-%}
       <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%} 
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Soy</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_allergen_icon-%}
       <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%} 
       <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Milk</p>
     </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
+    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px; background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
       {%- if block.settings.Custom_allergen_icon-%}
       <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
       {%- endif -%} 
@@ -363,10 +381,6 @@
     "content":"MAIN TABLE"
    },
    {
-    "type":"paragraph",
-    "content":"These settings affect the main table or section."
-   },
-   {
     "type":"color",
     "id":"primaryBorder",
     "label":"Primary Border color",
@@ -420,11 +434,6 @@
     "label": "Table Background"
   },
   {
-    "type": "image_picker",
-    "id": "MobileView",
-    "label": "Mobile Table Background"
-  },
-  {
     "type":"header",
     "content":"FONT STYLE"
    },
@@ -465,7 +474,7 @@
     "content":"CELLS STYLE"
    },
    {
-     "type": "color",
+    "type": "color",
     "id": "cells_background_color",
     "label": "Cells Background Color",
     "default": "#F3F3F3"
@@ -481,18 +490,18 @@
     "default": 4
   },
   {
-    "type":"header",
-    "content":"ICONS AND DETAILS"
-  },
-   {
     "type": "range",
-    "id": "Ingredients_allergens_border_radius",
+    "id": "Ingredients_allergens_border_padding",
     "min": 0,
     "max": 20,
     "step": 1,
     "unit": "px",
-    "label": "Ingredients and allergens border radius",
+    "label": "Cells border padding",
     "default": 0
+  },
+  {
+    "type":"header",
+    "content":"ICONS AND DETAILS"
   },
   {
     "type": "color",
@@ -511,15 +520,14 @@
     "label": "Custom allergen icon"
   },
   {
-    "type": "color",
-    "id": "Accordion_icon_color",
-    "label": "Accordion icon color",
-    "default": "#F3F3F3"
+    "type": "image_picker",
+    "id": "custom_accordion_icon_opend",
+    "label": "Custom Accordion Icon opend"
   },
   {
     "type": "image_picker",
-    "id": "custom_accordion_icon",
-    "label": "Custom Accordion Icon"
+    "id": "custom_accordion_icon_closed",
+    "label": "Custom Accordion Icon closed "
   }
   ]
 }
