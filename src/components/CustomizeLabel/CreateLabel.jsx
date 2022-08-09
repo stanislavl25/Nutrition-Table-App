@@ -36,6 +36,26 @@ import {
   calsEnergyInfo,
 } from "../defaultData.js";
 import BasicVitaminsMineralsPage from "./BasicVitaminsMineralsPage";
+import { ResourcePicker } from "@shopify/app-bridge-react";
+// import createApp from "@shopify/app-bridge";
+// import { ResourcePicker } from "@shopify/app-bridge/actions";
+
+// const app = createApp({
+//   apiKey: process.env.SHOPIFY_API_KEY,
+//   host: new URL(location).searchParams.get("host"),
+// });
+// const productPicker = ResourcePicker.create(app, {
+//   resourceType: ResourcePicker.ResourceType.Product,
+// });
+// const picker = ResourcePicker.create(app, {
+//   resourceType: ResourcePicker.ResourceType.Product,
+// });
+// picker.subscribe(ResourcePicker.Action.SELECT, (selectPayload) => {
+//   const selection = selectPayload.selection;
+//   console.log(selection);
+//   // Do something with `selection`
+// });
+// console.log(picker);
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
 const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
 const formLables = {
@@ -104,7 +124,6 @@ const DeleteLabel = ({}) => {
 function CreateLabel({
   langState,
   location,
-  selectedProducts,
   handleTabChange,
   productsArray,
   handleSaveSelectedProducts,
@@ -139,6 +158,7 @@ function CreateLabel({
   const [rightSideWidth, setRightSideWidth] = useState("35%");
   const [leftSideWidth, setLeftSideWidth] = useState("60%");
   const [flexDirection, setFlexDirection] = useState("row");
+  const [openResourcePicker, setSourcePicker] = useState(false);
 
   const updateProducts = async () => {
     if (data.richText.notesText === undefined) {
@@ -241,18 +261,29 @@ function CreateLabel({
     setData(newData);
   };
 
+  const updateNonFoodStatus = () => {
+    let count = 0;
+    productsArray.forEach((elem) => {
+      if (selectedOptions.includes(elem.name)) {
+        if (!elem.food_product) {
+          count++;
+        }
+      }
+    });
+    if (count === selectedOptions.length && count !== 0) {
+      setNonFoodProduct(true);
+    }
+  };
+  useEffect(() => {
+    updateNonFoodStatus();
+  }, []);
   return (
     <Page
       title="Create Label"
       primaryAction={{
         content: "Save Label",
         onAction: () => {
-          handleSaveSelectedProducts(
-            selectedProducts,
-            nonFoodProduct,
-            data,
-            selectedOptions
-          );
+          handleSaveSelectedProducts(nonFoodProduct, data, selectedOptions);
         },
       }}
       fullWidth
@@ -289,6 +320,7 @@ function CreateLabel({
               setMemoOptions={setMemoOptions}
               removeTag={removeTag}
               productsAredifferent={productsAredifferent}
+              setSourcePicker={setSourcePicker}
             />
             {nonFoodProduct ? (
               <Card sectioned>
@@ -409,7 +441,6 @@ function CreateLabel({
                 className="button remove"
                 onClick={() =>
                   handleSaveSelectedProducts(
-                    selectedProducts,
                     nonFoodProduct,
                     data,
                     selectedOptions
@@ -481,6 +512,7 @@ function CreateLabel({
           </Layout>
         </SkeletonPage>
       )}
+      <ResourcePicker resourceType="Product" open={openResourcePicker} />
     </Page>
   );
 }

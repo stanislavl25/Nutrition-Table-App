@@ -17,7 +17,7 @@ import { userLoggedInFetch } from "../../App";
 import React, { useCallback, useState } from "react";
 import { SearchMinor } from "@shopify/polaris-icons";
 
-const ResetProducts = () => {
+const ResetProducts = ({ handleBulkProductsReset }) => {
   const [active, setActive] = useState(false);
 
   const handleChange = () => {
@@ -29,7 +29,10 @@ const ResetProducts = () => {
       <TextStyle variation="negative">Reset products</TextStyle>
     </div>
   );
-
+  const handleReset = () => {
+    handleChange();
+    handleBulkProductsReset();
+  };
   return (
     <Modal
       activator={activator}
@@ -38,7 +41,7 @@ const ResetProducts = () => {
       title="Reset products"
       primaryAction={{
         content: "Reset products",
-        onAction: handleChange,
+        onAction: handleReset,
         destructive: true,
       }}
       secondaryActions={[
@@ -60,7 +63,7 @@ const ResetProducts = () => {
     </Modal>
   );
 };
-const HideLablesModal = () => {
+const HideLablesModal = ({ handleBulkProductsHide }) => {
   const [active, setActive] = useState(false);
 
   const handleChange = () => {
@@ -72,7 +75,10 @@ const HideLablesModal = () => {
       <TextStyle variation="negative">Hide lables</TextStyle>
     </div>
   );
-
+  const handleHideLables = () => {
+    handleBulkProductsHide();
+    handleChange();
+  };
   return (
     <Modal
       activator={activator}
@@ -81,7 +87,7 @@ const HideLablesModal = () => {
       title="Hide Labels"
       primaryAction={{
         content: "Hide Labels",
-        onAction: handleChange,
+        onAction: handleHideLables,
         destructive: true,
       }}
       secondaryActions={[
@@ -113,7 +119,12 @@ const HideLablesModal = () => {
   );
 };
 
-const PopOverElem = ({ index, productId, handleProductRemove }) => {
+const PopOverElem = ({
+  index,
+  productId,
+  handleProductHide,
+  handleProductReset,
+}) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
   const togglePopoverActive = useCallback(
@@ -141,8 +152,8 @@ const PopOverElem = ({ index, productId, handleProductRemove }) => {
             plain
             destructive
             onClick={() => {
-              //  handleProductRemove(productId, index)
-              console.log("clicked");
+              handleProductHide(productId);
+              togglePopoverActive();
             }}
           >
             Hidel label
@@ -151,8 +162,8 @@ const PopOverElem = ({ index, productId, handleProductRemove }) => {
             plain
             destructive
             onClick={() => {
-              //  handleProductRemove(productId, index)
-              console.log("clicked");
+              handleProductReset(productId);
+              togglePopoverActive();
             }}
           >
             Reset products
@@ -175,6 +186,9 @@ function MyLablesTable({
   selectedResources,
   allResourcesSelected,
   handleSelectionChange,
+  fetchProducts,
+  setToastMessage,
+  toggleActive,
 }) {
   const resourceName = {
     singular: "product",
@@ -188,7 +202,6 @@ function MyLablesTable({
   const updateText = useCallback(
     (value) => {
       setInputValue(value);
-
       if (value === "") {
         setMemoOptions(deselectedOptions);
         return;
@@ -246,22 +259,15 @@ function MyLablesTable({
       setSortValue(value);
       selectedResources.splice(0, selectedResources.length);
       productsArray.forEach((elem) => {
-        if (elem.product_type.includes(value)) {
+        if (elem.product_type !== null && elem.product_type.includes(value)) {
           selectedResources.push(elem.name);
         }
       });
     },
     [selectedResources, productsArray]
   );
-  let removeFormFields = (i) => {
-    let newproductsValues = [...productsArray];
-    newproductsValues.splice(i, 1);
-    setProductsArray(newproductsValues);
-  };
 
-  //!!!!! todo message to inform that products are deleted
-  //!!!!! todo also update selected products A.splice(0,A.length)
-  const handleProductRemove = async (productId, index) => {
+  const handleProductHide = async (productId) => {
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -271,15 +277,13 @@ function MyLablesTable({
       },
       body: JSON.stringify({ productId }),
     };
-    if (typeof index == "number") {
-      removeFormFields(index);
-      selectedResources.splice(0, selectedResources.length);
-    }
-    const data = await fetch("/product_delete", fetchOptions)
+    const data = await fetch("/product_Hide", fetchOptions)
       .then((res) => res.json())
-      .then((response) => {
+      .then(async (response) => {
         if (response.success) {
-          console.log(response.message);
+          await fetchProducts();
+          setToastMessage(response.message);
+          toggleActive();
         } else {
           console.warn(response.message);
         }
@@ -288,18 +292,91 @@ function MyLablesTable({
         console.log(err);
       });
   };
-  const handleBulkDelete = () => {
-    productsArray.forEach((element) => {
-      if (selectedResources.includes(element.name)) {
-        handleProductRemove(element._id, "");
-      }
-    });
-    const neProductsArray = productsArray.filter(
-      (value) => !selectedResources.includes(value.name)
-    );
-    setProductsArray(neProductsArray);
-    selectedResources.splice(0, selectedResources.length);
+  const handleProductReset = async (productId) => {
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ productId }),
+    };
+    const data = await fetch("/product_Reset", fetchOptions)
+      .then((res) => res.json())
+      .then(async (response) => {
+        if (response.success) {
+          await fetchProducts();
+          setToastMessage(response.message);
+          toggleActive();
+        } else {
+          console.warn(response.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
+  const handleBulkProductsReset = async () => {
+    const products = [];
+    await productsArray.forEach((elem) => {
+      if (selectedResources.includes(elem.name)) products.push(elem._id);
+    });
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ products }),
+    };
+    const data = await fetch("/product_bulk_Reset", fetchOptions)
+      .then((res) => res.json())
+      .then(async (response) => {
+        if (response.success) {
+          await fetchProducts();
+          setToastMessage(response.message);
+          toggleActive();
+        } else {
+          console.warn(response.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const handleBulkProductsHide = async () => {
+    const products = [];
+    await productsArray.forEach((elem) => {
+      if (selectedResources.includes(elem.name)) products.push(elem._id);
+    });
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ products }),
+    };
+    console.log(products);
+    const data = await fetch("/product_bulk_Hide", fetchOptions)
+      .then((res) => res.json())
+      .then(async (response) => {
+        if (response.success) {
+          await fetchProducts();
+          setToastMessage(response.message);
+          toggleActive();
+        } else {
+          console.warn(response.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const categorieOptions = categories;
   const bulkActions = [];
   const promotedBulkActions = [
@@ -378,7 +455,8 @@ function MyLablesTable({
                 <PopOverElem
                   index={index}
                   productId={_id}
-                  handleProductRemove={handleProductRemove}
+                  handleProductHide={handleProductHide}
+                  handleProductReset={handleProductReset}
                 />
               </div>
             </IndexTable.Cell>
@@ -456,8 +534,8 @@ function MyLablesTable({
         {rowMarkup}
       </IndexTable>
       <div style={{ display: "none" }}>
-        <HideLablesModal />
-        <ResetProducts />
+        <HideLablesModal handleBulkProductsHide={handleBulkProductsHide} />
+        <ResetProducts handleBulkProductsReset={handleBulkProductsReset} />
       </div>
     </div>
   );

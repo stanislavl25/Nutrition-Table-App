@@ -30,6 +30,7 @@ function ProductInfo({
   setMemoOptions,
   removeTag,
   productsAredifferent,
+  setSourcePicker,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
@@ -114,7 +115,7 @@ function ProductInfo({
             </Tag>
           ))}
         </Stack>
-        {productsAredifferent ? (
+        {(productsAredifferent && !nonFoodProduct) || productsAredifferent ? (
           <Banner title="" status="critical">
             <p>
               You have made different settings in the past for the products you
@@ -160,7 +161,9 @@ function ProductInfo({
             {/* // todo Product name goes here */}
             Product
           </Subheading>
-          <Button plain>Manage</Button>
+          <Button plain onClick={() => setSourcePicker(true)}>
+            Manage
+          </Button>
         </div>
         <div
           style={{
@@ -186,13 +189,11 @@ function ProductInfo({
               <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
             ) : null}
           </Combobox>
-          {nonFoodProduct ? (
-            <></>
-          ) : (
-            <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-              <TextContainer>{tagsMarkup}</TextContainer>
-            </div>
-          )}
+
+          <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+            <TextContainer>{tagsMarkup}</TextContainer>
+          </div>
+
           <Checkbox
             label="This is a non-food product"
             checked={nonFoodProduct}

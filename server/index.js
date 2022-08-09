@@ -282,6 +282,25 @@ export async function createServer(
   //       .send({ success: false, message: "products not deleted!" });
   //   }
   // });
+
+  app.get("/products_liveTheme", verifyRequest(app), async (req, res) => {
+    try {
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const query = Products.find({
+        store_id: session.shop,
+        food_product: true,
+      }).select("-store_id -productId -is_deleted");
+      const productsDatabase = await query.exec();
+      res.status(200).send({
+        data: productsDatabase,
+        message: "found products!",
+        success: true,
+      });
+    } catch (err) {
+      res.status(400).send({ success: false, message: "no products found!" });
+    }
+  });
+
   /***
    * get all products with the same shop_id
    */
@@ -290,7 +309,6 @@ export async function createServer(
       const session = await Shopify.Utils.loadCurrentSession(req, res, true);
       const query = Products.find({
         store_id: session.shop,
-        hideProducts: false,
       }).select("-store_id -productId -is_deleted");
       const productsDatabase = await query.exec();
       res.status(200).send({
@@ -461,10 +479,13 @@ export async function createServer(
     res.status(200).send(locations);
   });
 
-  app.post("/product_delete", verifyRequest(app), async (req, res) => {
-    console.log("product deleted!");
-    const update = Products.findOneAndDelete(
+  app.post("/product_Hide", verifyRequest(app), async (req, res) => {
+    console.log("product hide! ########################");
+    const update = Products.findOneAndUpdate(
       { _id: req.body.productId },
+      {
+        food_product: false,
+      },
       (err, docs) => {
         if (err) {
           res
@@ -473,11 +494,125 @@ export async function createServer(
         } else {
           res
             .status(200)
-            .send({ success: true, message: "Label deleted successfully!" });
+            .send({ success: true, message: "Label updated successfully!" });
         }
       }
     );
   });
+
+  app.post("/product_bulk_Hide", verifyRequest(app), async (req, res) => {
+    console.log("product bulk hide! ########################");
+    const products = req.body.products;
+    try {
+      products.forEach(async (elem) => {
+        const update = Products.findOneAndUpdate(
+          { _id: elem },
+          {
+            food_product: false,
+          },
+          (err, docs) => {
+            if (err) console.log(err);
+          }
+        );
+      });
+      res
+        .status(200)
+        .send({ success: true, message: "Label updated successfully!" });
+    } catch (err) {
+      res
+        .status(400)
+        .send({ success: false, message: "Something wrong happend!" });
+    }
+  });
+
+  app.post("/product_Reset", verifyRequest(app), async (req, res) => {
+    console.log("product reset!");
+    try {
+      let productData;
+      const productToReset = await Products.findOne({
+        _id: req.body.productId,
+      }).exec();
+      productData = productToReset;
+
+      const update = Products.findOneAndDelete(
+        { _id: req.body.productId },
+        (err, docs) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("product Deleted!");
+          }
+        }
+      );
+      var newProduct = Products();
+      newProduct.productId = productData.productId;
+      newProduct.name = productData.name;
+      newProduct.store_id = productData.store_id;
+      newProduct.product_type = productData.product_type
+        ? productData.product_type
+        : null;
+      newProduct.image =
+        productData.image && productData.image.length
+          ? productData.image
+          : null;
+      await newProduct.save(function (err, data) {
+        if (err) console.log(err);
+        else console.log("Added product!");
+      });
+      res
+        .status(200)
+        .send({ success: true, message: "Label reset successfully!" });
+    } catch (err) {
+      res
+        .status(400)
+        .send({ success: false, message: "Something wrong happend!" });
+    }
+  });
+
+  app.post("/product_bulk_Reset", verifyRequest(app), async (req, res) => {
+    console.log("product reset bulk!");
+    try {
+      let productData;
+      const productsArray = req.body.products;
+      productsArray.forEach(async (elem) => {
+        const productToReset = await Products.findOne({
+          _id: elem,
+        }).exec();
+        productData = productToReset;
+
+        const update = Products.findOneAndDelete({ _id: elem }, (err, docs) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("product Deleted!");
+          }
+        });
+        var newProduct = Products();
+        newProduct.productId = productData.productId;
+        newProduct.name = productData.name;
+        newProduct.store_id = productData.store_id;
+        newProduct.product_type = productData.product_type
+          ? productData.product_type
+          : null;
+        newProduct.image =
+          productData.image && productData.image.length
+            ? productData.image
+            : null;
+        await newProduct.save(function (err, data) {
+          if (err) console.log(err);
+          else console.log("Added product!");
+        });
+      });
+      res
+        .status(200)
+        .send({ success: true, message: "Labels reset successfully!" });
+    } catch (err) {
+      res
+        .status(400)
+        .send({ success: false, message: "Something wrong happend!" });
+    }
+  });
+
   app.post("/portionSizeModal", verifyRequest(app), async (req, res) => {
     console.log("portion size modal!");
     const session = await Shopify.Utils.loadCurrentSession(req, res);

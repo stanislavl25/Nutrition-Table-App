@@ -23,6 +23,7 @@ function MyLables({
   shop_plan,
   toggleActive,
   setToastMessage,
+  fetchProducts,
 }) {
   return (
     <div>
@@ -188,6 +189,9 @@ function MyLables({
                 selectedResources={selectedResources}
                 allResourcesSelected={allResourcesSelected}
                 handleSelectionChange={handleSelectionChange}
+                fetchProducts={fetchProducts}
+                setToastMessage={setToastMessage}
+                toggleActive={toggleActive}
               />
             )}
           </Card>

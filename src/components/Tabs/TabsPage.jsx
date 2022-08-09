@@ -37,8 +37,6 @@ const recommendedIntakeRows = [
   { name: "Vitamin C", quantity: "00", unit: "Grams" },
 ];
 
-const order = formDataCA.length;
-
 function TabsPage() {
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
@@ -48,7 +46,6 @@ function TabsPage() {
   });
 
   const [selected, setSelected] = useState(0);
-  const [selectedProducts, setSelectedProducts] = useState();
   const handleTabChange = useCallback(
     (selectedTabIndex) => setSelected(selectedTabIndex),
     []
@@ -364,27 +361,22 @@ function TabsPage() {
 
   /***handle saving products labels to database */
   const handleSaveSelectedProducts = async (
-    selectedProducts,
     nonFoodProduct,
     data,
     selectedOptions
   ) => {
-    if (!selectedProducts && !selectedOptions) {
-      setToastMessage("No products selected!");
-      toggleActive();
-      return;
-    }
-    if (nonFoodProduct) {
-      handleSaveNonFoodProducts(
-        selectedProducts ? selectedProducts : selectedOptions
-      );
-    }
-    if (!nonFoodProduct) {
-      handleSaveProducts(
-        selectedProducts ? selectedProducts : selectedOptions,
-        data
-      );
-    }
+    console.log(selectedOptions);
+    // if (!selectedOptions) {
+    //   setToastMessage("No products selected!");
+    //   toggleActive();
+    //   return;
+    // }
+    // if (nonFoodProduct) {
+    //   handleSaveNonFoodProducts(selectedOptions);
+    // }
+    // if (!nonFoodProduct) {
+    //   handleSaveProducts(selectedOptions, data);
+    // }
   };
 
   const handleSelectedProducts = (selectedPro) => {
@@ -399,7 +391,7 @@ function TabsPage() {
     for (var i = 0; i < productsArray.length; i++) {
       if (selectedPro.includes(productsArray[i].name)) {
         setArrayData(productsArray[i]);
-        return;
+        break;
       }
     }
     let selectedElements = [];
@@ -489,6 +481,7 @@ function TabsPage() {
         ) {
           setProductsAredifferent(true);
           console.log("products are different");
+          return;
         }
       }
     }
@@ -561,22 +554,22 @@ function TabsPage() {
     /***
      * handle order change
      */
-    if (name === "order") {
-      let newData = { ...arraydata };
-      var element = newData[tag][secondTag];
-      newData[tag].splice(secondTag, 1);
-      newData[tag].splice(val, 0, element);
-      newData[tag][secondTag][name] = val;
-      await setArrayData(newData);
-      // setTimeout(async () => {
-      //   for (var i = 0; i < newData[tag].length; i++) {
-      //     const num = i;
-      //     newData[tag][i]["order"] = num.toString();
-      //   }
-      //   await setArrayData(newData);
-      // }, 500);
-      return;
-    }
+    // if (name === "order") {
+    //   let newData = { ...arraydata };
+    //   var element = newData[tag][secondTag];
+    //   newData[tag].splice(secondTag, 1);
+    //   newData[tag].splice(val, 0, element);
+    //   newData[tag][secondTag][name] = val;
+    //   await setArrayData(newData);
+    //   // setTimeout(async () => {
+    //   //   for (var i = 0; i < newData[tag].length; i++) {
+    //   //     const num = i;
+    //   //     newData[tag][i]["order"] = num.toString();
+    //   //   }
+    //   //   await setArrayData(newData);
+    //   // }, 500);
+    //   return;
+    // }
     /***
      * handle change if not secondTag is an index (number)
      */
@@ -797,6 +790,7 @@ function TabsPage() {
           shop_plan={shop_plan}
           setToastMessage={setToastMessage}
           toggleActive={toggleActive}
+          fetchProducts={fetchProducts}
         />
       ),
     },
@@ -808,7 +802,6 @@ function TabsPage() {
           langState={langState}
           location={location}
           setLocation={setLocation}
-          selectedProducts={selectedProducts}
           handleTabChange={handleTabChange}
           productsArray={productsArray}
           handleSaveSelectedProducts={handleSaveSelectedProducts}
