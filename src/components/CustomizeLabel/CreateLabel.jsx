@@ -9,6 +9,8 @@ import Notes from "./Notes";
 import Ingredients from "./Ingredients";
 import AllergyInfo from "./AllergyInfo";
 import LegalNotes from "./LegalNotes";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { userLoggedInFetch } from "../../App";
 import {
   Heading,
   Card,
@@ -21,6 +23,9 @@ import {
   TextContainer,
   SkeletonDisplayText,
   Modal,
+  Stack,
+  TextField,
+  Select,
 } from "@shopify/polaris";
 import NutritionInfoEU from "./NutritionInfoEU";
 import {
@@ -63,7 +68,7 @@ const formLables = {
   formLablesEU,
 };
 
-const DeleteLabel = ({}) => {
+const DeleteLabel = ({ handleBulkProductsReset }) => {
   const [active, setActive] = useState(false);
   const handleChange = () => {
     setActive(!active);
@@ -71,22 +76,14 @@ const DeleteLabel = ({}) => {
 
   const activator = (
     <div style={{ width: "164px" }} onClick={handleChange} id="portionSizeID">
-      <Button
-        destructive
-        outline
-        style={{ margin: "4px" }}
-        type="button"
-        className="button remove"
-        onClick={() => {
-          console.log("clicked");
-        }}
-      >
+      <Button destructive outline style={{ margin: "4px" }} type="button">
         Delete Label
       </Button>
     </div>
   );
   const handleDelete = () => {
     handleChange();
+    handleBulkProductsReset();
   };
   const handleCancel = () => {
     handleChange();
@@ -121,6 +118,122 @@ const DeleteLabel = ({}) => {
   );
 };
 
+const MissingRIModal = ({
+  handleTabChange,
+  setStoreData,
+  storeData,
+  saveRecomIntake,
+}) => {
+  const [active, setActive] = useState(false);
+  const handleChange = () => {
+    setActive(!active);
+  };
+  const [newRIdata, setNewRIdata] = useState({
+    name: "",
+    quantity: "",
+    unit: "Grams",
+  });
+
+  const handleChangeData = useCallback(
+    (val, tag) => {
+      const newData = { ...newRIdata };
+      newData[tag] = val;
+      setNewRIdata(newData);
+    },
+    [newRIdata]
+  );
+
+  const activator = (
+    <div style={{ width: "164px" }} onClick={handleChange} id="missing_RI">
+      <Button style={{ margin: "4px" }} type="button">
+        Missing recommended intake
+      </Button>
+    </div>
+  );
+
+  const handleSave = () => {
+    const newStoreData = { ...storeData };
+    newStoreData.recommendedIntake.push(newRIdata);
+    setStoreData(newStoreData);
+    handleChange();
+    saveRecomIntake(newStoreData.recommendedIntake);
+  };
+
+  const handleCancel = () => {
+    handleChange();
+  };
+
+  const options = ["Grams", "Milligrams", "Micrograms", "Kcal", "Kj"];
+
+  return (
+    <Modal
+      activator={activator}
+      open={active}
+      onClose={handleChange}
+      title="Missing recommended intake "
+      primaryAction={{
+        content: "Save",
+        onAction: handleSave,
+      }}
+      secondaryActions={[
+        {
+          content: "Cancel",
+          onAction: handleCancel,
+        },
+      ]}
+    >
+      <Modal.Section>
+        <TextContainer spacing="loose">
+          <p style={{ marginBottom: "10px" }}>
+            Unfortunately, we could not find any recommended daily intake values
+            for this vitamin. But don't worry, you can add the recommended daily
+            intake right here and we'll save it for the future so you only have
+            to enter it once.
+            <br /> Of course, you can change the stored values at any time on
+            the{" "}
+            <Button onClick={() => handleTabChange(2)} plain>
+              Recommended Intake page.
+            </Button>
+          </p>
+        </TextContainer>
+        <Stack>
+          <Stack.Item fill>
+            {" "}
+            <TextField
+              label="Name*"
+              type="text"
+              name="Name"
+              value={newRIdata.name}
+              onChange={(e) => handleChangeData(e, "name")}
+            />
+          </Stack.Item>
+          <Stack.Item fill>
+            {" "}
+            <TextField
+              label="Quantity*"
+              type="number"
+              name="Quantity"
+              value={newRIdata.quantity}
+              onChange={(e) => handleChangeData(e, "quantity")}
+            />
+          </Stack.Item>
+          <Stack.Item fill>
+            {" "}
+            <div style={{ width: "100px" }}>
+              <Select
+                options={options}
+                label="Unit"
+                value={newRIdata.unit}
+                onChange={(e) => handleChangeData(e, "unit")}
+              />
+            </div>
+          </Stack.Item>
+        </Stack>
+      </Modal.Section>
+    </Modal>
+  );
+};
+
 function CreateLabel({
   langState,
   location,
@@ -149,14 +262,21 @@ function CreateLabel({
   productExist,
   setProductExist,
   storeData,
+  setStoreData,
   handleSelectedProducts,
+  handleSettingDefaultData,
+  saveRecomIntake,
+  setToastMessage,
+  toggleActive,
+  fetchProducts,
 }) {
+  const app = useAppBridge();
+  const fetch = userLoggedInFetch(app);
   const [locationPlan, setLocationPlan] = useState({
     location: location,
     plan: shop_plan,
   });
   const [productToPrepare, setProductToPrepare] = useState(false);
-  const [nonFoodProduct, setNonFoodProduct] = useState(false);
   const [rightSideWidth, setRightSideWidth] = useState("35%");
   const [leftSideWidth, setLeftSideWidth] = useState("60%");
   const [flexDirection, setFlexDirection] = useState("row");
@@ -193,15 +313,12 @@ function CreateLabel({
     if (!Object.keys(data?.calsEnergyInfo).length > 0) {
       data.calsEnergyInfo = calsEnergyInfo;
     }
-    // console.log(data);
     setProductExist(true);
   };
   useEffect(() => {
     window.addEventListener("DOMContentLoaded", updateProducts());
 
-    window.removeEventListener("DOMContentLoaded", () => {
-      // console.log("done!");
-    });
+    window.removeEventListener("DOMContentLoaded", () => {});
   }, [data]);
   useEffect(() => {
     window.addEventListener("resize", () => {
@@ -215,23 +332,15 @@ function CreateLabel({
         setFlexDirection("row");
       }
     });
-    window.removeEventListener("resize", () => {
-      // console.log(window.innerWidth);
-    });
+    window.removeEventListener("resize", () => {});
   }, []);
 
   const handleNutriScoreCheckElem = (newState) => {
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
-    // console.log(newState);
   };
 
   const handleproductToPrepare = useCallback(
     (newChecked) => setProductToPrepare(newChecked),
-    []
-  );
-
-  const handleNonFoodProduct = useCallback(
-    (newChecked) => setNonFoodProduct(newChecked),
     []
   );
 
@@ -263,8 +372,61 @@ function CreateLabel({
     setData(newData);
   };
 
+  useEffect(() => {
+    if (selectedOptions && selectedOptions.length > 0)
+      handleSettingDefaultData();
+    else return;
+  }, [selectedOptions]);
+
+  const handleBulkProductsReset = async () => {
+    const products = [];
+    await productsArray.forEach((elem) => {
+      if (selectedOptions.includes(elem.name)) products.push(elem._id);
+    });
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ products }),
+    };
+    const data = await fetch("/product_bulk_Reset", fetchOptions)
+      .then((res) => res.json())
+      .then(async (response) => {
+        if (response.success) {
+          handleTabChange(0);
+          await fetchProducts();
+          setToastMessage(response.message);
+          toggleActive();
+        } else {
+          console.warn(response.message);
+        }
+      })
+      .catch((err) => {
+        console.warn(err);
+      });
+  };
+
+  const handleResoucePickerSelection = useCallback((elem) => {
+    const newSelectedOptions = [];
+    elem.selection.forEach((element) => {
+      newSelectedOptions.push(element.title);
+    });
+    setSelectedOptions(newSelectedOptions);
+  });
+
   const updateNonFoodStatus = () => {
     let count = 0;
+    if (
+      selectedOptions.length === 0 ||
+      selectedOptions.length === 1 ||
+      data.food_product === undefined
+    ) {
+      handleChange(true, "food_product");
+      return;
+    }
     productsArray.forEach((elem) => {
       if (selectedOptions.includes(elem.name)) {
         if (!elem.food_product) {
@@ -272,20 +434,22 @@ function CreateLabel({
         }
       }
     });
-    if (count === selectedOptions.length && count !== 0) {
-      setNonFoodProduct(true);
+    if (count === selectedOptions.length && count > 1) {
+      handleChange(true, "food_product");
     }
   };
+
   useEffect(() => {
     updateNonFoodStatus();
   }, []);
+
   return (
     <Page
       title="Create Label"
       primaryAction={{
         content: "Save Label",
         onAction: () => {
-          handleSaveSelectedProducts(nonFoodProduct, data, selectedOptions);
+          handleSaveSelectedProducts(!data.food_product, data, selectedOptions);
         },
       }}
       fullWidth
@@ -311,9 +475,6 @@ function CreateLabel({
             <ProductInfo
               productToPrepare={productToPrepare}
               handleproductToPrepare={handleproductToPrepare}
-              nonFoodProduct={nonFoodProduct}
-              handleNonFoodProduct={handleNonFoodProduct}
-              handleNutriScoreCheckElem={handleNutriScoreCheckElem}
               locationPlan={locationPlan}
               selectedOptions={selectedOptions}
               setSelectedOptions={setSelectedOptions}
@@ -324,8 +485,10 @@ function CreateLabel({
               productsAredifferent={productsAredifferent}
               setSourcePicker={setSourcePicker}
               handleSelectedProducts={handleSelectedProducts}
+              data={data}
+              handleChange={handleChange}
             />
-            {nonFoodProduct ? (
+            {!data.food_product ? (
               <Card sectioned>
                 <div
                   style={{
@@ -383,6 +546,7 @@ function CreateLabel({
                   handleRemoveNutritionData={handleRemoveNutritionData}
                   handleChange={handleChange}
                   productToPrepare={productToPrepare}
+                  storeData={storeData}
                 />
                 {locationPlan.plan === "Basic" && location === "EU" ? (
                   <BasicVitaminsMineralsPage
@@ -397,6 +561,7 @@ function CreateLabel({
                       handleRemoveVitamins={handleRemoveVitamins}
                       handleChange={handleChange}
                       allData={data}
+                      storeData={storeData}
                     />
                     <Minerals
                       data={data.minerals}
@@ -405,6 +570,7 @@ function CreateLabel({
                       handleRemoveMinerals={handleRemoveMinerals}
                       handleChange={handleChange}
                       allData={data}
+                      storeData={storeData}
                     />
                   </>
                 )}
@@ -437,7 +603,7 @@ function CreateLabel({
                 marginTop: "20px",
               }}
             >
-              <DeleteLabel />
+              <DeleteLabel handleBulkProductsReset={handleBulkProductsReset} />
               <Button
                 primary
                 style={{ margin: "4px" }}
@@ -445,7 +611,7 @@ function CreateLabel({
                 className="button remove"
                 onClick={() =>
                   handleSaveSelectedProducts(
-                    nonFoodProduct,
+                    !data.food_product,
                     data,
                     selectedOptions
                   )
@@ -457,7 +623,7 @@ function CreateLabel({
           </div>
           {/* //  Todo right side page */}
           <div style={{ width: rightSideWidth, marginTop: "10px" }}>
-            {nonFoodProduct ? (
+            {!data.food_product ? (
               <></>
             ) : (
               <TablePreview
@@ -516,7 +682,19 @@ function CreateLabel({
           </Layout>
         </SkeletonPage>
       )}
-      <ResourcePicker resourceType="Product" open={openResourcePicker} />
+      <ResourcePicker
+        resourceType="Product"
+        open={openResourcePicker}
+        onSelection={handleResoucePickerSelection}
+      />
+      <div style={{ display: "none" }}>
+        <MissingRIModal
+          handleTabChange={handleTabChange}
+          setStoreData={setStoreData}
+          storeData={storeData}
+          saveRecomIntake={saveRecomIntake}
+        />
+      </div>
     </Page>
   );
 }

@@ -36,6 +36,7 @@ function CalsEnergyInfos({
       "calsEnergyInfo",
       "energyKcal100"
     );
+    handleRiAutoCalculs();
   };
   useEffect(() => {
     let isSubscribed = true;

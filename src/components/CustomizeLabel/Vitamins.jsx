@@ -91,7 +91,29 @@ function Vitamins({
   handleRemoveVitamins,
   handleChange,
   allData,
+  storeData,
 }) {
+  const handleRiAutoCalculs = () => {
+    allData.vitamins.forEach((vitamin, index) => {
+      storeData.recommendedIntake.forEach((elem, i) => {
+        if (vitamin.name === elem.name) {
+          if (elem.quantity > 0) {
+            const newRI = Math.floor(
+              (vitamin.perportion / elem.quantity) * 100
+            ).toString();
+            handleChange(newRI, "vitamins", "RI", index);
+          } else {
+            handleChange("0", "vitamins", "RI", index);
+          }
+        }
+      });
+    });
+  };
+
+  useEffect(() => {
+    handleRiAutoCalculs();
+  }, []);
+
   const handleAutoCalculsOnChange = useCallback((val, index) => {
     handleChange(val, "vitamins", "per100g", index);
     const division =
@@ -104,6 +126,7 @@ function Vitamins({
       "perportion",
       index
     );
+    handleRiAutoCalculs();
   });
   const handleAutoCalculsOnPortionChange = () => {
     const division =
@@ -118,6 +141,7 @@ function Vitamins({
         index
       );
     });
+    handleRiAutoCalculs();
   };
   useEffect(() => {
     let isSubscribed = true;
@@ -126,6 +150,23 @@ function Vitamins({
     handleAutoCalculsOnPortionChange();
     return () => (isSubscribed = false);
   }, [allData?.servingSize.EU.PortionSize]);
+
+  const handleNewRIElem = useCallback(
+    (e) => {
+      let check;
+      storeData.recommendedIntake.forEach((elem) => {
+        if (elem.name === e) {
+          check = true;
+        }
+      });
+      if (!check) {
+        document.getElementById("missing_RI").click();
+      }
+      return;
+    },
+    [storeData.recommendedIntake]
+  );
+
   return (
     <Card>
       <div
@@ -308,6 +349,7 @@ function Vitamins({
                         onChange={(e) =>
                           handleChange(e, "vitamins", "name", index)
                         }
+                        onBlur={(e) => handleNewRIElem(e.target.value)}
                       />
                     </div>
                     <div
@@ -336,9 +378,10 @@ function Vitamins({
                         type="number"
                         name="perportion"
                         value={element.perportion || ""}
-                        onChange={(e) =>
-                          handleChange(e, "vitamins", "perportion", index)
-                        }
+                        onChange={(e) => {
+                          handleChange(e, "vitamins", "perportion", index);
+                          handleRiAutoCalculs();
+                        }}
                       />
                     </div>
                     <div

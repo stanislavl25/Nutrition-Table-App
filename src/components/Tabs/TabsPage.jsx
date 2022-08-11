@@ -27,7 +27,7 @@ import {
 } from "../defaultData.js";
 
 const recommendedIntakeRows = [
-  { name: "Energy", quantity: "2000", unit: "Grams" },
+  { name: "Energy", quantity: "2000", unit: "Kcal" },
   { name: "Fat", quantity: "44", unit: "Grams" },
   { name: "Of which Saturates", quantity: "", unit: "Grams" },
   { name: "Carbohydrates", quantity: "00", unit: "Grams" },
@@ -54,7 +54,7 @@ function TabsPage() {
   const [location, setLocation] = useState("");
   const [locationObj, setlocationObj] = useState({});
   const [emptyStore, setEmptyStore] = useState(false);
-  const [checkPlan, setCheckPlan] = useState(true);
+  const [checkPlan, setCheckPlan] = useState(false);
   const [categories, setCategories] = useState([]);
   const [storeData, setStoreData] = useState([]);
   const [active, setActive] = useState(false);
@@ -117,7 +117,6 @@ function TabsPage() {
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
 
-  // ! fix recommended intake late update for useState
   useEffect(async () => {
     let isSubscribed = true;
     if (storeData.recommendedIntake !== recommendedIntakeData) {
@@ -192,7 +191,9 @@ function TabsPage() {
   const fetchProducts = async () => {
     try {
       const data = await fetch("products-list").then((res) => res.json());
-
+      if (data.data.length > 999) {
+        setCheckPlan(true);
+      }
       if (data.success) {
         setProductsArray(data.data);
         setArrayData(defaultData);
@@ -299,6 +300,7 @@ function TabsPage() {
 
   /***handle save non food products to database */
   const handleSaveNonFoodProducts = async (products) => {
+    console.log("here non food ##########");
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -365,22 +367,21 @@ function TabsPage() {
     data,
     selectedOptions
   ) => {
-    console.log(selectedOptions);
-    // if (!selectedOptions) {
-    //   setToastMessage("No products selected!");
-    //   toggleActive();
-    //   return;
-    // }
-    // if (nonFoodProduct) {
-    //   handleSaveNonFoodProducts(selectedOptions);
-    // }
-    // if (!nonFoodProduct) {
-    //   handleSaveProducts(selectedOptions, data);
-    // }
+    if (!selectedOptions) {
+      setToastMessage("No products selected!");
+      toggleActive();
+      return;
+    }
+    if (nonFoodProduct) {
+      handleSaveNonFoodProducts(selectedOptions);
+    }
+    if (!nonFoodProduct) {
+      handleSaveProducts(selectedOptions, data);
+    }
   };
 
   const handleSelectedProducts = (selectedPro, boolean) => {
-    if (boolean !== false) {
+    if (!boolean || boolean === undefined) {
       setSelectedOptions(selectedPro);
       const products = productsArray;
       setProductsArray("none");
@@ -488,8 +489,14 @@ function TabsPage() {
     }
   };
   const handleEditProduct = (id) => {
-    setSelected(1);
     setSelectedOptions([id]);
+    const products = productsArray;
+    setProductsArray("none");
+    setDefaultSet(false);
+    setTimeout(() => {
+      setProductsArray(products);
+      setSelected(1);
+    }, 500);
   };
   const resourceIDResolver = (products) => {
     return products.name;
@@ -553,27 +560,15 @@ function TabsPage() {
    */
   const handleChange = useCallback(async (val, tag, name, secondTag) => {
     /***
-     * handle order change
-     */
-    // if (name === "order") {
-    //   let newData = { ...arraydata };
-    //   var element = newData[tag][secondTag];
-    //   newData[tag].splice(secondTag, 1);
-    //   newData[tag].splice(val, 0, element);
-    //   newData[tag][secondTag][name] = val;
-    //   await setArrayData(newData);
-    //   // setTimeout(async () => {
-    //   //   for (var i = 0; i < newData[tag].length; i++) {
-    //   //     const num = i;
-    //   //     newData[tag][i]["order"] = num.toString();
-    //   //   }
-    //   //   await setArrayData(newData);
-    //   // }, 500);
-    //   return;
-    // }
-    /***
      * handle change if not secondTag is an index (number)
      */
+    if (!name && name === undefined) {
+      let newData = { ...arraydata };
+      newData[tag] = val;
+      setArrayData(newData);
+      return;
+    }
+
     if (!secondTag && typeof secondTag !== "number") {
       let newData = { ...arraydata };
       newData[tag][name] = val;
@@ -829,7 +824,13 @@ function TabsPage() {
           productExist={productExist}
           setProductExist={setProductExist}
           storeData={storeData}
+          setStoreData={setStoreData}
           handleSelectedProducts={handleSelectedProducts}
+          handleSettingDefaultData={handleSettingDefaultData}
+          saveRecomIntake={saveRecomIntake}
+          setToastMessage={setToastMessage}
+          toggleActive={toggleActive}
+          fetchProducts={fetchProducts}
         />
       ),
     },

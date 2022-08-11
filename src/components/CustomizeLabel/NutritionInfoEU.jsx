@@ -113,7 +113,30 @@ function NutritionInfo({
   handleRemoveNutritionData,
   handleChange,
   productToPrepare,
+  storeData,
 }) {
+  const options = [
+    { label: "Grams", value: "Grams" },
+    { label: "MilliGrams", value: "MilliGrams" },
+  ];
+
+  const handleRiAutoCalculs = () => {
+    data.nutritionData.forEach((nutrition, index) => {
+      storeData.recommendedIntake.forEach((elem, i) => {
+        if (nutrition.name === elem.name) {
+          if (elem.quantity > 0) {
+            const newRI = Math.floor(
+              (nutrition.perportion / elem.quantity) * 100
+            ).toString();
+            handleChange(newRI, "nutritionData", "RI", index);
+          } else {
+            handleChange("0", "nutritionData", "RI", index);
+          }
+        }
+      });
+    });
+  };
+
   const handleAutoCalculsOnChange = useCallback((val, index) => {
     handleChange(val, "nutritionData", "per100g", index);
     const division =
@@ -125,11 +148,9 @@ function NutritionInfo({
       "perportion",
       index
     );
+    handleRiAutoCalculs();
   });
-  const options = [
-    { label: "Grams", value: "Grams" },
-    { label: "MilliGrams", value: "MilliGrams" },
-  ];
+
   const handleAutoCalculsOnPortionChange = () => {
     const division =
       data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
@@ -142,7 +163,9 @@ function NutritionInfo({
         index
       );
     });
+    handleRiAutoCalculs();
   };
+
   useEffect(() => {
     let isSubscribed = true;
     if (data?.nutritionData.length === 0 || locationPlan.location !== "EU")
@@ -150,6 +173,27 @@ function NutritionInfo({
     handleAutoCalculsOnPortionChange();
     return () => (isSubscribed = false);
   }, [data?.servingSize.EU.PortionSize]);
+
+  useEffect(() => {
+    handleRiAutoCalculs();
+  }, []);
+
+  const handleNewRIElem = useCallback(
+    (e) => {
+      let check;
+      storeData.recommendedIntake.forEach((elem) => {
+        if (elem.name === e) {
+          check = true;
+        }
+      });
+      if (!check) {
+        document.getElementById("missing_RI").click();
+      }
+      return;
+    },
+    [storeData.recommendedIntake]
+  );
+
   return (
     <div style={{ marginTop: "20px", marginBottom: "20px" }}>
       {locationPlan.location === "CA" ? (
@@ -243,6 +287,7 @@ function NutritionInfo({
                         }
                         label=""
                         autoComplete="off"
+                        onBlur={(e) => handleNewRIElem(e.target.value)}
                       />
                     </div>
                     <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
@@ -259,9 +304,10 @@ function NutritionInfo({
                       <TextField
                         value={element.perportion || 0}
                         name="Perportion"
-                        onChange={(e) =>
-                          handleChange(e, "nutritionData", "perportion", index)
-                        }
+                        onChange={(e) => {
+                          handleChange(e, "nutritionData", "perportion", index);
+                          handleRiAutoCalculs();
+                        }}
                         autoComplete="off"
                         inputMode="number"
                         type="number"

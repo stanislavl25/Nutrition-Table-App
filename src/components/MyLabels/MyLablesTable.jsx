@@ -392,16 +392,19 @@ function MyLablesTable({
           onAction: () => {
             document.getElementById("Hide_Lables").click();
           },
+          destructive: true,
         },
         {
           content: "Reset products",
           onAction: () => {
             document.getElementById("Reset_products").click();
           },
+          destructive: true,
         },
       ],
     },
   ];
+
   const rowMarkup =
     productsArray !== "none" ? (
       productsArray?.map(
@@ -449,7 +452,7 @@ function MyLablesTable({
                   alignItems: "center",
                 }}
               >
-                <Button primary onClick={() => handleEditProduct(name)}>
+                <Button primary onClick={() => handleSelectedProducts([name])}>
                   Edit
                 </Button>
                 <PopOverElem

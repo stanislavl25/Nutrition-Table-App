@@ -20,9 +20,6 @@ import { useEffect } from "react";
 function ProductInfo({
   productToPrepare,
   handleproductToPrepare,
-  handleNutriScoreCheckElem,
-  nonFoodProduct,
-  handleNonFoodProduct,
   locationPlan,
   selectedOptions,
   setSelectedOptions,
@@ -33,11 +30,15 @@ function ProductInfo({
   productsAredifferent,
   setSourcePicker,
   handleSelectedProducts,
+  data,
+  handleChange,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
-  const [selectedNutriScore, setSelectedNutriScore] = useState("");
 
+  const handleNonFoodProduct = useCallback((newChecked) => {
+    handleChange(!newChecked, "food_product");
+  }, []);
   const updateText = useCallback(
     (value) => {
       setInputValue(value);
@@ -74,8 +75,7 @@ function ProductInfo({
   );
 
   const handleSelectChange = useCallback((value) => {
-    handleNutriScoreCheckElem(value);
-    setSelectedNutriScore(value);
+    handleChange(value, "nutriScore");
   }, []);
   const handleNutriScore = useCallback(
     (newChecked) => setNutriScore(newChecked),
@@ -120,7 +120,7 @@ function ProductInfo({
           ))}
         </Stack>
         {(productsAredifferent &&
-          !nonFoodProduct &&
+          !data.food_product &&
           selectedOptions.length > 1) ||
         (productsAredifferent && selectedOptions.length > 1) ? (
           <Banner title="" status="critical">
@@ -203,8 +203,9 @@ function ProductInfo({
 
           <Checkbox
             label="This is a non-food product"
-            checked={nonFoodProduct}
+            checked={!data.food_product}
             onChange={handleNonFoodProduct}
+            disabled={selectedOptions.length === 0 ? true : false}
           />
           <div
             style={{
@@ -296,7 +297,7 @@ function ProductInfo({
                   label=""
                   options={options}
                   onChange={handleSelectChange}
-                  value={selectedNutriScore}
+                  value={data.nutriScore}
                 />
                 <></>
                 <></>

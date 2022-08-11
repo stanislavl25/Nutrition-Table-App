@@ -27,10 +27,7 @@ function MyLables({
 }) {
   return (
     <div>
-      {checkPlan &&
-      shop_plan &&
-      shop_plan === "Basic" &&
-      productsArray?.length < 999 ? (
+      {shop_plan && shop_plan === "Basic" && productsArray?.length < 999 ? (
         <div style={{ marginBottom: "10px" }}>
           <Card sectioned>
             <div

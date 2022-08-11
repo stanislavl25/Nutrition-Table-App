@@ -236,53 +236,6 @@ export async function createServer(
     }
   });
 
-  /*** handle deleted store products */
-
-  // app.get("/deleted-store-products", verifyRequest(app), async (req, res) => {
-  //   console.log("deleted store products");
-  //   let array = [];
-  //   let comparisonArray = [];
-  //   try {
-  //     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-  //     const productsDatabase = await Products.find({
-  //       store_id: session.shop,
-  //     }).lean();
-  //     const { Product } = await import(
-  //       `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-  //     );
-  //     const storeProducts = await Product.all({
-  //       session,
-  //       fields: "id,title,product_type,images",
-  //     });
-  //     if (storeProducts) {
-  //       storeProducts.forEach((elem) => {
-  //         let num = elem.id;
-  //         let text = num.toString();
-  //         array.push(text);
-  //       });
-  //     }
-  //     if (productsDatabase) {
-  //       productsDatabase.forEach((elem) => {
-  //         comparisonArray.push(elem.productId);
-  //       });
-  //       comparisonArray.forEach(async (elem) => {
-  //         if (!array.includes(elem)) {
-  //           const deleteElement = await Products.findOneAndDelete({
-  //             productId: elem,
-  //           });
-  //         } else {
-  //           // do something
-  //         }
-  //       });
-  //     }
-  //     res.status(200).send({ success: true, message: "products deleted!" });
-  //   } catch (err) {
-  //     res
-  //       .status(400)
-  //       .send({ success: false, message: "products not deleted!" });
-  //   }
-  // });
-
   app.get("/products_liveTheme", verifyRequest(app), async (req, res) => {
     try {
       const session = await Shopify.Utils.loadCurrentSession(req, res, true);

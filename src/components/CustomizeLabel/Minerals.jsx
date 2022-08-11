@@ -97,7 +97,29 @@ function Minerals({
   handleRemoveMinerals,
   handleChange,
   allData,
+  storeData,
 }) {
+  const handleRiAutoCalculs = () => {
+    allData.minerals.forEach((vitamin, index) => {
+      storeData.recommendedIntake.forEach((elem, i) => {
+        if (vitamin.name === elem.name) {
+          if (elem.quantity > 0) {
+            const newRI = Math.floor(
+              (vitamin.perportion / elem.quantity) * 100
+            ).toString();
+            handleChange(newRI, "minerals", "RI", index);
+          } else {
+            handleChange("0", "minerals", "RI", index);
+          }
+        }
+      });
+    });
+  };
+
+  useEffect(() => {
+    handleRiAutoCalculs();
+  }, []);
+
   const handleAutoCalculsOnChange = useCallback((val, index) => {
     handleChange(val, "minerals", "per100g", index);
     const division =
@@ -110,6 +132,7 @@ function Minerals({
       "perportion",
       index
     );
+    handleRiAutoCalculs();
   });
 
   const handleAutoCalculsOnPortionChange = () => {
@@ -125,7 +148,9 @@ function Minerals({
         index
       );
     });
+    handleRiAutoCalculs();
   };
+
   useEffect(() => {
     let isSubscribed = true;
     if (allData?.minerals.length === 0 || locationPlan.location !== "EU")
@@ -133,6 +158,23 @@ function Minerals({
     handleAutoCalculsOnPortionChange();
     return () => (isSubscribed = false);
   }, [allData?.servingSize.EU.PortionSize]);
+
+  const handleNewRIElem = useCallback(
+    (e) => {
+      let check;
+      storeData.recommendedIntake.forEach((elem) => {
+        if (elem.name === e) {
+          check = true;
+        }
+      });
+      if (!check) {
+        document.getElementById("missing_RI").click();
+      }
+      return;
+    },
+    [storeData.recommendedIntake]
+  );
+
   return (
     <Card>
       <div
@@ -293,6 +335,7 @@ function Minerals({
                         onChange={(e) =>
                           handleChange(e, "minerals", "name", index)
                         }
+                        onBlur={(e) => handleNewRIElem(e.target.value)}
                       />
                     </div>
                     <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
@@ -315,9 +358,10 @@ function Minerals({
                         type="number"
                         name="perportion"
                         value={element.perportion || ""}
-                        onChange={(e) =>
-                          handleChange(e, "minerals", "perportion", index)
-                        }
+                        onChange={(e) => {
+                          handleChange(e, "minerals", "perportion", index);
+                          handleRiAutoCalculs();
+                        }}
                       />
                     </div>
                     <div style={{ display: "table-cell" }}>

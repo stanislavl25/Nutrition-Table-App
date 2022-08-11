@@ -65,7 +65,7 @@ const Edit = ({
           value={element.unit}
           onChange={(e) => handleChange(e, index, "unit")}
           onBlur={() => saveRecomIntake(recommendedIntake)}
-          options={["Grams", "Milligrams", "Micrograms"]}
+          options={["Grams", "Milligrams", "Micrograms", "Kcal", "Kj"]}
         />
         <Button
           destructive

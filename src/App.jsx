@@ -8,7 +8,6 @@ import {
 import {
   Provider as AppBridgeProvider,
   useAppBridge,
-  ResourcePicker,
 } from "@shopify/app-bridge-react";
 import { authenticatedFetch } from "@shopify/app-bridge-utils";
 import { Redirect } from "@shopify/app-bridge/actions";
@@ -16,7 +15,7 @@ import { AppProvider as PolarisProvider } from "@shopify/polaris";
 import translations from "@shopify/polaris/locales/en.json";
 import "@shopify/polaris/build/esm/styles.css";
 import TabsPage from "./components/Tabs/TabsPage";
-import { useState } from "react";
+
 export default function App() {
   return (
     <PolarisProvider i18n={translations}>
