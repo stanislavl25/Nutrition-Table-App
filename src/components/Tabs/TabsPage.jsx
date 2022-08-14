@@ -144,7 +144,7 @@ function TabsPage() {
     try {
       const data = await fetch("/locations").then((res) => res.json());
       setlocationObj(data);
-      setLocation("EU");
+      setLocation("NA");
       return;
       if (data.length) {
         const countryCode = data[0].country_code;
@@ -747,10 +747,21 @@ function TabsPage() {
     };
     if (boolean) {
       const update = await fetch("/portionSizeModal", fetchOptions)
-        .then((res) => res.json)
+        .then((res) => res.json())
         .then((response) => console.log(response));
     }
   };
+
+  const testRequest = async () => {
+    const update = await fetch("/products_liveTheme")
+      .then((res) => res.json())
+      .then((response) => console.log(response));
+  };
+
+  useEffect(async () => {
+    await testRequest();
+  }, []);
+
   const toastMarkup = active ? (
     <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />
   ) : null;

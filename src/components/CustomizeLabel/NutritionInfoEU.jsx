@@ -203,8 +203,9 @@ function NutritionInfo({
           handleChange={handleChange}
           handleAddNutritionData={handleAddNutritionData}
           handleRemoveNutritionData={handleRemoveNutritionData}
-          dataLength={data.length}
           productToPrepare={productToPrepare}
+          data={data}
+          handleNewRIElem={handleNewRIElem}
         />
       ) : (
         <></>
@@ -217,6 +218,8 @@ function NutritionInfo({
           handleRemoveNutritionData={handleRemoveNutritionData}
           productToPrepare={productToPrepare}
           dataLength={data.length}
+          data={data}
+          handleNewRIElem={handleNewRIElem}
         />
       ) : (
         <></>

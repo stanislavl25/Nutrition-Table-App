@@ -562,6 +562,7 @@ function CreateLabel({
                       handleChange={handleChange}
                       allData={data}
                       storeData={storeData}
+                      handleTabChange={handleTabChange}
                     />
                     <Minerals
                       data={data.minerals}
@@ -571,6 +572,7 @@ function CreateLabel({
                       handleChange={handleChange}
                       allData={data}
                       storeData={storeData}
+                      handleTabChange={handleTabChange}
                     />
                   </>
                 )}

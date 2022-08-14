@@ -36,7 +36,7 @@ const PopoverElement = ({ element, removeFormFields, handleChange, index }) => {
     >
       <FormLayout>
         <TextField
-          label="%RI*"
+          label="% DV*"
           type="number"
           name="Name"
           value={element.RI || ""}
@@ -92,6 +92,7 @@ function Vitamins({
   handleChange,
   allData,
   storeData,
+  handleTabChange,
 }) {
   const handleRiAutoCalculs = () => {
     allData.vitamins.forEach((vitamin, index) => {
@@ -167,8 +168,31 @@ function Vitamins({
     [storeData.recommendedIntake]
   );
 
+  const handleAutoCalculsOnChangeDV = useCallback((val, index, tag) => {
+    handleChange(val, "vitamins", tag, index);
+    const newNutritionDV =
+      (allData.vitamins[index].quantity / allData.vitamins[index].dailyValue) *
+      100;
+    handleChange(
+      Math.floor(newNutritionDV).toString(),
+      "vitamins",
+      "RI",
+      index
+    );
+  });
+
   return (
     <Card>
+      {locationPlan?.plan === "Basic" && locationPlan?.location !== "EU" ? (
+        <Banner status="warning">
+          <Button onClick={() => handleTabChange(5)} plain>
+            Upgrade your plan
+          </Button>{" "}
+          to add more Vitamins
+        </Banner>
+      ) : (
+        <></>
+      )}
       <div
         style={{
           display: "flex",
@@ -187,7 +211,7 @@ function Vitamins({
           style={{ margin: "4px" }}
           primary
           disabled={
-            locationPlan?.plan === "basic" && locationPlan?.location !== "EU"
+            locationPlan?.plan === "Basic" && locationPlan?.location !== "EU"
               ? true
               : false
           }
@@ -195,15 +219,7 @@ function Vitamins({
           Add
         </Button>
       </div>
-      {locationPlan?.plan === "basic" && locationPlan?.location !== "EU" ? (
-        <TextContainer>
-          <Banner status="warning">
-            Upgrade your plan to add more Vitamins
-          </Banner>
-        </TextContainer>
-      ) : (
-        <></>
-      )}
+
       {data.length === 0 ? (
         <div style={{ textAlign: "center", paddingBottom: "20px" }}>
           <p>Click add to create a new Vitamin</p>
@@ -276,6 +292,7 @@ function Vitamins({
                         onChange={(e) =>
                           handleChange(e, "vitamins", "name", index)
                         }
+                        onBlur={(e) => handleNewRIElem(e.target.value)}
                       />
                     </div>
                     <div
@@ -288,7 +305,7 @@ function Vitamins({
                         name="quantity"
                         value={element.quantity || ""}
                         onChange={(e) =>
-                          handleChange(e, "vitamins", "quantity", index)
+                          handleAutoCalculsOnChangeDV(e, index, "quantity")
                         }
                         type="number"
                       />
@@ -315,7 +332,7 @@ function Vitamins({
                         type="number"
                         value={element.dailyValue || ""}
                         onChange={(e) =>
-                          handleChange(e, "vitamins", "dailyValue", index)
+                          handleAutoCalculsOnChangeDV(e, index, "dailyValue")
                         }
                       />
                     </div>

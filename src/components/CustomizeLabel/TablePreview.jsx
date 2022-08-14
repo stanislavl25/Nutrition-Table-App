@@ -4,6 +4,8 @@ import "../../assets/previewStyles.css";
 import { Markup } from "interweave";
 function TablePreview({ data, productToPrepare, locationPlan, langState }) {
   const [bannerDismissed, setBannerDismissed] = useState(true);
+  console.log(langState);
+  //!!! get inputs to mode number all in NA and CA
   return (
     <Card title="Label Preview">
       <div style={{ padding: "10px" }}>
@@ -29,7 +31,11 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
                 justifyContent: "space-between",
               }}
             >
-              <Heading>{langState.NutritionInformation}</Heading>
+              <Heading>
+                {locationPlan === "EU"
+                  ? langState.NutritionInformation
+                  : langState.nutritionFacts}
+              </Heading>
               <p style={{ marginRight: "30px" }}>
                 <i className="arrow up"></i>
               </p>
@@ -59,8 +65,8 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
             {locationPlan.location === "NA" ? (
               <div style={{ borderBottom: "3px solid black" }}>
                 <div>
-                  {data.servingSize.NA.Servingspercontainer} servings per
-                  container
+                  {data.servingSize.NA.Servingspercontainer}{" "}
+                  {langState.servingsPerContainer}
                 </div>
                 <div
                   style={{
@@ -80,30 +86,7 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
             ) : (
               <></>
             )}
-            {locationPlan.location === "NA" ? (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  borderBottom: "3px solid black",
-                }}
-              >
-                <strong>Amount per serving</strong>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <strong>Calories </strong>
-                  <strong>{data.servingSize.NA.Preparedcalories}</strong>
-                </div>
-              </div>
-            ) : (
-              <></>
-            )}
+
             {locationPlan.location === "CA" ? (
               <div
                 style={{
@@ -185,7 +168,15 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
                 overflow: "hidden",
               }}
             >
-              <thead className="thead">
+              <thead
+                className="thead"
+                style={{
+                  borderBottom:
+                    locationPlan.location === "NA" && productToPrepare
+                      ? "1px solid #ccc"
+                      : "3px solid black",
+                }}
+              >
                 {locationPlan.location === "EU" ? (
                   <tr style={{ wordBreak: "break-word" }}>
                     <th scope="col" style={{ textAlign: "left" }}>
@@ -227,13 +218,86 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
                   <></>
                 )}
                 {locationPlan.location === "NA" ? (
+                  <>
+                    <tr>
+                      <th style={{ textAlign: "left" }}>
+                        <strong>{langState.amountPerServing}</strong>
+                      </th>
+                      {productToPrepare ? (
+                        <>
+                          <th
+                            style={{
+                              borderRight: "1px solid #ccc",
+                              borderLeft: "1px solid #ccc",
+                              textAlign: "right",
+                            }}
+                          >
+                            <strong>
+                              {data.servingSize.NA.Servingreference}
+                            </strong>
+                          </th>
+                          <th style={{ textAlign: "right" }}>
+                            <strong>As prepared</strong>
+                          </th>
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                    </tr>
+                    <tr style={{ borderBottom: "3px solid black" }}>
+                      <th style={{ textAlign: "left" }}>
+                        <strong>{langState.calories}</strong>
+                      </th>
+                      <th
+                        style={{
+                          borderRight: "1px solid #ccc",
+                          borderLeft: "1px solid #ccc",
+                          textAlign: "right",
+                        }}
+                      >
+                        {productToPrepare ? (
+                          <strong style={{ textAlign: "right" }}>
+                            {data.servingSize.NA.Unpreparedcalories}
+                          </strong>
+                        ) : (
+                          <></>
+                        )}
+                      </th>
+                      <th style={{ textAlign: "right" }}>
+                        <strong>{data.servingSize.NA.Preparedcalories}</strong>
+                      </th>
+                    </tr>
+                  </>
+                ) : (
+                  <></>
+                )}
+                {locationPlan.location === "NA" ? (
                   <tr>
-                    <th
-                      style={{ width: "100%", textAlign: "right" }}
-                      scope="col"
-                    >
-                      <strong>% Daily Value*</strong>
-                    </th>
+                    {locationPlan.location === "NA" && productToPrepare ? (
+                      <>
+                        <th></th>
+                        <th
+                          style={{
+                            borderRight: "1px solid #ccc",
+                            borderLeft: "1px solid #ccc",
+                            textAlign: "right",
+                          }}
+                        >
+                          % DV*
+                        </th>
+                        <th style={{ textAlign: "right" }}>% DV*</th>
+                      </>
+                    ) : (
+                      <th
+                        style={{
+                          width: "100%",
+                          textAlign: "right",
+                          borderBottom: "none",
+                        }}
+                      >
+                        <strong>% Daily Value*</strong>
+                      </th>
+                    )}
                   </tr>
                 ) : (
                   <></>
@@ -319,55 +383,120 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
                   <></>
                 )}
                 {locationPlan.location === "NA" ? (
-                  data.nutritionData.map((element, index) => (
-                    <tr
-                      key={index}
-                      scope="row"
-                      style={{
-                        borderBottom: "1px solid rgb(190, 190, 190)",
-                      }}
-                    >
-                      <td>
-                        <div
+                  data.nutritionData.map((element, index) =>
+                    productToPrepare ? (
+                      <tr
+                        key={index}
+                        scope="row"
+                        style={{
+                          borderBottom: "1px solid rgb(190, 190, 190)",
+                        }}
+                      >
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                fontWeight:
+                                  element.bold === "Yes" ? "bold" : "",
+                                marginLeft: element.leftSpacing + "px",
+                              }}
+                            >
+                              {element.name}
+                            </p>
+                          </div>
+                        </td>
+                        <td
                           style={{
+                            borderRight: "1px solid #ccc",
+                            borderLeft: "1px solid #ccc",
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
-                            gap: "10px",
+                            justifyContent: "space-between",
                           }}
                         >
-                          <p
-                            style={{
-                              fontWeight: element.bold === "Yes" ? "bold" : "",
-                              marginLeft: element.leftSpacing + "px",
-                            }}
-                          >
-                            {element.name}
-                          </p>
                           <p>
                             {element.quantity}
                             {element.unit === "Grams" ? "g" : "mg"}
                           </p>
-                        </div>
-                      </td>
-                      <td
+                          <p>
+                            <strong>
+                              {element.dailyValue ? element.dailyValue : 0}%
+                            </strong>
+                          </p>
+                        </td>
+                        <td
+                          style={{
+                            textAlign: "right",
+                          }}
+                        >
+                          <p>
+                            <strong>
+                              {element.preparedProductDV
+                                ? element.preparedProductDV
+                                : 0}
+                              %
+                            </strong>
+                          </p>
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr
+                        key={index}
+                        scope="row"
                         style={{
-                          textAlign: "right",
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "end",
+                          borderBottom: "1px solid rgb(190, 190, 190)",
                         }}
                       >
-                        <p>
-                          <strong>
-                            {element.dailyValue ? element.dailyValue : 0}
-                          </strong>
-                        </p>
-                        <strong>%</strong>
-                      </td>
-                    </tr>
-                  ))
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                fontWeight:
+                                  element.bold === "Yes" ? "bold" : "",
+                                marginLeft: element.leftSpacing + "px",
+                              }}
+                            >
+                              {element.name}
+                            </p>
+                            <p>
+                              {element.quantity}
+                              {element.unit === "Grams" ? "g" : "mg"}
+                            </p>
+                          </div>
+                        </td>
+                        <td
+                          style={{
+                            textAlign: "right",
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "end",
+                          }}
+                        >
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            <strong>
+                              {element.dailyValue ? element.dailyValue : 0}%
+                            </strong>
+                          </p>
+                        </td>
+                      </tr>
+                    )
+                  )
                 ) : (
                   <></>
                 )}
@@ -504,106 +633,227 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
                   <></>
                 )}
                 {locationPlan.location === "NA" ? (
-                  data.vitamins.map((element, index) => (
-                    <tr
-                      key={index}
-                      scope="row"
-                      style={{
-                        borderBottom: "1px solid rgb(190, 190, 190)",
-                      }}
-                    >
-                      <td>
-                        <div
+                  data.vitamins.map((element, index) =>
+                    productToPrepare ? (
+                      <tr
+                        key={index}
+                        scope="row"
+                        style={{
+                          borderBottom: "1px solid rgb(190, 190, 190)",
+                        }}
+                      >
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                marginLeft: element.LeftSpacing + "px",
+                              }}
+                            >
+                              {element.name}
+                            </p>
+                          </div>
+                        </td>
+                        <td
                           style={{
+                            borderRight: "1px solid #ccc",
+                            borderLeft: "1px solid #ccc",
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
-                            gap: "10px",
+                            justifyContent: "space-between",
                           }}
                         >
-                          <p
-                            style={{
-                              marginLeft: element.LeftSpacing + "px",
-                            }}
-                          >
-                            {element.name}
-                          </p>
+                          {" "}
                           <p>
                             {element.quantity}
                             {element.unit === "Grams" ? "g" : "mg"}
                           </p>
-                        </div>
-                      </td>
-                      <td
+                          <p>
+                            <strong>
+                              {element.dailyValue ? element.dailyValue : 0}%
+                            </strong>
+                          </p>
+                        </td>
+                        <td
+                          style={{
+                            textAlign: "right",
+                          }}
+                        >
+                          <p>
+                            <strong>
+                              {element.dailyValue ? element.RI : 0}%
+                            </strong>
+                          </p>
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr
+                        key={index}
+                        scope="row"
                         style={{
-                          textAlign: "right",
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "right",
+                          borderBottom: "1px solid rgb(190, 190, 190)",
                         }}
                       >
-                        <p>
-                          <strong>
-                            {element.dailyValue ? element.dailyValue : 0}
-                          </strong>
-                        </p>
-                        <strong>%</strong>
-                      </td>
-                    </tr>
-                  ))
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                marginLeft: element.LeftSpacing + "px",
+                              }}
+                            >
+                              {element.name}
+                            </p>
+                            <p>
+                              {element.quantity}
+                              {element.unit === "Grams" ? "g" : "mg"}
+                            </p>
+                          </div>
+                        </td>
+                        <td
+                          style={{
+                            textAlign: "right",
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "right",
+                          }}
+                        >
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            <strong>
+                              {element.dailyValue ? element.dailyValue : 0}
+                            </strong>
+                          </p>
+                          <strong>%</strong>
+                        </td>
+                      </tr>
+                    )
+                  )
                 ) : (
                   <></>
                 )}
                 {locationPlan.location === "NA" ? (
-                  data.minerals.map((element, index) => (
-                    <tr
-                      key={index}
-                      scope="row"
-                      style={{
-                        borderBottom: "1px solid rgb(190, 190, 190)",
-                      }}
-                    >
-                      <td>
-                        <div
+                  data.minerals.map((element, index) =>
+                    productToPrepare ? (
+                      <tr
+                        key={index}
+                        scope="row"
+                        style={{
+                          borderBottom: "1px solid rgb(190, 190, 190)",
+                        }}
+                      >
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                marginLeft: element.LeftSpacing + "px",
+                              }}
+                            >
+                              {element.name}
+                            </p>
+                          </div>
+                        </td>
+                        <td
                           style={{
+                            borderRight: "1px solid #ccc",
+                            borderLeft: "1px solid #ccc",
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
-                            gap: "10px",
+                            justifyContent: "space-between",
                           }}
                         >
-                          <p
-                            style={{
-                              marginLeft: element.LeftSpacing + "px",
-                            }}
-                          >
-                            {element.name}
-                          </p>
                           <p>
                             {element.quantity}
                             {element.unit === "Grams" ? "g" : "mg"}
                           </p>
-                        </div>
-                      </td>
-                      <td
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            <strong>
+                              {element.dailyValue ? element.dailyValue : 0}%
+                            </strong>
+                          </p>
+                        </td>
+                        <td
+                          style={{
+                            textAlign: "right",
+                          }}
+                        >
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            <strong>
+                              {element.dailyValue ? element.dailyValue : 0}%
+                            </strong>
+                          </p>
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr
+                        key={index}
+                        scope="row"
                         style={{
-                          textAlign: "right",
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "right",
+                          borderBottom: "1px solid rgb(190, 190, 190)",
                         }}
                       >
-                        <p>
-                          <strong>
-                            {element.dailyValue ? element.dailyValue : 0}
-                          </strong>
-                        </p>
-                        <strong>%</strong>
-                      </td>
-                    </tr>
-                  ))
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: "10px",
+                            }}
+                          >
+                            <p
+                              style={{
+                                marginLeft: element.LeftSpacing + "px",
+                              }}
+                            >
+                              {element.name}
+                            </p>
+                            <p>
+                              {element.quantity}
+                              {element.unit === "Grams" ? "g" : "mg"}
+                            </p>
+                          </div>
+                        </td>
+                        <td
+                          style={{
+                            textAlign: "right",
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "right",
+                          }}
+                        >
+                          <p style={{ whiteSpace: "nowrap" }}>
+                            <strong>
+                              {element.dailyValue ? element.dailyValue : 0}
+                            </strong>
+                          </p>
+                          <strong>%</strong>
+                        </td>
+                      </tr>
+                    )
+                  )
                 ) : (
                   <></>
                 )}
@@ -700,21 +950,28 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
             ) : (
               <></>
             )}
-            <hr
-              style={{
-                width: "95%",
-                borderTop: "1px solid rgb(190, 190, 190)",
-              }}
-            />
-            <div
-              style={{
-                paddingRight: "10px",
-                paddingLeft: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              {langState.referenceIntakeDisclaimer}
-            </div>
+            {locationPlan === "EU" ? (
+              <>
+                <hr
+                  style={{
+                    width: "95%",
+                    borderTop: "1px solid rgb(190, 190, 190)",
+                  }}
+                />
+
+                <div
+                  style={{
+                    paddingRight: "10px",
+                    paddingLeft: "10px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {langState.referenceIntakeDisclaimer}
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
 
             <div
               style={{

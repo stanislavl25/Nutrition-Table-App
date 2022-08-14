@@ -239,15 +239,20 @@ export async function createServer(
   app.get("/products_liveTheme", verifyRequest(app), async (req, res) => {
     try {
       const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const shopData = StoreModel.find({ shop_id: session.shop }).select(
+        "-_id -shop_id"
+      );
       const query = Products.find({
         store_id: session.shop,
         food_product: true,
       }).select("-store_id -productId -is_deleted");
       const productsDatabase = await query.exec();
+      const storeData = await shopData.exec();
       res.status(200).send({
         data: productsDatabase,
         message: "found products!",
         success: true,
+        shopData: storeData,
       });
     } catch (err) {
       res.status(400).send({ success: false, message: "no products found!" });

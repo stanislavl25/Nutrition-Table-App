@@ -98,6 +98,7 @@ function Minerals({
   handleChange,
   allData,
   storeData,
+  handleTabChange,
 }) {
   const handleRiAutoCalculs = () => {
     allData.minerals.forEach((vitamin, index) => {
@@ -175,8 +176,31 @@ function Minerals({
     [storeData.recommendedIntake]
   );
 
+  const handleAutoCalculsOnChangeDV = useCallback((val, index, tag) => {
+    handleChange(val, "minerals", tag, index);
+    const newNutritionDV =
+      (allData.minerals[index].quantity / allData.minerals[index].dailyValue) *
+      100;
+    handleChange(
+      Math.floor(newNutritionDV).toString(),
+      "minerals",
+      "RI",
+      index
+    );
+  });
+
   return (
     <Card>
+      {locationPlan?.plan === "Basic" && locationPlan?.location !== "EU" ? (
+        <Banner status="warning">
+          <Button onClick={() => handleTabChange(5)} plain>
+            Upgrade your plan
+          </Button>{" "}
+          to add more Vitamins
+        </Banner>
+      ) : (
+        <></>
+      )}
       <div
         style={{
           display: "flex",
@@ -195,7 +219,7 @@ function Minerals({
           style={{ margin: "4px" }}
           primary
           disabled={
-            locationPlan?.plan === "basic" && locationPlan?.location !== "EU"
+            locationPlan?.plan === "Basic" && locationPlan?.location !== "EU"
               ? true
               : false
           }
@@ -203,15 +227,7 @@ function Minerals({
           Add
         </Button>
       </div>
-      {locationPlan?.plan === "basic" && locationPlan?.location !== "EU" ? (
-        <TextContainer>
-          <Banner status="warning">
-            Upgrade your plan to add more Vitamins
-          </Banner>
-        </TextContainer>
-      ) : (
-        <></>
-      )}
+
       {data.length === 0 ? (
         <div style={{ textAlign: "center", paddingBottom: "20px" }}>
           <p>Click add to create a new Mineral</p>
@@ -273,6 +289,7 @@ function Minerals({
                         onChange={(e) =>
                           handleChange(e, "minerals", "name", index)
                         }
+                        onBlur={(e) => handleNewRIElem(e.target.value)}
                       />
                     </div>
                     <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
@@ -283,7 +300,7 @@ function Minerals({
                         name="quantity"
                         value={element.quantity || ""}
                         onChange={(e) =>
-                          handleChange(e, "minerals", "quantity", index)
+                          handleAutoCalculsOnChangeDV(e, index, "quantity")
                         }
                       />
                     </div>
@@ -302,7 +319,7 @@ function Minerals({
                         name="dailyValue"
                         value={element.dailyValue || ""}
                         onChange={(e) =>
-                          handleChange(e, "minerals", "dailyValue", index)
+                          handleAutoCalculsOnChangeDV(e, index, "dailyValue")
                         }
                       />
                     </div>

@@ -15,17 +15,19 @@
   {%- endif -%} -->
  
  <script>
-  const fetchProducts = ()=>{
-    fetch("/test",{
+  const fetchProducts = async()=>{
+   const products =await fetch("/apps/products_liveTheme",{
       method:"GET",
       headers:{
         'Content-Type': 'application/json',
         Accept: 'application/json'
       }
-    }).then((res)=>res.text()).then((response)=>
+    }).then((res)=>res.json()).then((response)=>{    
     console.log(response)
-    )
+    console.log("######################################## here")
+  })
   }
+  fetchProducts()
   // const handleBackGroundImage =()=>{
   //   var width = window.innerWidth;
   //   const element = document.getElementById('container')

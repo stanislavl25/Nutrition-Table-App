@@ -16,7 +16,6 @@ const PopOverComponent = ({
   element,
   removeFormFields,
   productToPrepare,
-  dataLength,
 }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
@@ -33,6 +32,10 @@ const PopOverComponent = ({
   const options = [
     { label: "Yes", value: "Yes" },
     { label: "No", value: "No" },
+  ];
+  const unitoptions = [
+    { label: "Grams", value: "Grams" },
+    { label: "MilliGrams", value: "MilliGrams" },
   ];
   return (
     <Popover
@@ -54,16 +57,6 @@ const PopOverComponent = ({
               onChange={(e) => handleChange(e, "nutritionData", "bold", index)}
             />
           </Stack.Item>
-          {/* <Stack.Item>
-            <TextField
-              label="Order"
-              onChange={(e) => handleChange(e, "nutritionData", "order", index)}
-              autoComplete="off"
-              value={element.order}
-              min={0}
-              max={dataLength}
-            />
-          </Stack.Item> */}
         </Stack>
         <TextField
           label="Left Spacing (Table)"
@@ -105,10 +98,11 @@ const PopOverComponent = ({
                 />
               </Stack.Item>
             </Stack>
-            <TextField
+
+            <Select
               label="Prepared Unit"
+              options={unitoptions}
               value={element.preparedProductUnit}
-              autoComplete="off"
               onChange={(e) =>
                 handleChange(e, "nutritionData", "preparedProductUnit", index)
               }
@@ -132,12 +126,28 @@ function NutritionInfoNA({
   handleRemoveNutritionData,
   handleChange,
   productToPrepare,
-  dataLength,
+  data,
+  handleNewRIElem,
 }) {
   const options = [
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
   ];
+
+  const handleAutoCalculsOnChangeDV = useCallback((val, index, tag) => {
+    handleChange(val, "nutritionData", tag, index);
+    const newNutritionDV =
+      (data.nutritionData[index].quantity /
+        data.nutritionData[index].dailyValue) *
+      100;
+    handleChange(
+      Math.floor(newNutritionDV).toString(),
+      "nutritionData",
+      "preparedProductDV",
+      index
+    );
+  });
+
   return (
     <Card sectioned>
       <Stack distribution="equalSpacing">
@@ -199,13 +209,14 @@ function NutritionInfoNA({
                   onChange={(e) =>
                     handleChange(e, "nutritionData", "name", index)
                   }
+                  onBlur={(e) => handleNewRIElem(e.target.value)}
                 />
               </div>
               <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
                 <TextField
                   value={elem.quantity || ""}
                   onChange={(e) =>
-                    handleChange(e, "nutritionData", "quantity", index)
+                    handleAutoCalculsOnChangeDV(e, index, "quantity")
                   }
                 />
               </div>
@@ -239,7 +250,6 @@ function NutritionInfoNA({
                   handleChange={handleChange}
                   removeFormFields={handleRemoveNutritionData}
                   productToPrepare={productToPrepare}
-                  dataLength={dataLength}
                 />
               </div>
             </div>

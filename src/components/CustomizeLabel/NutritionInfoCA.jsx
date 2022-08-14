@@ -15,7 +15,6 @@ const PopOverComponent = ({
   index,
   element,
   removeFormFields,
-  dataLength,
   productToPrepare,
 }) => {
   const [popoverActive, setPopoverActive] = useState(false);
@@ -55,18 +54,6 @@ const PopOverComponent = ({
               label="Bold Name"
             />
           </Stack.Item>
-          {/* <Stack.Item>
-            <TextField
-              label="Order"
-              type="number"
-              name="order"
-              min={0}
-              max={dataLength}
-              value={element.order || ""}
-              onChange={(e) => handleChange(e, "nutritionData", "order", index)}
-              multiline={false}
-            />
-          </Stack.Item> */}
         </Stack>
         <TextField
           label="Left Spacing (Table)"
@@ -89,7 +76,7 @@ const PopOverComponent = ({
                 type="number"
                 value={element.preparedProduct || ""}
                 min={0}
-                name="% RI*"
+                name="% DV*"
                 onChange={(e) =>
                   handleChange(e, "nutritionData", "preparedProduct", index)
                 }
@@ -123,13 +110,29 @@ function NutritionInfoCA({
   handleAddNutritionData,
   handleRemoveNutritionData,
   handleChange,
-  dataLength,
   productToPrepare,
+  data,
+  handleNewRIElem,
 }) {
   const options = [
     { label: "Grams", value: "Grams" },
     { label: "MilliGrams", value: "MilliGrams" },
   ];
+
+  const handleAutoCalculsOnChangeDV = useCallback((val, index, tag) => {
+    handleChange(val, "nutritionData", tag, index);
+    const newNutritionDV =
+      (data.nutritionData[index].quantity /
+        data.nutritionData[index].dailyValue) *
+      100;
+    handleChange(
+      Math.floor(newNutritionDV).toString(),
+      "nutritionData",
+      "preparedProduct",
+      index
+    );
+  });
+
   return (
     <Card>
       <Card.Section>
@@ -204,6 +207,7 @@ function NutritionInfoCA({
                       handleChange(e, "nutritionData", "name", index)
                     }
                     autoComplete="off"
+                    onBlur={(e) => handleNewRIElem(e.target.value)}
                   />
                 </div>
                 <div style={{ flex: "1 0 0 auto", display: "table-cell" }}>
@@ -211,7 +215,7 @@ function NutritionInfoCA({
                     value={element.quantity || 0}
                     name="quantity"
                     onChange={(e) =>
-                      handleChange(e, "nutritionData", "quantity", index)
+                      handleAutoCalculsOnChangeDV(e, index, "quantity")
                     }
                     inputMode="number"
                     autoComplete="off"
@@ -238,7 +242,7 @@ function NutritionInfoCA({
                     value={element.dailyValue || 0}
                     name="dailyValue"
                     onChange={(e) =>
-                      handleChange(e, "nutritionData", "dailyValue", index)
+                      handleAutoCalculsOnChangeDV(e, index, "dailyValue")
                     }
                     autoComplete="off"
                     inputMode="number"
@@ -250,7 +254,6 @@ function NutritionInfoCA({
                     handleChange={handleChange}
                     removeFormFields={handleRemoveNutritionData}
                     index={index}
-                    dataLength={dataLength}
                     productToPrepare={productToPrepare}
                   />
                 </div>
