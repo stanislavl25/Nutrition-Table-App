@@ -99,11 +99,12 @@ export async function createServer(
 
   /** handle food products save */
   app.post("/save_foodProducts", verifyRequest(app), async (req, res) => {
-    const products = req.body.products;
+    const updates = req.body.data;
+    updates["edited"] = true;
     try {
       const update = Products.findByIdAndUpdate(
         { _id: req.body.id },
-        req.body.data,
+        updates,
         (err, docs) => {
           if (err) {
             console.log("######### error", err);
@@ -236,18 +237,21 @@ export async function createServer(
     }
   });
 
-  app.get("/products_liveTheme", verifyRequest(app), async (req, res) => {
+  app.post("/products_liveTheme", async (req, res) => {
+    console.log("live theme#########", req.body.id);
     try {
-      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-      const shopData = StoreModel.find({ shop_id: session.shop }).select(
-        "-_id -shop_id"
-      );
+      const id = req.body.id;
+      console.log(id);
       const query = Products.find({
-        store_id: session.shop,
+        productId: id,
         food_product: true,
-      }).select("-store_id -productId -is_deleted");
+        edited: true,
+      }).select("-productId -is_deleted -_id -createdAt -updatedAt");
       const productsDatabase = await query.exec();
-      const storeData = await shopData.exec();
+      const storeQuery = StoreModel.find({
+        store_id: productsDatabase.store_id,
+      }).select("-shop_id -_id -createdAt -updatedAt");
+      const storeData = await storeQuery.exec();
       res.status(200).send({
         data: productsDatabase,
         message: "found products!",
@@ -424,17 +428,60 @@ export async function createServer(
     });
   });
 
+  /*update store location */
+
+  const updateStoreLocation = (storeId, location) => {
+    const update = StoreModel.findOneAndUpdate(
+      { shop_id: storeId },
+      {
+        location: location,
+      },
+      (err, docs) => {
+        if (err) {
+          console.log("err", err);
+          return false;
+        } else {
+          console.log("location updated successfully!");
+          return true;
+        }
+      }
+    );
+  };
+
   /**return the locations object */
 
   app.get("/locations", verifyRequest(app), async (req, res) => {
-    const { Location } = await import(
-      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-    );
-    const session = await Shopify.Utils.loadCurrentSession(req, res);
-    const locations = await Location.all({
-      session: session,
-    });
-    res.status(200).send(locations);
+    try {
+      const { Location } = await import(
+        `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+      );
+      const session = await Shopify.Utils.loadCurrentSession(req, res);
+      console.log("###############", session.shop);
+      const locations = await Location.all({
+        session: session,
+      });
+      let location;
+      if (locations.length > 0) {
+        const countryCode = locations[0].country_code;
+        if (countryCode.includes("US") || countryCode.includes("UM")) {
+          location = "NA";
+        }
+        if (countryCode.includes("CA")) {
+          location = "CA";
+        } else {
+          location = "EU";
+        }
+      } else {
+        res.status(200).send({ location: "EU" });
+        updateStoreLocation(session.shop, "EU");
+      }
+      res.status(200).send({ location: location });
+      updateStoreLocation(session.shop, location);
+    } catch (err) {
+      res
+        .status(400)
+        .send({ success: false, message: "Something wrong happend!" });
+    }
   });
 
   app.post("/product_Hide", verifyRequest(app), async (req, res) => {

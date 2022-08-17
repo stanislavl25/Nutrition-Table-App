@@ -52,7 +52,6 @@ function TabsPage() {
   );
   const [productsArray, setProductsArray] = useState([]);
   const [location, setLocation] = useState("");
-  const [locationObj, setlocationObj] = useState({});
   const [emptyStore, setEmptyStore] = useState(false);
   const [checkPlan, setCheckPlan] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -142,21 +141,13 @@ function TabsPage() {
   /*** get store location */
   const fetchLocations = async () => {
     try {
-      const data = await fetch("/locations").then((res) => res.json());
-      setlocationObj(data);
-      setLocation("NA");
+      const data = await fetch("/locations")
+        .then((res) => res.json())
+        .then((response) => {
+          console.log(response);
+        });
+      setLocation("EU");
       return;
-      if (data.length) {
-        const countryCode = data[0].country_code;
-        if (countryCode.includes("US") || countryCode.includes("UM")) {
-          setLocation("NA");
-        }
-        if (countryCode.includes("CA")) {
-          setLocation("CA");
-        } else {
-          setLocation("EU");
-        }
-      }
     } catch (err) {
       //Todo
       // console.log(err);
@@ -751,16 +742,6 @@ function TabsPage() {
         .then((response) => console.log(response));
     }
   };
-
-  const testRequest = async () => {
-    const update = await fetch("/products_liveTheme")
-      .then((res) => res.json())
-      .then((response) => console.log(response));
-  };
-
-  useEffect(async () => {
-    await testRequest();
-  }, []);
 
   const toastMarkup = active ? (
     <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />

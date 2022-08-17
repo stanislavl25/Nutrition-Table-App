@@ -6,6 +6,8 @@
 {% endstyle %}
 {% assign body_font_size = block.settings.body_font_size%}
 <nutrition-Table class="container_performance-facts" data-id="{{ block.id }}" style="align-items:{{block.settings.vertical_alignment}};"  >
+  
+  <section id="container" class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadiusMainTable}}px;background-color:{{block.settings.Table_background_color}};  ">
   <!-- {%- if block.settings.heading -%}
     <h1>{{ block.settings.heading }}</h1>
   {%- endif -%}
@@ -14,23 +16,26 @@
     <p>{{ block.settings.description }}</p>
   {%- endif -%} -->
  
+
  <script>
-  const fetchProducts = async()=>{
-   const products =await fetch("/apps/products_liveTheme",{
-      method:"GET",
+  let data = {};
+  const fetchProducts = async(id)=>{ 
+   const products = await fetch("/apps/products_liveTheme",{
+      method:"POST",
       headers:{
         'Content-Type': 'application/json',
         Accept: 'application/json'
-      }
+      }, 
+      body:JSON.stringify({id:id})
     }).then((res)=>res.json()).then((response)=>{    
-    console.log(response)
-    console.log("######################################## here")
-  })
-  }
-  fetchProducts()
+    console.log(response) 
+    data = response;
+  }).catch((err)=>console.log(err))
+  } 
+  fetchProducts({{product.id}})
   // const handleBackGroundImage =()=>{
-  //   var width = window.innerWidth;
-  //   const element = document.getElementById('container')
+    //   var width = window.innerWidth;
+    //   const element = document.getElementById('container')
   //   var imageElem = document.createElement("img");
   //   imageElem.setAttribute("class", "backGroundImage");
   //   imageElem.setAttribute("height", "");
@@ -46,8 +51,9 @@
   // }
   // handleBackGroundImage()
   // window.addEventListener('resize',handleBackGroundImage)
+  console.log('##################',data)
  </script>
-  <section id="container" class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadiusMainTable}}px;background-color:{{block.settings.Table_background_color}};  ">
+  <h1>{data.message}</h1>
     {%- if block.settings.back_ground_image-%}
     <img class="backGroundImage" src="{{block.settings.back_ground_image | img_url: 'large'}}" alt="" height="" width="">
     {%- endif -%}

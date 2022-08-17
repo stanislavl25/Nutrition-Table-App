@@ -9,6 +9,7 @@ const productSchema = new Schema(
     store_id: { type: String },
     productId: { type: String },
     food_product: { type: Boolean, default: true },
+    edited: { type: Boolean, default: false },
     is_deleted: { type: Boolean, default: false },
     image: { type: String },
     product_type: { type: String },
