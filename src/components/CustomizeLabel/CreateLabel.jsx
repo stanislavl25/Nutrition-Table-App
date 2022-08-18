@@ -339,10 +339,11 @@ function CreateLabel({
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
   };
 
-  const handleproductToPrepare = useCallback(
-    (newChecked) => setProductToPrepare(newChecked),
-    []
-  );
+  console.log(data);
+  const handleproductToPrepare = useCallback((newChecked) => {
+    setProductToPrepare(newChecked);
+    handleChange(newChecked, "productToPrepare");
+  }, []);
 
   const handleIngredientsTextChange = async (e, editor) => {
     const editedText = await editor.getData();

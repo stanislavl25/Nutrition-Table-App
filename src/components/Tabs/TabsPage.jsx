@@ -144,7 +144,8 @@ function TabsPage() {
       const data = await fetch("/locations")
         .then((res) => res.json())
         .then((response) => {
-          console.log(response);
+          // console.log(response);
+          // setLocation(response.location)
         });
       setLocation("EU");
       return;

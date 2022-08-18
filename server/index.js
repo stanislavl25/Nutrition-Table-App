@@ -25,7 +25,7 @@ Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
   API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
   SCOPES: process.env.SCOPES.split(","),
-  HOST_NAME: process.env.HOST.replace(/https:\/\//, ""),
+  HOST_NAME: process.env.HOST.replace(/https:\/\//, ""), 
   API_VERSION: ApiVersion.April22,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
@@ -92,18 +92,18 @@ export async function createServer(
     }
   });
 
-  app.post("/test", async (req, res) => {
-    console.log(req.body);
-    res.status(200).send({ message: "RJAA3" });
-  });
-
   /** handle food products save */
   app.post("/save_foodProducts", verifyRequest(app), async (req, res) => {
     const updates = req.body.data;
     updates["edited"] = true;
+    const id = req.body.id;
+    delete updates._id;
+	delete updates.name;
+	delete updates.product_type;
+	delete updates.image;
     try {
       const update = Products.findByIdAndUpdate(
-        { _id: req.body.id },
+        { _id: id },
         updates,
         (err, docs) => {
           if (err) {

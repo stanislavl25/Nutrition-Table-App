@@ -14,6 +14,7 @@ const productSchema = new Schema(
     image: { type: String },
     product_type: { type: String },
     nutriScore: { type: String, default: "A" },
+    productToPrepare: { type: Boolean, default: false },
     richText: {
       ingredientsText: {
         type: String,

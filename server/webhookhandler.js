@@ -1,6 +1,6 @@
 import Products from "./models/productModel.js";
 import Stores from "./models/storeModel.js";
-
+import AppSession from "./models/AppSessionModel";
 export async function handleAllWebhooks(shop, topic, body) {
   switch (topic) {
     case "products/update":
@@ -111,25 +111,11 @@ async function handleProductsCreateHook(shop, body) {
       if (await Products.exists({ store_id: shop, product_id: body.id })) {
         console.log("Product already exists!");
       } else {
-        const datenow = Date.now().toString();
-        var tempData = {};
-        tempData[datenow] = body.variants[0].price.toString();
         var newProduct = Products();
         newProduct.product_id = body.id;
         newProduct.name = body.title;
         newProduct.store_id = shop;
-        newProduct.current_price = body.variants[0].price;
-        newProduct.pricesArray = [tempData];
-        newProduct.compare_price = body.variants[0].compare_at_price;
-        newProduct.lowest_price_x_days = body.variants[0].price;
         newProduct.product_type = body.product_type;
-        newProduct.images = body.images;
-        newProduct.showLowestPriceBoxValue = false;
-        newProduct.showProductSaleStatus = false;
-        newProduct.ignoreSubsequentDiscounts = false;
-        newProduct.selectadditShowPercentage = "always";
-        newProduct.Period = 30;
-        newProduct.templatePresence = [];
         await newProduct.save(function (err, data) {
           if (err) {
             console.log(err);
@@ -174,6 +160,7 @@ async function handleAppDeletionHook(shop, body) {
       if (await Stores.exists({ shop_id: shop })) {
         const deleted = await Stores.deleteOne({ shop_id: shop });
         await Products.deleteMany({ store_id: { $eq: shop } });
+        const deleteAppSession = await AppSession.deleteOne({ shop: shop });
         console.log("Deleted Store Successfully");
       } else {
         console.log("Store Already Deleted");

@@ -4,56 +4,66 @@
     color: #222222;
   }
 {% endstyle %}
-{% assign body_font_size = block.settings.body_font_size%}
 <nutrition-Table class="container_performance-facts" data-id="{{ block.id }}" style="align-items:{{block.settings.vertical_alignment}};"  >
-  
-  <section id="container" class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadiusMainTable}}px;background-color:{{block.settings.Table_background_color}};  ">
-  <!-- {%- if block.settings.heading -%}
-    <h1>{{ block.settings.heading }}</h1>
-  {%- endif -%}
 
-  {%- if block.settings.description -%}
-    <p>{{ block.settings.description }}</p>
-  {%- endif -%} -->
  
+    <!-- {%- if noProducts == true -%}
+      <h1>no products stored on the App!</h1>
+      <h2>you need to modify lables in the App first.</h2>
+    {%- endif -%}
+    {%- if somethingWrong == true -%}
+      <h1>Something wrong happend!</h1>
+      <h2>if this continues contact the App support.</h2>
+    {%- endif -%} -->
 
- <script>
-  let data = {};
-  const fetchProducts = async(id)=>{ 
-   const products = await fetch("/apps/products_liveTheme",{
-      method:"POST",
-      headers:{
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }, 
-      body:JSON.stringify({id:id})
-    }).then((res)=>res.json()).then((response)=>{    
-    console.log(response) 
-    data = response;
-  }).catch((err)=>console.log(err))
-  } 
-  fetchProducts({{product.id}})
-  // const handleBackGroundImage =()=>{
-    //   var width = window.innerWidth;
-    //   const element = document.getElementById('container')
-  //   var imageElem = document.createElement("img");
-  //   imageElem.setAttribute("class", "backGroundImage");
-  //   imageElem.setAttribute("height", "");
-  //   imageElem.setAttribute("width", "");
-  //   imageElem.setAttribute("alt", "");
-  //   if(width>700){
-  //     imageElem.src = "{{block.settings.back_ground_image | img_url: 'large'}}";
-  //     element.prepend(imageElem)
-  //   }else{
-  //     imageElem.src = "{{block.settings.MobileView | img_url: 'large'}}";
-  //     element.prepend(imageElem)
-  //   }
-  // }
-  // handleBackGroundImage()
-  // window.addEventListener('resize',handleBackGroundImage)
-  console.log('##################',data)
- </script>
-  <h1>{data.message}</h1>
+  <section id="container" class="performance-facts" style="width:{{block.settings.tableWidth}}%;border: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}; border-radius:{{block.settings.borderRadiusMainTable}}px;background-color:{{block.settings.Table_background_color}};  "> 
+    {% assign body_font_size = block.settings.body_font_size%}
+    {% assign noProducts = false %}
+    {% assign somethingWrong = false %}
+    {% assign aPreparedPortionIsEquivalentTo = false %}
+    <script>
+     document.addEventListener("DOMContentLoaded",()=>{
+    const topHeaderElem = document.getElementById("header1");
+    const aPreparedPortionIsEquivalentToElem = document.getElementById("aPreparedPortionIsEquivalentTo");
+    let strong = document.createElement("strong");
+      const fetchProducts = async(id)=>{ 
+        const products = await fetch("/apps/products_liveTheme",{
+       method:"POST",
+       headers:{
+         'Content-Type': 'application/json',
+         Accept: 'application/json'
+       }, 
+       body:JSON.stringify({id:id})
+     }).then((res)=>res.json()).then((response)=>{    
+     console.log(response) 
+       if( response.success && !response.data.length>0){
+        {%assign noProducts = false %}
+          return;
+      } if(!response.success){
+        {% assign somethingWrong = false %}
+        return
+      } else if(response.success && response.data.length>0){
+        {%assign noProducts = true %}
+          if(response.shopData[0].location==="EU"){
+          topHeaderElem.innerText = response.shopData[0].NutritionInformation
+        }else{
+          topHeaderElem.innerText = response.shopData[0].nutritionFacts
+        }
+        if(response.shopData[0].location === "EU" && response.data[0].productToPrepare){
+          {% assign aPreparedPortionIsEquivalentTo = true %}
+          strong.innerHTML = response.shopData[0].aPreparedPortionIsEquivalentTo 
+          aPreparedPortionIsEquivalentToElem.append(strong);
+          console.log('#################################################',strong)
+        }
+      }
+
+
+      }).catch((err)=>console.log(err))
+      }
+      fetchProducts({{product.id}});
+      })
+      </script>
+        {%-if noProducts == true -%}
     {%- if block.settings.back_ground_image-%}
     <img class="backGroundImage" src="{{block.settings.back_ground_image | img_url: 'large'}}" alt="" height="" width="">
     {%- endif -%}
@@ -64,13 +74,16 @@
             {%- if block.settings.custom_accordion_icon_opend-%}
             <img src="{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
             {%- endif -%}
-          <h2 class="performance-facts__title header_container" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Nutrition Facts</h2>
+          <h2 id="header1" class="performance-facts__title header_container" style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;"></h2>
           </div>
           {%- if block.settings.custom_accordion_icon_closed-%}
           <img src="{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
           {%- endif -%}
         </div>
       </div>
+      {%-if aPreparedPortionIsEquivalentTo == true -%}
+      <div id="aPreparedPortionIsEquivalentTo" style="color:white; text-align: center; background-color: black; width: 100%; padding-top: 10px; padding-bottom: 10px;"></div>
+      {%- endif -%}
       <hr style="margin:0"/>
         <h4 style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">6 serving per container</h4>
         <div class="performance-facts_secondaryHeader" >
@@ -335,6 +348,7 @@
     </strong>
      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam. 
    </div>
+   {%-endif-%}
   </section>
 </nutrition-Table>
 
