@@ -273,7 +273,7 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
                 )}
                 {locationPlan.location === "NA" ? (
                   <tr>
-                    {locationPlan.location === "NA" && productToPrepare ? (
+                    {productToPrepare ? (
                       <>
                         <th></th>
                         <th

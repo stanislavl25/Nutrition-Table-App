@@ -1,158 +1,39 @@
 @charset "UTF-8";
 
-.container_performance-facts{
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-}
-.performance-facts_secondaryHeader{
-    display:flex;
-    flex-direction: row;
-    justify-content:space-between;
- 
-}
-.performance-facts__header_title{
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-.image {
-  width: 250px;
-  float: left;
-  margin: 20px;
-}
-
-body {
-  font-size: small;
-  line-height: 1.4;
-}
-
-p {
-  margin: 0;
-}
-.backGroundImage{
-  /* pointer-events: none; */
-  position: absolute;
-  height: 100%;
+.table_cont {
   width:100%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: -1;
-}
-.performance-facts {
-  margin: 20px;
-  padding: 0.5rem;
-  overflow: hidden;
-  position:relative;
-  z-index:1;
-}
-.performance-facts table {
   border-collapse: collapse;
+  margin-bottom: 10px;
+  overflow: hidden;
 }
 
-.performance-facts__title {
-  font-weight: bolder;
-  font-size: 3rem;
-  margin: 0 0 0.25rem 0;
+.thtd{
+  border: 1px solid rgb(190, 190, 190);
+  border-left: none;
+  padding: 5px 10px;
 }
 
-.performance-facts__header {
-  padding: 0 0 0.25rem 0;
-  margin: 0 0 0.5rem 0;
-}
-.performance-facts__header p {
-  margin: 0;
-}
-
-.performance-facts__table, .performance-facts__table--grid, .performance-facts__table--small {
-  width: 100%;
-}
-.performance-facts__table thead tr th, .performance-facts__table--grid thead tr th, .performance-facts__table--small thead tr th,
-.performance-facts__table thead tr td,
-.performance-facts__table--grid thead tr td,
-.performance-facts__table--small thead tr td {
-  border: 0;
-}
-.performance-facts__table th, .performance-facts__table--grid th, .performance-facts__table--small th,
-.performance-facts__table td,
-.performance-facts__table--grid td,
-.performance-facts__table--small td {
-  font-weight: normal;
-  text-align: left;
-  padding: 0.25rem 0;
- 
-  white-space: nowrap;
-}
-.performance-facts__table td:last-child, .performance-facts__table--grid td:last-child, .performance-facts__table--small td:last-child {
-  text-align: right;
-}
-.performance-facts__table .blank-cell, .performance-facts__table--grid .blank-cell, .performance-facts__table--small .blank-cell {
-  width: 1rem;
-  border-top: 0;
-}
-.performance-facts__table .thick-row th, .performance-facts__table--grid .thick-row th, .performance-facts__table--small .thick-row th,
-.performance-facts__table .thick-row td,
-.performance-facts__table--grid .thick-row td,
-/* .performance-facts__table--small .thick-row td {
-  border-top-width: 5px;
-} */
-
-.small-info {
-  font-size: 0.9rem;
-}
-
-/* .performance-facts__table--small {
-  border-bottom: 1px solid #999;
-  margin: 0 0 0.5rem 0;
-}
-.performance-facts__table--small thead tr {
-  border-bottom: 1px solid black;
-}
-.performance-facts__table--small td:last-child {
-  text-align: left;
-}
-.performance-facts__table--small th,
-.performance-facts__table--small td {
-  border: 0;
-  padding: 0;
-} */
-
-.performance-facts__table--grid {
-  margin: 0 0 0.5rem 0;
-}
-.performance-facts__table--grid td:last-child {
-  text-align: left;
-}
-.performance-facts__table--grid td:last-child::before {
-  content: "•";
-  font-weight: bold;
-  margin: 0 0.25rem 0 0;
-}
-
-.text-center {
+.td {
   text-align: center;
 }
 
-/* .thick-end {
-  border-bottom: 10px solid black;
-} */
-
-.thin-end {
-  border-bottom: 1px solid black;
-}
-
-.header_container{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
+.table_container{
+  border:1px solid #dcdcdc;
   width: 100%;
+  margin-top: 10px;
 }
+.table_header{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.tbody{
+  border-bottom: 3px solid black;
+}
+ 
+
+
 .arrow {
-  border: solid #949494;
+  border: solid rgb(190, 190, 190);
   border-width: 0 3px 3px 0;
   display: inline-block;
   padding: 6px;
@@ -162,3 +43,10 @@ p {
   transform: rotate(-135deg);
   -webkit-transform: rotate(-135deg);
 }
+
+
+
+ 
+
+
+ 

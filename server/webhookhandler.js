@@ -1,6 +1,6 @@
 import Products from "./models/productModel.js";
 import Stores from "./models/storeModel.js";
-import AppSession from "./models/AppSessionModel";
+import AppSession from "./models/AppSessionModel.js";
 export async function handleAllWebhooks(shop, topic, body) {
   switch (topic) {
     case "products/update":
@@ -18,8 +18,7 @@ export async function handleAllWebhooks(shop, topic, body) {
   }
 }
 async function handleProductsUpdateHook(shop, body) {
-  console.log(body);
-
+  // console.log(body);
   //   try {
   //     var newPricesArray = [];
   //     if (shop && body) {
@@ -108,7 +107,14 @@ async function handleProductsUpdateHook(shop, body) {
 async function handleProductsCreateHook(shop, body) {
   try {
     if (shop && body) {
-      if (await Products.exists({ store_id: shop, product_id: body.id })) {
+      console.log(shop);
+      const id = body.id.toString();
+      const check = await Products.exists({ store_id: shop, product_id: id });
+      console.log(
+        "################################################ create",
+        check
+      );
+      if (check) {
         console.log("Product already exists!");
       } else {
         var newProduct = Products();
@@ -116,6 +122,8 @@ async function handleProductsCreateHook(shop, body) {
         newProduct.name = body.title;
         newProduct.store_id = shop;
         newProduct.product_type = body.product_type;
+        newProduct.image =
+          body.images && body.images.length ? body.images[0].src : null;
         await newProduct.save(function (err, data) {
           if (err) {
             console.log(err);
@@ -136,10 +144,16 @@ async function handleProductsCreateHook(shop, body) {
 async function handleProductsDeletionHook(shop, body) {
   try {
     if (shop && body) {
-      if (await Products.exists({ store_id: shop, product_id: body.id })) {
+      const id = body.id.toString();
+      const check = await Products.exists({ store_id: shop, product_id: id });
+      if (check) {
+        console.log(
+          "################################################# delete",
+          id
+        );
         const deleted = await Products.deleteOne({
           store_id: shop,
-          product_id: body.id,
+          product_id: id,
         });
         console.log("Deleted product Successfully");
       } else {
