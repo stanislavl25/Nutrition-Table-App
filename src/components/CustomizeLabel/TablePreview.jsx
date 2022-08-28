@@ -565,7 +565,6 @@ function TablePreview({ data, productToPrepare, locationPlan, langState }) {
                           {element.name}
                         </p>
                       </td>
-                      {/* //ddd!! todo tansech Mg unit */}
                       <td className="thtd td">
                         {element.per100g}{" "}
                         {element.unit === "Milligrams" ? "mg" : "g"}

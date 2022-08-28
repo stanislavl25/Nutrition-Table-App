@@ -112,7 +112,7 @@ export async function createServer(
               .status(400)
               .send({ message: "Something wrong happend!", success: false });
           } else {
-            console.log("######### success");
+            console.log("######### success",docs);
             res.status(200).send({ message: "updates saved!", success: true });
           }
         }
