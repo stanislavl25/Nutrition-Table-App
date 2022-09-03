@@ -19,7 +19,7 @@ function PricinPlans({ plan, handlePlan }) {
     <Page
       title="Plans and Pricing"
       divider
-      subtitle={<Badge status="info">Basic</Badge>}
+      subtitle={<Badge status="info">{plan}</Badge>}
     >
       <Layout>
         <Layout.Section oneThird>

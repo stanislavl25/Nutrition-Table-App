@@ -1,14 +1,27 @@
-import { Card } from "@shopify/polaris";
+import { Card, TextStyle } from "@shopify/polaris";
 import React from "react";
 import RichTextEditor from "../RichText/RichTextEditor";
 
 function AllergyInfo({ data, allergyInfoText, handleTextChange }) {
   return (
     <Card sectioned title={data}>
-      <RichTextEditor
-        text={allergyInfoText}
-        handleTextChange={handleTextChange}
-      />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          marginBottom: "10px",
+          gap: "7px",
+        }}
+      >
+        <TextStyle variation="subdued">
+          (Please separate each allergen with a comma like this: "allergen 1,
+          allergen 2,...")
+        </TextStyle>
+        <RichTextEditor
+          text={allergyInfoText}
+          handleTextChange={handleTextChange}
+        />
+      </div>
     </Card>
   );
 }

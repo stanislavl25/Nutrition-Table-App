@@ -408,20 +408,7 @@ function MyLablesTable({
   const rowMarkup =
     productsArray !== "none" ? (
       productsArray?.map(
-        (
-          {
-            _id,
-            name,
-            Calories,
-            totalFat,
-            Carbohydrate,
-            Protein,
-            Salt,
-            food_product,
-            image,
-          },
-          index
-        ) => (
+        ({ _id, name, Calories, food_product, image }, index) => (
           <IndexTable.Row
             id={name}
             key={index}
@@ -435,15 +422,15 @@ function MyLablesTable({
               <TextStyle variation="strong">{name}</TextStyle>
             </IndexTable.Cell>
             <IndexTable.Cell>{Calories ? Calories : "0"} g</IndexTable.Cell>
-            <IndexTable.Cell>{totalFat ? totalFat : "0"} g</IndexTable.Cell>
-            <IndexTable.Cell>
-              {Carbohydrate ? Carbohydrate : "0"} g
-            </IndexTable.Cell>
-            <IndexTable.Cell>{Protein ? Protein : "0"} g</IndexTable.Cell>
-            <IndexTable.Cell>{Salt ? Salt : "0"} g</IndexTable.Cell>
             <IndexTable.Cell>
               {food_product === true ? "Yes" : "No"}
             </IndexTable.Cell>
+            <IndexTable.Cell></IndexTable.Cell>
+            <IndexTable.Cell></IndexTable.Cell>
+            <IndexTable.Cell></IndexTable.Cell>
+            <IndexTable.Cell></IndexTable.Cell>
+            <IndexTable.Cell></IndexTable.Cell>
+
             <IndexTable.Cell>
               <div
                 style={{
@@ -525,12 +512,8 @@ function MyLablesTable({
         onSelectionChange={handleSelectionChange}
         headings={[
           { title: "" },
-          { title: "Products" },
+          { title: "Product" },
           { title: "Calories" },
-          { title: "Total Fat" },
-          { title: "Carbohydrate" },
-          { title: "Protein" },
-          { title: "Salt" },
           { title: "Food Product" },
         ]}
       >

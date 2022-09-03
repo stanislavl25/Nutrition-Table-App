@@ -3,14 +3,13 @@
 .table_cont {
   width:100%;
   border-collapse: collapse;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   overflow: hidden;
 }
 
 .thtd{
   border: 1px solid rgb(190, 190, 190);
-  border-left: none;
-  padding: 5px 10px;
+  border-left: none; 
 }
 
 .td {

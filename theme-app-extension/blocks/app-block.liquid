@@ -1,5 +1,5 @@
 <nutrition-Table data-id="{{ block.id }}">
-  <section style=" display:flex;flex-direction: column;justify-content: center;width: 100%;align-items:{{block.settings.vertical_alignment}};"> 
+  <section style="display:flex;flex-direction:column;justify-content:center;width:100%;align-items:{{block.settings.vertical_alignment}};"> 
     {% assign body_font_size = block.settings.body_font_size%}
     {% assign ProductsExist = false %}
     {% assign somethingWrong = false %}
@@ -7,6 +7,7 @@
     {% assign ServingspercontainerNA = false %}
     {% assign servingSizeCA = false %}
     {% assign caloriesPerServingBasic = false %}
+    {% assign ingredientsIcon =  block.settings.Custom_ingredient_icon %}
     <script>
      document.addEventListener("DOMContentLoaded",()=>{
     const topHeaderElem = document.getElementById("header1");
@@ -26,7 +27,7 @@
        if( response.success && !response.data.length>0){
         {%assign ProductsExist = false %}
           return;
-      } if(!response.success){
+      } if(response.success === false){
         {% assign somethingWrong = true %}
         return
       } else if(response.success && response.data.length>0){
@@ -629,26 +630,27 @@
 
         const container= document.getElementById("container")
         const div = document.createElement("div")
-        div.style.cssText = "padding:0px"
+        div.style.cssText = "padding:0px;display:flex;flex-direction:column;align-items:center;width:100%;gap:5px;"
         
         if(data.richText.notesText.length > 0){
           const div1 = document.createElement("div")
           const div2 = document.createElement("div")
           const p = document.createElement("p")
-          div1.style.cssText = "margin-bottom:10px;width:100%;"
+          div1.style.cssText = "width:100%;"
           div2.style.cssText = "padding-left:10px;padding-right:10px;"
-          p.innerText =  data.richText.notesText
+          p.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;"
+          p.innerHTML =  data.richText.notesText
           div2.append(p);
           div1.append(div2);
           div.append(div1);
           
-          if(shop.location === "EU"){
+          if(shop.location === "EU" && shop.referenceIntakeDisclaimer.trim().length > 0){
             const hr = document.createElement("hr");
-            hr.style.cssText = "width:95%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            hr.style.cssText = "margin:0;height:{{block.settings.primaryBorderThickness}}px;width:95%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
             const div1 = document.createElement("div");
-            div1.style.cssText = "padding-right:10px;padding-left:10px;margin-bottom:10px;";
+            div1.style.cssText = "padding-left:10px;padding-right:10px;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;";
             div1.innerText = shop.referenceIntakeDisclaimer
-            div.append(hr)
+            div.append(hr);
             div.append(div1);
           }
         }
@@ -657,19 +659,21 @@
           const div1 = document.createElement("div");
           const div2 = document.createElement("div");
           const div3 = document.createElement("div");
-          const h4 = document.createElement("h4");
-          const p = document.createElement("p"); 
+          const div5 = document.createElement("div");
+          const h4 = document.createElement("h4"); 
           const hr = document.createElement("hr");
           const image = document.createElement("img");
           const image1 = document.createElement("img");
-          div1.style.cssText = "border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};padding-right:10px;padding-left:10px;margin-bottom:10px;width:100%;"
-          div2.style.cssText = "display:flex;flex-direction:row;align-items:center;margin-top:10px;width:100%;"
-          div3.style.cssText = "display: flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;padding-left:4px;padding-right:4px;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
+          div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
+          div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
+          h4.style.cssText = "font-weight:bolder;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;"
+          div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
           
           image.src = "{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}";
           image.width = "15"
           image.height = "15"
-          image.style.cssText = "margin-right: 10px;"
+          image.style.cssText = "margin-right:10px;"
           div3.append(image)
           
           h4.innerText = shop.Ingredients
@@ -678,36 +682,125 @@
           image1.src = "{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}";
           image1.width = "15"
           image1.height = "15"
-          image1.style.cssText = "margin-right: 10px;"
+          image1.style.cssText = "margin-right:10px;"
           div2.append(div3);
           div2.append(image1);
           
-          hr.style.cssText = "width:100%;margin-top:10px;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
-          div2.append(hr);
-          
-          p.innerText = data.richText.allergyInfoText
-          div2.append(p);
+          hr.style.cssText = "margin:0;margin-bottom:10px;height:{{block.settings.primaryBorderThickness}}px;width:100%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+          div1.append(div2)
+          div1.append(hr);
 
-          div.append(div2);
-          
+        
+          let str = data.richText.ingredientsText.replace("<p>", ""); 
+            str = str.replace("</p>", "");             
+            const arr = str.split(','); 
+
+              arr.forEach((elem)=>{
+                const div4 = document.createElement("div");
+                const image3 = document.createElement('img');
+                const p = document.createElement("p"); 
+                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;"
+                p.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px"                
+                  
+                image3.src = "{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}";
+                image3.width = "10"
+                image3.height = "10"
+                div4.append(image3);
+
+                p.innerHTML = elem;
+                div4.append(p);
+                div5.append(div4)
+              })
+       
+            
+            div1.append(div5);
+            div.append(div1);
+            
 
         }
 
-        if(data.richText.allergyInfoText.length > 0){}
+        if(data.richText.allergyInfoText.length > 0){
 
-        if(data.richText.lEGALNOTICEText.length > 0){}
+          const div1 = document.createElement("div");
+          const div2 = document.createElement("div");
+          const div3 = document.createElement("div");
+          const div5 = document.createElement("div");
+          const h4 = document.createElement("h4"); 
+          const hr = document.createElement("hr");
+          const image = document.createElement("img");
+          const image1 = document.createElement("img");
+          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
+          div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
+          div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
+          h4.style.cssText = "font-weight:bolder;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;"
+          div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
+          
+          image.src = "{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}";
+          image.width = "15"
+          image.height = "15"
+          image.style.cssText = "margin-right:10px;"
+          div3.append(image)
+          
+          h4.innerText = shop.AllergyInformation
+          div3.append(h4)
+          
+          image1.src = "{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}";
+          image1.width = "15"
+          image1.height = "15"
+          image1.style.cssText = "margin-right:10px;"
+          div2.append(div3);
+          div2.append(image1);
+          
+          hr.style.cssText = "margin:0;height:{{block.settings.primaryBorderThickness}}px;width:100%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};margin-bottom:10px;"
+          div1.append(div2)
+          div1.append(hr);
+
+        
+          let str = data.richText.allergyInfoText.replace("<p>", ""); 
+            str = str.replace("</p>", "");             
+            const arr = str.split(','); 
+
+              arr.forEach((elem)=>{
+                const div4 = document.createElement("div");
+                const image3 = document.createElement('img');
+                const p = document.createElement("p"); 
+                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;"
+                p.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px"                
+                  
+                image3.src = "{{block.settings.Custom_allergen_icon | img_url: '10*10'}}";
+                image3.width = "10"
+                image3.height = "10"
+                div4.append(image3);
+
+                p.innerHTML = elem;
+                div4.append(p);
+                div5.append(div4)
+              })
+       
+            div1.append(div5);
+            div.append(div1);
+
+        }
+
+        if(data.richText.lEGALNOTICEText.length > 0){
+          const div1 = document.createElement("div");
+          div1.classList.add("LEGAL_NOTICE");
+          div1.style.cssText = "margin-top:10px;";
+          div1.innerHTML = data.richText.lEGALNOTICEText;
+          div.append(div1);
+        }
         //append the div that takes elements under table to container
         container.append(div);
 
       }
     }).catch((err)=>{ 
-      {% assign somethingWrong = true %}
+      // {% assign somethingWrong = true %}
       console.log(err)
       })
       }
       fetchProducts({{product.id}});
       })
-      </script>
+    </script>
 
 
     {%- if ProductsExist == false -%}
@@ -745,24 +838,25 @@
 
         </div>
       </div>
+    </div>
 
-      {%-if aPreparedPortionIsEquivalentTo == true -%}
+    {%-if aPreparedPortionIsEquivalentTo == true -%}
       <div id="aPreparedPortionIsEquivalentTo" style="color:white; text-align: center; background-color: black; width: 100%; padding-top: 10px; padding-bottom: 10px;"></div>
-      {%- endif -%}
+    {%- endif -%}
 
-      {%-if ServingspercontainerNA == true -%}
+    {%-if ServingspercontainerNA == true -%}
       <div style="border-bottom: 3px solid black;">
         <div id="ServingspercontainerNA"></div>
         <div id="ServingSizeNA" style="display: flex; flex-direction: row;align-items: center;justify-content: space-between;">
         </div>
       </div>
-      {%- endif -%}
+    {%- endif -%}
 
-      {%-if servingSizeCA== true -%}
+    {%-if servingSizeCA== true -%}
       <div id="servingSizeCA" style="display:flex;flex-direction:column;border-bottom: 3px solid black;"></div>
-      {%- endif -%}
+    {%- endif -%}
 
-      {%-if caloriesPerServingBasic == true -%}
+    {%-if caloriesPerServingBasic == true -%}
       <div>
         <div id="caloriesPerServingBasic" style="padding-left:4px;padding-right:4px;display: flex; flex-direction: row;align-items: center; justify-content: space-between;"></div>
         <div style="height:40px;display:flex;flex-direction:row;align-items:center;gap:10px;">
@@ -772,211 +866,16 @@
         </p>
       </div>
       </div>
-      {%- endif -%}
+    {%- endif -%}
 
-        <!-- <h4 style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">6 serving per container</h4>
-        <div class="performance-facts_secondaryHeader" >
-          <h3 style="margin:0; font-weight: bold;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">Serving size </h3>
-          <h3 style="margin:0; font-weight: bold;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">1 cup (230g) </h3>
-        </div> -->
-    </div>
     <table  class="table_cont">
      <thead></thead>
       <tbody id="tbody" class="tbody">
-        <!--  
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
-          <th colspan="2">
-            <b>Total Carbohydrate</b>
-            17g
-          </th>
-          <td>
-            <b>6%</b>
-          </td>
-        </tr>--> 
       </tbody>
       <tfoot id="tfoot"></tfoot>
     </table>
-    <!-- <table class="performance-facts__table--grid">
-      <tbody>
-        <tr style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
-          <td colspan="2" >
-            Vitamin A
-            10%
-          </td>
-          <td>
-            Vitamin C
-            0%
-          </td>
-        </tr>
-        <tr style="border-bottom:{{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">
-          <td colspan="2">
-            Calcium
-            10%
-          </td>
-          <td>
-            Iron
-            6%
-          </td>
-        </tr>
-      </tbody>
-    </table> -->
-    <!-- <p style="border-bottom:1px solid black;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">Salt content is exclusively due to the presence of naturally occurring sodium.</p>
-    <p style="border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;">*Reference intake of an average adult (8 400 kJ / 2 000 kcal)</p> -->
-    <div class="header_container" style="border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
-      <div style="display:flex;flex-direction:row;align-items:center;gap:10px;">
 
-        {%- if block.settings.custom_accordion_icon_opend-%}
-        <img src="{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
-        {%- endif -%}
-
-      <h2 style="font-weight:bolder;font-size:3rem;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Ingredients</h2>
-      </div>
-
-      {%- if block.settings.custom_accordion_icon_closed-%}
-      <img src="{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
-      {%- endif -%}
-
-    </div>
-    <div style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;display:flex;
-    flex-wrap:wrap;gap:5px;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;margin-bottom:10px;">
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:100px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Mandarin Oranges (37.9%)</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Light Whipping Cream (<strong>Milk</strong>)</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peras (12.4%)</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peaches (7.7%)</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Thompson Seedles Grapes (7.6%)</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Apple (7.5%)</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Banana (5.9%)</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_ingredient_icon-%}
-      <img src="{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%}
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">English Walnuts <strong>(Tree Nuts)</strong></p>
-    </div>
-      </div>
-    <div class="header_contaier" style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
-      <div style="display:flex;flex-direction:row;align-items:center;gap:10px;">
-        
-        {%- if block.settings.custom_accordion_icon_opend-%}
-        <img src="{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
-        {%- endif -%}
-
-      <h2 style="font-weight:bolder;font-size: 3rem;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;">Allergy Information</h2>
-      </div>
-      
-      {%- if block.settings.custom_accordion_icon_closed-%}
-      <img src="{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
-      {%- endif -%}
-
-    </div>
-    <div style="border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;display:flex;
-    flex-wrap:wrap;gap:5px;text-align:center;">
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_allergen_icon-%}
-      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%} 
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px;">Contains Wheat</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_allergen_icon-%}
-      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%} 
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Almond</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_allergen_icon-%}
-      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%} 
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Peanut</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_allergen_icon-%}
-      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%} 
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Soy</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_allergen_icon-%}
-      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%} 
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">Milk</p>
-    </div>
-    <div style="display:flex;flex-direction: row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px; background-color:{{block.settings.cells_background_color}};text-align:center;padding:2px;">
-      
-      {%- if block.settings.Custom_allergen_icon-%}
-      <img src="{{block.settings.Custom_allergen_icon | img_url: '10*10'}}"   alt="" width="10" height="10">
-      {%- endif -%} 
-
-      <p style="font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px">It May contain other tree nuts</p>
-    </div>
-    </div>
-   <div  style="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;margin-top:10px;">
-    <strong>
-      *LEGAL NOTICE
-    </strong>
-     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed elementum risus tempor, blandit nisi sollicitudin, varius diam. 
-   </div>
-   {%-endif-%}
+    {%-endif-%}
   </div>
   </section>
 </nutrition-Table>
@@ -1180,19 +1079,4 @@
   ]
 }
 {% endschema %}
-<!-- {
- "type":"paragraph",
- "content":"These settings affect the text on the whole section."
-}, -->
-
-
-
-<!-- {
- "type":"paragraph",
- "content":"Modify the style of the cells"
-}, -->
-
-<!-- {
- "type":"paragraph",
- "content":"Extra styling options, such as icons and icons color."
-}, -->
+ 
