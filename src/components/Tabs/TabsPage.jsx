@@ -6,6 +6,7 @@ import {
   Frame,
   useIndexResourceState,
 } from "@shopify/polaris";
+import { Redirect } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../../App";
 import MyLables from "../MyLabels/MyLables";
@@ -518,6 +519,7 @@ function TabsPage() {
 
   useEffect(async () => {
     let isSubscribed = true;
+    await handlePlan();
     await fetchProducts();
     handleSettingDefaultData();
     handleRecommendedIntakeData();
@@ -712,9 +714,19 @@ function TabsPage() {
       const data = await fetch("/recurring-subscribtion", fetchOptions)
         .then((res) => res.json())
         .then(async (response) => {
-          if (response.success) {
-            setToastMessage(response.message);
-            toggleActive();
+          // if (response.success) {
+          //   setToastMessage(response.message);
+          //   toggleActive();
+          // }
+          if (
+            response.confirmation_url !== undefined &&
+            response.confirmation_url.length > 0
+          ) {
+            app.dispatch(
+              Redirect.toRemote({
+                url: response.confirmation_url,
+              })
+            );
           }
         });
       setShopPlan(planType);

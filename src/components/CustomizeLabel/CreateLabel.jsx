@@ -339,7 +339,6 @@ function CreateLabel({
     setData((prevState) => ({ ...prevState, nutriScore: newState }));
   };
 
-  console.log(data);
   const handleproductToPrepare = useCallback((newChecked) => {
     setProductToPrepare(newChecked);
     handleChange(newChecked, "productToPrepare");
@@ -420,11 +419,7 @@ function CreateLabel({
 
   const updateNonFoodStatus = () => {
     let count = 0;
-    if (
-      selectedOptions.length === 0 ||
-      selectedOptions.length === 1 ||
-      data.food_product === undefined
-    ) {
+    if (selectedOptions.length === 0 || data.food_product === undefined) {
       handleChange(true, "food_product");
       return;
     }
@@ -450,7 +445,7 @@ function CreateLabel({
       primaryAction={{
         content: "Save Label",
         onAction: () => {
-          handleSaveSelectedProducts(!data.food_product, data, selectedOptions);
+          handleSaveSelectedProducts(data.food_product, data, selectedOptions);
         },
       }}
       fullWidth
@@ -489,7 +484,7 @@ function CreateLabel({
               data={data}
               handleChange={handleChange}
             />
-            {!data.food_product ? (
+            {selectedOptions.length > 0 && data.food_product === false ? (
               <Card sectioned>
                 <div
                   style={{
@@ -614,7 +609,7 @@ function CreateLabel({
                 className="button remove"
                 onClick={() =>
                   handleSaveSelectedProducts(
-                    !data.food_product,
+                    data.food_product,
                     data,
                     selectedOptions
                   )
@@ -626,7 +621,7 @@ function CreateLabel({
           </div>
           {/* //  Todo right side page */}
           <div style={{ width: rightSideWidth, marginTop: "10px" }}>
-            {!data.food_product ? (
+            {selectedOptions.length > 0 && data.food_product === false ? (
               <></>
             ) : (
               <TablePreview

@@ -125,10 +125,18 @@ function NutritionInfo({
       storeData.recommendedIntake.forEach((elem, i) => {
         if (nutrition.name === elem.name) {
           if (elem.quantity > 0) {
-            const newRI = Math.floor(
-              (nutrition.perportion / elem.quantity) * 100
-            ).toString();
-            handleChange(newRI, "nutritionData", "RI", index);
+            const newRI = (nutrition.perportion / elem.quantity) * 100;
+            var num = Number(newRI);
+            var roundedString = num.toFixed(1);
+            let numAfterUnitCheck;
+            if (elem.unit === "Milligrams") {
+              numAfterUnitCheck = roundedString + " k";
+            } else if (elem.unit === "Micrograms") {
+              numAfterUnitCheck = roundedString + " m";
+            } else {
+              numAfterUnitCheck = roundedString;
+            }
+            handleChange(numAfterUnitCheck, "nutritionData", "RI", index);
           } else {
             handleChange("0", "nutritionData", "RI", index);
           }
@@ -142,12 +150,9 @@ function NutritionInfo({
     const division =
       data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
     const newNutritionPortion = data.nutritionData[index].per100g / division;
-    handleChange(
-      Math.floor(newNutritionPortion).toString(),
-      "nutritionData",
-      "perportion",
-      index
-    );
+    var num = Number(newNutritionPortion);
+    var roundedString = num.toFixed(1);
+    handleChange(roundedString, "nutritionData", "perportion", index);
     handleRiAutoCalculs();
   });
 
@@ -156,12 +161,9 @@ function NutritionInfo({
       data?.servingSize.EU.DefaultAmount / data?.servingSize.EU.PortionSize;
     data?.nutritionData.forEach((elem, index) => {
       const newNutritionPortion = elem.per100g / division;
-      handleChange(
-        Math.floor(newNutritionPortion).toString(),
-        "nutritionData",
-        "perportion",
-        index
-      );
+      var num = Number(newNutritionPortion);
+      var roundedString = num.toFixed(1);
+      handleChange(roundedString, "nutritionData", "perportion", index);
     });
     handleRiAutoCalculs();
   };

@@ -5,6 +5,7 @@ import { Shopify, ApiVersion } from "@shopify/shopify-api";
 import "dotenv/config";
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
+import verifyHmac from "./middleware/verifyHmac.js";
 import db from "./db.js";
 import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
@@ -25,15 +26,11 @@ Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
   API_SECRET_KEY: process.env.SHOPIFY_API_SECRET,
   SCOPES: process.env.SCOPES.split(","),
-  HOST_NAME: process.env.HOST.replace(/https:\/\//, ""), 
+  HOST_NAME: process.env.HOST.replace(/https:\/\//, ""),
   API_VERSION: ApiVersion.April22,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
-  SESSION_STORAGE: new Shopify.Session.CustomSessionStorage(
-    storeCallback,
-    loadCallback,
-    deleteCallback
-  ),
+  SESSION_STORAGE: new Shopify.Session.MongoDBSessionStorage("mongodb://localhost:27017/", "nutritiontable"),
 });
 
 // Storing the currently active shops in memory will force them to re-login when your server restarts. You should
@@ -44,21 +41,43 @@ Shopify.Webhooks.Registry.addHandlers({
   APP_UNINSTALLED: {
     path: "/webhooks",
     webhookHandler: async (topic, shop, body) => {
-      // delete ACTIVE_SHOPIFY_SHOPS[shop];
-      //sessionStorage.deleteActiveShop(shop);
-      console.log("APP_UNINSTALLED WEBHOOK HANDLER TRIGGERED");
+      console.log(topic);
+      handleAllWebhooks(shop, topic, JSON.parse(body));
+    },
+  },
+   PRODUCTS_CREATE: {
+    path: "/webhooks",
+    webhookHandler: async (topic, shop, body) => {
+      console.log(topic);
+      handleAllWebhooks(shop, topic, JSON.parse(body));
     },
   },
   PRODUCTS_UPDATE: {
     path: "/webhooks",
     webhookHandler: async (topic, shop, body) => {
-      console.log("PRODUCTS_UPDATE WEBHOOK HANDLER TRIGGERED");
+      console.log(topic);
+      handleAllWebhooks(shop, topic, JSON.parse(body));
     },
   },
-  ORDERS_CREATE: {
+  PRODUCTS_DELETE: {
     path: "/webhooks",
     webhookHandler: async (topic, shop, body) => {
-      console.log("ORDERS_CREATE WEBHOOK HANDLER TRIGGERED");
+      console.log(topic);
+      handleAllWebhooks(shop, topic, JSON.parse(body));
+    },
+  },
+  THEMES_PUBLISH: {
+    path: "/webhooks",
+    webhookHandler: async (topic, shop, body) => {
+      console.log(topic);
+      handleAllWebhooks(shop, topic, JSON.parse(body));
+    },
+  },
+  THEMES_UPDATE: {
+    path: "/webhooks",
+    webhookHandler: async (topic, shop, body) => {
+      console.log(topic);
+      handleAllWebhooks(shop, topic, JSON.parse(body));
     },
   },
 });
@@ -72,35 +91,49 @@ export async function createServer(
   app.set("top-level-oauth-cookie", TOP_LEVEL_OAUTH_COOKIE);
   app.set("active-shopify-shops", ACTIVE_SHOPIFY_SHOPS);
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
-  app.use(express.json());
   app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
 
   applyAuthMiddleware(app);
 
   app.post("/webhooks", async (req, res) => {
     try {
-      const topic = req.headers["x-shopify-topic"];
-      console.log(topic);
-      const shop = req.headers["x-shopify-shop-domain"];
-      await handleAllWebhooks(shop, topic, req.body);
-      const a = await Shopify.Webhooks.Registry.process(req, res);
-      console.log(a);
-      console.log(`Webhook processed, returned status code 200`);
+      await Shopify.Webhooks.Registry.process(req, res);
+      res.status(200).end()
     } catch (error) {
       console.log(`Failed to process webhook: ${error}`);
-      res.status(500).send(error.message);
+      if (!res.headersSent) {
+        res.status(500).send(error.message);
+      }
     }
   });
-
+  app.use(express.json());
+  app.post("/gdpr/:GDPRwebhook", verifyHmac, async (req, res) => {
+    try {
+      const topic = req.headers["x-shopify-topic"];
+      const shop = req.headers["x-shopify-shop-domain"];
+      console.log("gdpr hmac verified");
+      console.log(topic);
+      console.log(shop);
+      if (topic === "shop/redact"){
+        handleAllWebhooks(shop, topic, req.body)
+      }
+      res.status(200).end()
+    } catch (error) {
+      console.log(`Failed to process webhook: ${error}`);
+      if (!res.headersSent) {
+        res.status(500).send(error.message);
+      }
+    }
+  });
   /** handle food products save */
   app.post("/save_foodProducts", verifyRequest(app), async (req, res) => {
     const updates = req.body.data;
     updates["edited"] = true;
     const id = req.body.id;
     delete updates._id;
-	delete updates.name;
-	delete updates.product_type;
-	delete updates.image;
+    delete updates.name;
+    delete updates.product_type;
+    delete updates.image;
     try {
       const update = Products.findByIdAndUpdate(
         { _id: id },
@@ -112,7 +145,7 @@ export async function createServer(
               .status(400)
               .send({ message: "Something wrong happend!", success: false });
           } else {
-            console.log("######### success",docs);
+            console.log("######### success", docs);
             res.status(200).send({ message: "updates saved!", success: true });
           }
         }
@@ -266,6 +299,11 @@ export async function createServer(
   /***
    * get all products with the same shop_id
    */
+  function subtractDays(dateObj, numDays) {
+    dateObj.setDate(dateObj.getDate() - numDays);
+    return dateObj;
+  }
+
   app.get("/products-list", verifyRequest(app), async (req, res) => {
     try {
       const session = await Shopify.Utils.loadCurrentSession(req, res, true);
@@ -346,86 +384,295 @@ export async function createServer(
   //   }
   // };
 
+  const checkTrialEnd = async (shop_id) => {
+    const storeQuery = StoreModel.find({ shop_id: shop_id });
+    const store = await storeQuery.exec();
+    const shopCreationDate = new Date(store[0].createdAt);
+    const freeTrialDone_Paid = store[0].freeTrialDone_Paid;
+    if (freeTrialDone_Paid) return "paid";
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - shopCreationDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays >= 1) return false;
+    return true;
+  };
+
   app.post("/recurring-subscribtion", verifyRequest(app), async (req, res) => {
-    const plan = req.body.planType;
+    let plan = req.body.planType;
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const store = session.shop;
-    // const accessToken = await AppSession.findOne({ shop: store })
-    //   .select("accessToken -_id")
-    //   .exec();
+    const storeQuery = StoreModel.find({ shop_id: store });
+    const shopData = await storeQuery.exec();
+    const firstTimeOpen = shopData[0].firstTimeOpenApp;
+    if (plan === undefined && firstTimeOpen) {
+      plan = "Basic";
+    }
+    if (plan === undefined) {
+      res.status(200).send({ success: true });
+      return;
+    }
+    console.log("plan ############", firstTimeOpen);
+    try {
+      const data = await StoreModel.findOneAndUpdate(
+        {
+          shop_id: store,
+        },
+        {
+          firstTimeOpenApp: false,
+        },
+        {
+          returnOriginal: false,
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
+
+    let client = new Shopify.Clients.Graphql(store, session.accessToken);
+    const { RecurringApplicationCharge, ApplicationCharge, Shop } =
+      await import(
+        `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+      );
+
+    const current_subscriptions = await RecurringApplicationCharge.all({
+      session: session,
+    });
+
     let plan_price;
     if (plan === "Basic") {
       plan_price = 10;
-      try {
-        const data = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          { shop_plan: plan }
-        );
-      } catch (err) {
-        console.log(err);
-      }
     }
     if (plan === "Advanced") {
       plan_price = 25;
-      try {
-        const data = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          { shop_plan: plan }
-        );
-      } catch (err) {
-        console.log(err);
-      }
     }
     if (plan === "Entreprise") {
       plan_price = 100;
+    }
+    const check = await checkTrialEnd(session.shop);
+    if (check === "paid") {
+      console.log("trial done and plan paid!");
+    }
+    if (check === true) {
+      console.log("your free trial still on mf!!", check);
       try {
         const data = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          { shop_plan: plan }
+          {
+            shop_id: store,
+          },
+          {
+            AlreadySubscribed: true,
+            shop_plan: plan,
+          },
+          {
+            returnOriginal: false,
+          }
         );
       } catch (err) {
         console.log(err);
       }
+      res.status(200).send({
+        success: true,
+        message: "Plan updated successfully!",
+      });
+      return;
+    } else if (check === false) {
+      console.log("your free trial ended!!");
+
+      const filtered_subscriptions = current_subscriptions.filter(
+        (subscription) => subscription.status === "active"
+      );
+
+      if (filtered_subscriptions.length > 0) {
+        console.log("subscription status is active");
+        try {
+          const data = await StoreModel.findOneAndUpdate(
+            {
+              shop_id: store,
+            },
+            {
+              AlreadySubscribed: true,
+              shop_plan: plan,
+            },
+            {
+              returnOriginal: false,
+            }
+          );
+        } catch (err) {
+          console.log(err);
+        }
+
+        if (filtered_subscriptions[0].name !== plan) {
+          console.log("active subscription has different plan ");
+          const data = await client.query({
+            data: {
+              query: `mutation AppSubscriptionCancel($id: ID!){
+                appSubscriptionCancel(id: $id) {
+                  userErrors {
+                    field
+                    message
+                  }
+                  appSubscription {
+                    id
+                    status
+                  }
+                }
+              }`,
+              variables: {
+                id: `gid://shopify/AppSubscription/${filtered_subscriptions[0].id}`,
+              },
+            },
+          });
+          client = new Shopify.Clients.Graphql(store, session.accessToken);
+          const createdSubscription = await client.query({
+            data: {
+              query: `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $test: Boolean ){
+              appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems, test: $test) {
+                userErrors {
+                  field
+                  message
+                }
+                appSubscription {
+                  id
+                }
+                confirmationUrl
+              }
+            }`,
+              variables: {
+                name: `${plan}`,
+                returnUrl: `http://${store}/admin/apps/nutrition_table`,
+                test: true,
+                lineItems: [
+                  {
+                    plan: {
+                      appRecurringPricingDetails: {
+                        price: {
+                          amount: plan_price,
+                          currencyCode: "USD",
+                        },
+                        interval: "EVERY_30_DAYS",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          });
+          console.log(
+            createdSubscription.body,
+            "###############################################"
+          );
+          res.status(200).send({
+            confirmation_url:
+              createdSubscription.body.data.appSubscriptionCreate
+                .confirmationUrl,
+          });
+        } else {
+          res.status(200).send({});
+        }
+      } else {
+        console.log(
+          "subscription status is not active (pending || expired || declined)"
+        );
+        const AlreadySubscribed = await StoreModel.findOne({
+          shop_id: store,
+        }).exec();
+
+        if (AlreadySubscribed.AlreadySubscribed) {
+          console.log("has been subscribed");
+
+          const createdSubscription = await client.query({
+            data: {
+              query: `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $test: Boolean ){
+            appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems, test: $test) {
+              userErrors {
+                field
+                message
+              }
+              appSubscription {
+                id
+              }
+              confirmationUrl
+            }
+          }`,
+              variables: {
+                name: `${plan}`,
+                returnUrl: `http://${store}/admin/apps/nutrition_table`,
+                test: true,
+                lineItems: [
+                  {
+                    plan: {
+                      appRecurringPricingDetails: {
+                        price: {
+                          amount: plan_price,
+                          currencyCode: "USD",
+                        },
+                        interval: "EVERY_30_DAYS",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          });
+          console.log(
+            createdSubscription.body,
+            "###############################################"
+          );
+          res.status(200).send({
+            confirmation_url:
+              createdSubscription.body.data.appSubscriptionCreate
+                .confirmationUrl,
+          });
+        } else {
+          console.log("no previous subscriptions");
+
+          const createdSubscription = await client.query({
+            data: {
+              query: `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL!, $trialDays: Int, $test: Boolean  ){
+            appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems, trialDays: $trialDays, test: $test) {
+              userErrors {
+                field
+                message
+              }
+              appSubscription {
+                id
+              }
+              confirmationUrl
+            }
+          }`,
+              variables: {
+                name: `${plan}`,
+                returnUrl: `http://${store}/admin/apps/nutrition_table`,
+                test: true,
+                trialDays: 7,
+                lineItems: [
+                  {
+                    plan: {
+                      appRecurringPricingDetails: {
+                        price: {
+                          amount: plan_price,
+                          currencyCode: "USD",
+                        },
+                        interval: "EVERY_30_DAYS",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          });
+          console.log(
+            createdSubscription.body,
+            "###############################################"
+          );
+          res.status(200).send({
+            confirmation_url:
+              createdSubscription.body.data.appSubscriptionCreate
+                .confirmationUrl,
+          });
+        }
+      }
     }
-    // console.log(plan_price);
-    //     const client = new Shopify.Clients.Graphql(store, accessToken.accessToken);
-    //     const data = await client.query({
-    //    data: {
-    //     "query": `mutation AppSubscriptionCreate($name: String!, $lineItems: [AppSubscriptionLineItemInput!]!, $returnUrl: URL! ){
-    //       appSubscriptionCreate(name: $name, returnUrl: $returnUrl, lineItems: $lineItems) {
-    //         userErrors {
-    //           field
-    //           message
-    //         }
-    //         appSubscription {
-    //           id
-    //         }
-    //         confirmationUrl
-    //       }
-    //     }`,
-    //     "variables": {
-    //       "name": `${plan} Plan`,
-    //       "returnUrl": "http://appName.shopifyapps.com/",
-    //       "lineItems": [
-    //         {
-    //           "plan": {
-    //             "appRecurringPricingDetails": {
-    //               "price": {
-    //                 "amount": plan_price,
-    //                 "currencyCode": "USD"
-    //               },
-    //               "interval": "EVERY_30_DAYS"
-    //             }
-    //           }
-    //         }
-    //       ]
-    //     },
-    //   },
-    // });
-    res.status(200).send({
-      success: true,
-      message: "Plan updated successfully!",
-    });
   });
 
   /*update store location */
@@ -650,7 +897,7 @@ export async function createServer(
 
   app.use(express.json());
 
-  app.use((req, res, next) => {
+    app.use((req, res, next) => {
     const shop = req.query.shop;
     if (Shopify.Context.IS_EMBEDDED_APP && shop) {
       res.setHeader(
@@ -658,19 +905,21 @@ export async function createServer(
         `frame-ancestors https://${shop} https://admin.shopify.com;`
       );
     } else {
-      res.setHeader("Content-Security-Policy", `frame-ancestors 'none';`);
+      res.setHeader("Content-Security-Policy", `frame-ancestors 'none';default-src 'self'; img-src https://*; child-src 'none';`);
     }
     next();
   });
 
   app.use("/*", async (req, res, next) => {
-    const { shop } = req.query;
-    const checkShop = await AppSession.exists({ shop: shop });
+    const {
+      shop
+    } = req.query;
+    const checkShop = await AppSession.find(
+      { id: { $regex:`${shop}_.*`} });
     // Detect whether we need to reinstall the app, any request from Shopify will
     // include a shop in the query parameters.
-    if (!checkShop && shop !== undefined) {
-      res.redirect(`/auth?shop=${shop}`);
-      console.log("index.js", `/auth?shop=${shop}`);
+    if (checkShop.length === 0 && shop !== undefined) {
+      res.redirect(`/auth?${new URLSearchParams(req.query).toString()}`);
     } else {
       next();
     }
@@ -702,8 +951,10 @@ export async function createServer(
     const compression = await import("compression").then(
       ({ default: fn }) => fn
     );
-    const serveStatic = await import("serve-static").then(
-      ({ default: fn }) => fn
+const serveStatic = await import("serve-static").then(
+      ({
+        default: fn
+      }) => fn
     );
     const fs = await import("fs");
     app.use(compression());
@@ -717,9 +968,14 @@ export async function createServer(
     });
   }
 
-  return { app, vite };
+  return {
+    app,
+    vite
+  };
 }
 
 if (!isTest) {
-  createServer().then(({ app }) => app.listen(PORT));
+  createServer().then(({
+    app
+  }) => app.listen(PORT));
 }

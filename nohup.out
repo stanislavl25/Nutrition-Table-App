@@ -1,0 +1,253 @@
+
+> start
+> npm run serve
+
+
+> preserve
+> npm run build
+
+
+> build
+> npm run build:client
+
+
+> build:client
+> vite build --outDir dist/client
+
+vite v2.9.1 building for production...
+transforming...
+✓ 1630 modules transformed.
+rendering chunks...
+dist/client/index.html                  0.30 KiB
+dist/client/assets/index.4661773d.css   287.07 KiB / gzip: 34.12 KiB
+dist/client/assets/index.16529525.js    1703.58 KiB / gzip: 449.02 KiB
+
+(!) Some chunks are larger than 500 KiB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/guide/en/#outputmanualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+> serve
+> cross-env NODE_ENV=production node server/index.js
+
+Killed
+
+> start
+> npm run serve
+
+
+> preserve
+> npm run build
+
+
+> build
+> npm run build:client
+
+
+> build:client
+> vite build --outDir dist/client
+
+vite v2.9.1 building for production...
+transforming...
+✓ 1630 modules transformed.
+rendering chunks...
+dist/client/index.html                  0.30 KiB
+dist/client/assets/index.4661773d.css   287.07 KiB / gzip: 34.12 KiB
+dist/client/assets/index.16529525.js    1703.58 KiB / gzip: 449.02 KiB
+
+(!) Some chunks are larger than 500 KiB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/guide/en/#outputmanualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+> serve
+> cross-env NODE_ENV=production node server/index.js
+
+yarn run v1.22.18
+$ npm run serve
+
+> preserve
+> npm run build
+
+
+> build
+> npm run build:client
+
+
+> build:client
+> vite build --outDir dist/client
+
+vite v2.9.1 building for production...
+transforming...
+✓ 1630 modules transformed.
+rendering chunks...
+dist/client/index.html                  0.30 KiB
+dist/client/assets/index.4661773d.css   287.07 KiB / gzip: 34.12 KiB
+dist/client/assets/index.16529525.js    1703.58 KiB / gzip: 449.02 KiB
+
+(!) Some chunks are larger than 500 KiB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/guide/en/#outputmanualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+> serve
+> cross-env NODE_ENV=production node server/index.js
+
+node:events:505
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8081
+    at Server.setupListenHandle [as _listen2] (node:net:1372:16)
+    at listenInCluster (node:net:1420:12)
+    at Server.listen (node:net:1508:7)
+    at Function.listen (/opt/bitnami/apache/htdocs/nutrition-table/node_modules/express/lib/application.js:618:24)
+    at file:///opt/bitnami/apache/htdocs/nutrition-table/server/index.js:521:40
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1399:8)
+    at processTicksAndRejections (node:internal/process/task_queues:83:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 8081
+}
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+Killed
+yarn run v1.22.18
+$ npm run serve
+
+> preserve
+> npm run build
+
+
+> build
+> npm run build:client
+
+
+> build:client
+> vite build --outDir dist/client
+
+vite v2.9.1 building for production...
+transforming...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+yarn run v1.22.18
+$ npm run serve
+
+> preserve
+> npm run build
+
+
+> build
+> npm run build:client
+
+
+> build:client
+> vite build --outDir dist/client
+
+vite v2.9.1 building for production...
+transforming...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+✓ 1630 modules transformed.
+✓ 1630 modules transformed.
+Terminated
+Terminated
+npm notice 
+npm notice New minor version of npm available! 8.5.5 -> 8.17.0
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v8.17.0>
+npm notice Run `npm install -g npm@8.17.0` to update!
+npm notice 
+
+> start
+> npm run serve
+
+
+> preserve
+> npm run build
+
+
+> build
+> npm run build:client
+
+
+> build:client
+> vite build --outDir dist/client
+
+vite v2.9.1 building for production...
+transforming...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+✓ 1630 modules transformed.
+rendering chunks...
+dist/client/index.html                  0.30 KiB
+dist/client/assets/index.4661773d.css   287.07 KiB / gzip: 34.12 KiB
+dist/client/assets/index.e8326642.js    1717.77 KiB / gzip: 452.68 KiB
+
+(!) Some chunks are larger than 500 KiB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/guide/en/#outputmanualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+> serve
+> cross-env NODE_ENV=production node server/index.js
+
+node:events:505
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::8081
+    at Server.setupListenHandle [as _listen2] (node:net:1372:16)
+    at listenInCluster (node:net:1420:12)
+    at Server.listen (node:net:1508:7)
+    at Function.listen (/opt/bitnami/apache/htdocs/nutrition-table/node_modules/express/lib/application.js:618:24)
+    at file:///opt/bitnami/apache/htdocs/nutrition-table/server/index.js:719:40
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1399:8)
+    at processTicksAndRejections (node:internal/process/task_queues:83:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 8081
+}
+yarn run v1.22.18
+$ npm run serve
+
+> preserve
+> npm run build
+
+
+> build
+> npm run build:client
+
+
+> build:client
+> vite build --outDir dist/client
+
+vite v2.9.1 building for production...
+transforming...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx browserslist@latest --update-db
+  Why you should do it regularly: https://github.com/browserslist/browserslist#browsers-data-updating
+✓ 1630 modules transformed.
+rendering chunks...
+dist/client/index.html                  0.30 KiB
+dist/client/assets/index.4661773d.css   287.07 KiB / gzip: 34.12 KiB
+dist/client/assets/index.f5233d37.js    1721.90 KiB / gzip: 453.28 KiB
+
+(!) Some chunks are larger than 500 KiB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/guide/en/#outputmanualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+> serve
+> cross-env NODE_ENV=production node server/index.js
+

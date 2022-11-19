@@ -140,12 +140,9 @@ function NutritionInfoNA({
       (data.nutritionData[index].quantity /
         data.nutritionData[index].dailyValue) *
       100;
-    handleChange(
-      Math.floor(newNutritionDV).toString(),
-      "nutritionData",
-      "preparedProductDV",
-      index
-    );
+    var num = Number(newNutritionDV);
+    var roundedString = num.toFixed(1);
+    handleChange(roundedString, "nutritionData", "preparedProductDV", index);
   });
 
   return (

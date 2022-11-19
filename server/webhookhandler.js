@@ -3,17 +3,20 @@ import Stores from "./models/storeModel.js";
 import AppSession from "./models/AppSessionModel.js";
 export async function handleAllWebhooks(shop, topic, body) {
   switch (topic) {
-    case "products/update":
+    case "PRODUCTS_UPDATE":
       await handleProductsUpdateHook(shop, body);
       break;
-    case "products/create":
+    case "PRODUCTS_CREATE":
       await handleProductsCreateHook(shop, body);
       break;
-    case "products/delete":
+    case "PRODUCTS_DELETE":
       await handleProductsDeletionHook(shop, body);
       break;
-    case "app/uninstalled":
+    case "shop/redact":
       await handleAppDeletionHook(shop, body);
+      break;
+    case "APP_UNINSTALLED":
+      await AppSession.deleteMany({shop:shop})
       break;
   }
 }

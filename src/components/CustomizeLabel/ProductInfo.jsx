@@ -35,7 +35,6 @@ function ProductInfo({
 }) {
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
-
   const handleNonFoodProduct = useCallback((newChecked) => {
     handleChange(!newChecked, "food_product");
   }, []);
@@ -120,7 +119,7 @@ function ProductInfo({
           ))}
         </Stack>
         {(productsAredifferent &&
-          !data.food_product &&
+          data.food_product === false &&
           selectedOptions.length > 1) ||
         (productsAredifferent && selectedOptions.length > 1) ? (
           <Banner title="" status="critical">
@@ -200,10 +199,15 @@ function ProductInfo({
           <div style={{ marginTop: "10px", marginBottom: "10px" }}>
             <TextContainer>{tagsMarkup}</TextContainer>
           </div>
-
           <Checkbox
             label="This is a non-food product"
-            checked={!data.food_product}
+            checked={
+              selectedOptions.length > 0
+                ? data.food_product === true
+                  ? false
+                  : true
+                : false
+            }
             onChange={handleNonFoodProduct}
             disabled={selectedOptions.length === 0 ? true : false}
           />
@@ -220,7 +224,13 @@ function ProductInfo({
               label="Product to prepare"
               checked={productToPrepare}
               onChange={handleproductToPrepare}
-              disabled={locationPlan.plan === "Basic" ? true : false}
+              disabled={
+                locationPlan.plan === "Basic" ||
+                data.food_product === false ||
+                selectedOptions.length === 0
+                  ? true
+                  : false
+              }
             />
             <Tooltip
               dismissOnMouseOut
@@ -261,7 +271,13 @@ function ProductInfo({
                   label="Show Nutri-Score"
                   checked={nutriScoreCheck}
                   onChange={handleNutriScore}
-                  disabled={locationPlan.plan === "Basic" ? true : false}
+                  disabled={
+                    locationPlan.plan === "Basic" ||
+                    data.food_product === false ||
+                    selectedOptions.length === 0
+                      ? true
+                      : false
+                  }
                 />
                 <Tooltip
                   dismissOnMouseOut

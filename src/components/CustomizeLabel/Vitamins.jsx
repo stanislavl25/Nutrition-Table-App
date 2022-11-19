@@ -99,10 +99,19 @@ function Vitamins({
       storeData.recommendedIntake.forEach((elem, i) => {
         if (vitamin.name === elem.name) {
           if (elem.quantity > 0) {
-            const newRI = Math.floor(
-              (vitamin.perportion / elem.quantity) * 100
-            ).toString();
-            handleChange(newRI, "vitamins", "RI", index);
+            const newRI = (vitamin.perportion / elem.quantity) * 100;
+            var num = Number(newRI);
+            var roundedString = num.toFixed(1);
+            let numAfterUnitCheck;
+            if (elem.unit === "Milligrams") {
+              numAfterUnitCheck = roundedString + " k";
+            } else if (elem.unit === "Micrograms") {
+              numAfterUnitCheck = roundedString + " m";
+            } else {
+              numAfterUnitCheck = roundedString;
+            }
+
+            handleChange(numAfterUnitCheck, "vitamins", "RI", index);
           } else {
             handleChange("0", "vitamins", "RI", index);
           }
@@ -121,12 +130,9 @@ function Vitamins({
       allData?.servingSize.EU.DefaultAmount /
       allData?.servingSize.EU.PortionSize;
     const newVitamonPortion = data[index].per100g / division;
-    handleChange(
-      Math.floor(newVitamonPortion).toString(),
-      "vitamins",
-      "perportion",
-      index
-    );
+    var num = Number(newVitamonPortion);
+    var roundedString = num.toFixed(1);
+    handleChange(roundedString, "vitamins", "perportion", index);
     handleRiAutoCalculs();
   });
   const handleAutoCalculsOnPortionChange = () => {
@@ -135,12 +141,9 @@ function Vitamins({
       allData?.servingSize.EU.PortionSize;
     allData?.vitamins.forEach((elem, index) => {
       const newVitamonPortion = elem.per100g / division;
-      handleChange(
-        Math.floor(newVitamonPortion).toString(),
-        "vitamins",
-        "perportion",
-        index
-      );
+      var num = Number(newVitamonPortion);
+      var roundedString = num.toFixed(1);
+      handleChange(roundedString, "vitamins", "perportion", index);
     });
     handleRiAutoCalculs();
   };
@@ -173,12 +176,9 @@ function Vitamins({
     const newNutritionDV =
       (allData.vitamins[index].quantity / allData.vitamins[index].dailyValue) *
       100;
-    handleChange(
-      Math.floor(newNutritionDV).toString(),
-      "vitamins",
-      "RI",
-      index
-    );
+    var num = Number(newNutritionDV);
+    var roundedString = num.toFixed(1);
+    handleChange(roundedString, "vitamins", "RI", index);
   });
 
   return (

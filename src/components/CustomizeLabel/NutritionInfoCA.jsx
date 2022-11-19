@@ -125,12 +125,9 @@ function NutritionInfoCA({
       (data.nutritionData[index].quantity /
         data.nutritionData[index].dailyValue) *
       100;
-    handleChange(
-      Math.floor(newNutritionDV).toString(),
-      "nutritionData",
-      "preparedProduct",
-      index
-    );
+    var num = Number(newNutritionDV);
+    var roundedString = num.toFixed(1);
+    handleChange(roundedString, "nutritionData", "preparedProduct", index);
   });
 
   return (

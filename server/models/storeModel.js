@@ -6,7 +6,9 @@ const Schema = mongoose.Schema;
 const storeSchema = new Schema(
   {
     shop_id: { type: String, required: true, trim: true, unique: true },
-    shop_plan: { type: String, trim: true },
+    shop_plan: { type: String, trim: true, default: "Advanced" },
+    AlreadySubscribed: { type: Boolean, default: false },
+    firstTimeOpenApp: { type: Boolean, default: true },
     NutritionInformation: { type: String, default: "Nutrition Information" },
     portionSizeModalCheckBox: { type: Boolean, default: false },
     Ingredients: { type: String, default: "Ingredients" },
@@ -34,6 +36,7 @@ const storeSchema = new Schema(
     calories: { type: String, default: "calories" },
     recommendedIntake: [],
     location: { type: String },
+    freeTrialDone_Paid: { type: Boolean, default: false },
   },
   {
     timestamps: true,

@@ -4,8 +4,6 @@ import "../../assets/previewStyles.css";
 import { Markup } from "interweave";
 function TablePreview({ data, productToPrepare, locationPlan, langState }) {
   const [bannerDismissed, setBannerDismissed] = useState(true);
-  console.log(langState);
-  //!!! get inputs to mode number all in NA and CA
   return (
     <Card title="Label Preview">
       <div style={{ padding: "10px" }}>

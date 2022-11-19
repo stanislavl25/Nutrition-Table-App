@@ -2,13 +2,12 @@ import { Shopify } from "@shopify/shopify-api";
 import Products from "../models/productModel.js";
 import Stores from "../models/storeModel.js";
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js";
-
+import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
 export default function applyAuthMiddleware(app) {
   app.get("/auth", async (req, res) => {
     if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
-      return res.redirect(`/auth/toplevel?shop=${req.query.shop}`);
+      return res.redirect(`/auth/toplevel?${new URLSearchParams(req.query).toString()}`);
     }
-
     const redirectUrl = await Shopify.Auth.beginAuth(
       req,
       res,
@@ -16,7 +15,6 @@ export default function applyAuthMiddleware(app) {
       "/auth/callback",
       app.get("use-online-tokens")
     );
-
     res.redirect(redirectUrl);
   });
 
@@ -26,14 +24,14 @@ export default function applyAuthMiddleware(app) {
       httpOnly: true,
       sameSite: "strict",
     });
-
     res.set("Content-Type", "text/html");
 
     res.send(
       topLevelAuthRedirect({
         apiKey: Shopify.Context.API_KEY,
         hostName: Shopify.Context.HOST_NAME,
-        shop: req.query.shop,
+        host: req.query.host,
+        query: req.query,
       })
     );
   });
@@ -54,7 +52,6 @@ export default function applyAuthMiddleware(app) {
       );
 
       const AuthenticatedShop = session.shop;
-
       const checkNewShop = await Stores.exists({ shop_id: AuthenticatedShop });
       if (!checkNewShop) {
         var newShop = Stores();
@@ -90,18 +87,22 @@ export default function applyAuthMiddleware(app) {
         console.log("known shop");
       }
 
-      const response = await Shopify.Webhooks.Registry.register({
-        shop: session.shop,
-        accessToken: session.accessToken,
-        topic: "APP_UNINSTALLED",
-        path: "/webhooks",
+      const shop=session.shop;
+      const accessToken=session.accessToken;
+      const webhookRegister = await Shopify.Webhooks.Registry.registerAll({
+        shop,
+        accessToken,
       });
-
-      if (!response["APP_UNINSTALLED"].success) {
-        console.log(
-          `Failed to register APP_UNINSTALLED webhook: ${response.result}`
-        );
-      }
+      Object.entries(webhookRegister).map(([topic, response]) => {
+        if (!response.success && !gdprTopics.includes(topic)) {
+          console.error(
+            `--> Failed to register ${topic} for ${shop}.`,
+            response.result.errors[0].message
+          );
+        } else if (!gdprTopics.includes(topic)) {
+          console.log(`--> Registered ${topic} for ${shop}`);
+        }
+      });
 
       // Redirect to app with shop parameter upon auth
       res.redirect(`/?shop=${session.shop}&host=${host}`);
@@ -124,3 +125,4 @@ export default function applyAuthMiddleware(app) {
     }
   });
 }
+

@@ -2,8 +2,7 @@
 
 .table_cont {
   width:100%;
-  border-collapse: collapse;
-  margin-bottom: 5px;
+  border-collapse: collapse; 
   overflow: hidden;
 }
 

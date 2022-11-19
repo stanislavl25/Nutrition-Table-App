@@ -1,19 +1,23 @@
-<nutrition-Table data-id="{{ block.id }}">
-  <section style="display:flex;flex-direction:column;justify-content:center;width:100%;align-items:{{block.settings.vertical_alignment}};"> 
-    {% assign body_font_size = block.settings.body_font_size%}
-    {% assign ProductsExist = false %}
-    {% assign somethingWrong = false %}
-    {% assign aPreparedPortionIsEquivalentTo = false %}
-    {% assign ServingspercontainerNA = false %}
-    {% assign servingSizeCA = false %}
-    {% assign caloriesPerServingBasic = false %}
-    {% assign ingredientsIcon =  block.settings.Custom_ingredient_icon %}
+<nutrition-Table data-id="{{ block.id }}"> 
+
+  {% style %}
+    {{ block.settings.body_font_family | font_face: font_display: 'swap' }} 
+
+    :root {
+      --font-body: {{ block.settings.body_font_family.family }}, {{ block.settings.body_font_family.fallback_families }}; 
+    } 
+
+    .nutrition-TableContainer{
+      font-family:var(--font-body);
+      font-size:{{ block.settings.base_font_size }}px;
+    }
+  {% endstyle %}  
+  
+  <section class="nutrition-TableContainer" style="display:flex;flex-direction:column;justify-content:center;width:100%;align-items:{{ block.settings.vertical_alignment }};"> 
     <script>
-     document.addEventListener("DOMContentLoaded",()=>{
-    const topHeaderElem = document.getElementById("header1");
-    const aPreparedPortionIsEquivalentToElem = document.getElementById("aPreparedPortionIsEquivalentTo");
+    document.addEventListener("DOMContentLoaded",()=>{ 
     const fetchProducts = async(id)=>{ 
-      const products = await fetch("/apps/products_liveTheme",{
+       const products = await fetch("/apps/products_liveTheme",{
         method:"POST",
        headers:{
          'Content-Type': 'application/json',
@@ -22,16 +26,21 @@
        body:JSON.stringify({id:id})
       }).then((res)=>res.json()).then((response)=>{    
        const data = response.data[0];
-       const shop = response.shopData[0];
-        console.log(response) 
-       if( response.success && !response.data.length>0){
-        {%assign ProductsExist = false %}
+       const shop = response.shopData[0]; 
+       const container = document.getElementById('container'); 
+       const topHeaderElem = document.getElementById("header1"); 
+       const aPreparedPortionIsEquivalentToElem = document.getElementById("aPreparedPortionIsEquivalentTo");
+       const header_border = document.getElementById("header_border"); 
+       if( response.success && response.data.length === 0){ 
+          container.style.display = "none";
+          container.style. height = "50px"; 
           return;
-      } if(response.success === false){
-        {% assign somethingWrong = true %}
-        return
-      } else if(response.success && response.data.length>0){
-        {%assign ProductsExist = true %}
+      } else if(response.success && response.data.length > 0){  
+          container.style.display = "block";
+          topHeaderElem.style.cssText = "font-weight:bolder;font-size:{{ block.settings.acorddions_headings_font_size }}px;";
+          if(!shop.location === "EU" || !data.productToPrepare ) {
+            header_border.style.cssText = "border-bottom:{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};"
+          }
           if(shop.location==="EU"){
           topHeaderElem.innerText = shop.NutritionInformation
         }else{
@@ -41,74 +50,77 @@
           const strong = document.createElement("strong");
           const unit = data.servingSize.EU.PortionSizeUnit === "Grams"?"g":"mg"
           const text = shop.aPreparedPortionIsEquivalentTo + " " + data.servingSize.EU.PortionSize + unit 
-          {% assign aPreparedPortionIsEquivalentTo = true %}
+          const aPreparedPortionIsEquivalentTo = document.getElementById('aPreparedPortionIsEquivalentTo');
+          aPreparedPortionIsEquivalentTo.style.display = "block";
           strong.innerText = text
           aPreparedPortionIsEquivalentToElem.append(strong); 
         }
         
         if(shop.location === "NA"){
-          {% assign ServingspercontainerNA = true %}
+          const ServingspercontainerNAContainer = document.getElementById('ServingspercontainerNAContainer');
+          ServingspercontainerNAContainer.style.display = "block";
           let strongElem = document.createElement("strong")
           const ServingspercontainerNAElem = document.getElementById("ServingspercontainerNA")
           const ServingSizeNAElem = document.getElementById("ServingSizeNA")
           const text = data.servingSize.NA.Servingspercontainer + " " + shop.servingsPerContainer 
           ServingspercontainerNAElem.innerHTML = text
-          ServingspercontainerNAElem.style.cssText = 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          ServingspercontainerNAElem.style.cssText = 'color:{{ block.settings.base_fontColor }};';
           strongElem.innerHTML = shop.servingSize
-          strongElem.style.cssText += 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          strongElem.style.cssText += 'color:{{ block.settings.base_fontColor }};';
           ServingSizeNAElem.append(strongElem)
           const strongText = data.servingSize.NA.Servingreference + " " + data.servingSize.NA.servingsize
           strongElem.innerHTML = strongText
-          strongElem.style.cssText += 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          strongElem.style.cssText += 'color:{{ block.settings.base_fontColor }};';
           ServingSizeNAElem.append(strongElem)
         }
         
-        if(shop.location === "CA"){
-          {% assign servingSizeCA = true %}
+        if(shop.location === "CA"){ 
+          const servingSizeCA = document.getElementById('servingSizeCA');
+          servingSizeCA.style.display = "block";
           let  p = document.createElement("p")
           let  p1 = document.createElement("p")
           let  strong = document.createElement("strong")
           let  div = document.createElement("div")
-          const servingSizeCA = document.getElementById('servingSizeCA');
           strong.innerText = "Valeur nutritive"
-          strong.style.cssText += 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          strong.style.cssText += 'color:{{ block.settings.base_fontColor }};';
           servingSizeCA.append(strong)
           const unit = data.servingSize.CA.unitBasic === "Milliliters" ? "ml" : "l";
           const textelem = data.servingSize.CA.servingRefBasic + " " + data.servingSize.CA.servingSizeBasic + unit
           p.innerHTML = textelem;
-          p.style.cssText += 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          p.style.cssText += 'color:{{ block.settings.base_fontColor }};';
           div.append(p)
           const unit2 = data.servingSize.CA.unitBasic === "Milliliters" ? "ml" : "l";
           const text2 = data.servingSize.CA.bilingualRefBasic + " " + data.servingSize.CA.servingSizeBasic + unit2
           p1.innerHTML = text2
-          p1.style.cssText += 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          p1.style.cssText += 'color:{{ block.settings.base_fontColor }};';
           div.append(p1)
           servingSizeCA.append(div)
         }
         
-        if(shop.location === "CA"){
-          {% assign caloriesPerServingBasic = true %}
+        if(shop.location === "CA"){          
+          const caloriesPerServingBasicContainer = document.getElementById('caloriesPerServingBasicContainer');
+          caloriesPerServingBasicContainer.style.display = "block";
           const caloriesPerServingBasic = document.getElementById("caloriesPerServingBasic");
           const h4 = document.createElement("h4");
           const strong  = document.createElement("strong");
           const text = "Calories" + " " + data.servingSize.CA.caloriesPerServingBasic
           h4.innerText = text;
-          h4.style.cssText += 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          h4.style.cssText += 'color:{{ block.settings.base_fontColor }};';
           caloriesPerServingBasic.append(h4);
           strong.innerText = "% Daily Value*"
-          strong.style.cssText= 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};';
+          strong.style.cssText= 'color:{{ block.settings.base_fontColor }};';
           caloriesPerServingBasic.append(strong);
         }
          
         const thead = document.querySelector('thead');
-          thead.style.cssText =  shop.location === "NA" && data.productToPrepare ?"{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}}":"{{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}}"
+          thead.style.cssText =  shop.location === "NA" && data.productToPrepare ?"{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }}":"{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }}"
           if(shop.location === "EU"){
           const tr = document.createElement('tr');
-          tr.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};word-break: break-all;";
+          tr.style.cssText = "color:{{ block.settings.base_fontColor }};word-break: break-all;";
           const th = document.createElement("th");
           const th1 = document.createElement("th");
           th1.innerText = "Serving size";
-          th1.style.cssText = "text-align:left;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};"
+          th1.style.cssText = "text-align:left;color:{{ block.settings.base_fontColor }};"
           tr.append(th1)
           const unit = data.servingSize.EU.DefaultAmountUnit === "MilliGrams"? "mg": "g"
           const text = shop.per + " " + data.servingSize.EU.DefaultAmount + unit
@@ -139,11 +151,11 @@
           const strong1 = document.createElement("strong");
           const strong2 = document.createElement("strong");
           th.style.cssText = "text-align:left;";
-          tr.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};";
+          tr.style.cssText = "color:{{ block.settings.base_fontColor }};";
           strong.innerText = shop.amountPerServing;
           th.append(strong)
           tr.append(th);
-          th1.style.cssText = "border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};text-align:right;"
+          th1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align:right;"
           strong1.innerText = data.servingSize.NA.Servingreference
           th1.append(strong1);
           tr.append(th1);
@@ -159,9 +171,9 @@
           const strong3 = document.createElement("strong")
           const strong4 = document.createElement("strong")
           const strong5 = document.createElement("strong")
-          tr1.style.cssText = "border-bottom:{{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};";
+          tr1.style.cssText = "border-bottom:{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};";
           th4.style.cssText = "text-align:left;";
-          th5.style.cssText = "border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};text-align: right;"
+          th5.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align: right;"
           th6.style.cssText = "text-align:right;"
           strong4.style.cssText = "text-align:right;"
           strong3.innerText = shop.calories;
@@ -180,7 +192,7 @@
             const th8 = document.createElement("th");
             const th9 = document.createElement("th");
             tr2.append(th7)
-            th8.style.cssText = "border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};text-align:right;"
+            th8.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align:right;"
             th8.innerText = "% DV*"
             tr2.append(th8)
             th9.style.cssText = "text-align:right;"
@@ -207,10 +219,10 @@
           const div = document.createElement("div");
           const div1  = document.createElement("div");
           const div2 = document.createElement("div");
-          tr.style.cssText = "border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;"
+          tr.style.cssText = "border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};"
           td1.classList.add("thtd");
-          td1.style.cssText= "text-align:left;border-right: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
-          td.style.cssText= "border-right: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
+          td1.style.cssText= "text-align:left;border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+          td.style.cssText= "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
           b.innerText = "Energy";
           td1.append(b)
           tr.append(td1)
@@ -229,8 +241,8 @@
             const div2 = document.createElement("div");
             td.classList.add("thtd", "td")
             td1.classList.add("thtd", "td")
-            td.style.cssText = "border-right: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
-            td1.style.cssText = "border-right:none;border-left: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            td.style.cssText = "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+            td1.style.cssText = "border-right:none;border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
             div1.innerText = data.calsEnergyInfo.energyKj25 + "kj"
             div2.innerText = data.calsEnergyInfo.energyKcal25 + "kcal"
             div.append(div1)
@@ -253,11 +265,11 @@
             const td1 = document.createElement("td");
             const td2 = document.createElement("td");
             const p = document.createElement("p");
-            tr.style.cssText = "border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;"
+            tr.style.cssText = "border-bottom: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};"
             td.classList.add("thtd")
-            td.style.cssText = "text-align:left;border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
-            td1.style.cssText = "border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
-            td2.style.cssText = "border-left: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            td.style.cssText = "text-align:left;border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+            td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+            td2.style.cssText = "border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
             if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
             p.style.marginLeft = element.leftSpacing + "px";
             p.innerText = element.name;
@@ -268,6 +280,19 @@
             td1.innerText = element.per100g + " " + unit
             tr.append(td1);
             if(shop.plan !== "Basic"){
+              let text1 = (element.RI).toString();
+              for(var i=0; i<shop.recommendedIntake.length;i++){
+                if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
+                  if (shop.recommendedIntake[i].unit === "Milligrams") {
+                    text1 += "k"  + " %";
+                  } else if (shop.recommendedIntake[i].unit === "Micrograms") {
+                    text1 += "m"  + " %";
+                  } else {
+                    text1 += " %";
+                  } 
+                  break;   
+                }
+              } 
               const td = document.createElement('td');
               const td1 = document.createElement('td');
               td.classList.add("thtd","td")
@@ -275,9 +300,8 @@
               const unit = element.unit === "MilliGrams" ? "mg" : "g"
               const text = element.perportion + " " + unit;
               td.innerText = text;
-              td.style.cssText = "border-right: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
+              td.style.cssText = "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
               td1.style.cssText = "border-right:none;";
-              const text1 = element.RI + "%";
               td1.innerText = text1;
               tr.append(td)
               tr.append(td1)
@@ -299,7 +323,7 @@
             const p3 = document.createElement("p");
             const strong = document.createElement("strong");
             const strong1 = document.createElement("strong");
-            tr.style.cssText = "border-bottom: {{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;";
+            tr.style.cssText = "border-bottom: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};";
             div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
             if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
             p.style.marginLeft = element.leftSpacing + "px";
@@ -309,7 +333,7 @@
               div.append(p)
               td.append(div);
               tr.append(td);
-              td1.style.cssText = "border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};display:flex;flex-direction:row;align-items:center;justify-content:space-between;"
+              td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};display:flex;flex-direction:row;align-items:center;justify-content:space-between;"
               const unit = element.unit === "MilliGrams" ? "mg" : "g"
               p1.innerText = element.quantity + unit
               strong.innerText = element.dailyValue + "%"
@@ -350,7 +374,7 @@
             const p = document.createElement("p");
             const p1 = document.createElement("p"); 
          
-            tr.style.cssText = "border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
             td.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
             if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
             p.style.marginLeft = element.leftSpacing + "px";
@@ -372,7 +396,7 @@
 
        
         const tfoot = document.getElementById('tfoot')
-        tfoot.style.cssText = "border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};border-top: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};"
+        tfoot.style.cssText = "border-bottom: {{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};border-top: {{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};"
         if(shop.location === "EU"){
            
           //!!* ~######## vitamins
@@ -384,11 +408,11 @@
             const td2 = document.createElement("td"); 
             const td3 = document.createElement("td");  
             const p = document.createElement("p"); 
-            tr.style.cssText = 'border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};';
+            tr.style.cssText = 'border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
             td.classList.add('thtd');
-            td.style.cssText = 'text-align:left;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;';
-            td1.style.cssText = 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};';
-            td2.style.cssText = 'font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};';
+            td.style.cssText = 'text-align:left;color:{{ block.settings.base_fontColor }};';
+            td1.style.cssText = 'color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
+            td2.style.cssText = 'color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
             p.style.marginLeft = element.LeftSpacing + "px";
             p.innerText = element.name;
             td.append(p);
@@ -399,14 +423,27 @@
             td1.innerText = text;
             tr.append(td1);
             if(shop.shop_plan !== "Basic"){
+              let text1 = element.RI;
+              for(var i=0; i<shop.recommendedIntake.length;i++){
+                if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
+                  if (shop.recommendedIntake[i].unit === "Milligrams") {
+                    text1 += "k"  + " %";
+                  } else if (shop.recommendedIntake[i].unit === "Micrograms") {
+                    text1 += "m"  + " %";
+                  } else {
+                    text1 += " %";
+                  }   
+                break;
+                }
+              } 
               const unit = element.unit === "Milligrams" ? "mg" : "g";
               const text = element.perportion + unit
               td2.classList.add('thtd',"td")
               td3.classList.add('thtd',"td")
               td2.innerText = text;
               tr.append(td2);
-              td3.style.cssText ="font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-right:none;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;"
-              td3.innerText = element.RI + "%";
+              td3.style.cssText ="color:{{ block.settings.base_fontColor }};border-right:none;"
+              td3.innerText = text1;
               tr.append(td3);
             }
             tfoot.append(tr);
@@ -419,11 +456,11 @@
             const td2 = document.createElement("td"); 
             const td3 = document.createElement("td");  
             const p = document.createElement("p"); 
-            tr.style.cssText = 'border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};';
+            tr.style.cssText = 'border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
             td.classList.add("thtd");
-            td.style.cssText = "text-align:left;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;";
-            td1.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
-            td2.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
+            td.style.cssText = "text-align:left;color:{{ block.settings.base_fontColor }};";
+            td1.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+            td2.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
             p.style.marginLeft = element.LeftSpacing + "px";
             p.innerText = element.name;
             td.append(p);
@@ -442,8 +479,21 @@
             tr.append(td2);
             
             td3.classList.add("thtd","td");
-            td3.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-right:none;";
-            td3.innerText = element.RI
+            td3.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:none;";
+            let text2 = element.RI;
+            for(var i=0; i<shop.recommendedIntake.length;i++){
+              if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
+                if (shop.recommendedIntake[i].unit === "Milligrams") {
+                  text2 += "k"  + " %";
+                } else if (shop.recommendedIntake[i].unit === "Micrograms") {
+                  text2 += "m"  + " %";
+                } else {
+                  text2 += " %";
+                }   
+              break;
+              }
+            } 
+            td3.innerText = text2
             tr.append(td3);
 
             tfoot.append(tr);
@@ -464,7 +514,7 @@
             const p3 = document.createElement("p"); 
             const strong = document.createElement("strong"); 
             const strong1 = document.createElement("strong"); 
-            tr.style.cssText = "border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
             div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
             p.style.marginLeft = element.LeftSpacing + "px";
 
@@ -474,7 +524,7 @@
               td.append(div);
               tr.append(td);
               
-              td1.style.cssText = "border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+              td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
               const unit = element.unit === "Grams" ? "g" : "mg"
               const text = element.quantity + unit;
               p1.innerText = text;
@@ -526,7 +576,7 @@
             const p2 = document.createElement("p");  
             const strong = document.createElement("strong"); 
             const strong1 = document.createElement("strong"); 
-            tr.style.cssText = "border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
             div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
             p.style.marginLeft = element.LeftSpacing + "px";
             p.innerText = element.name;
@@ -536,7 +586,7 @@
               td.append(div);
               tr.append(td);
               
-              td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;border-right:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-left:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+              td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
               const unit = element.unit === "Grams" ? "g" : "mg";
               const text = element.quantity + unit;
               p1.innerText = text;
@@ -578,7 +628,7 @@
             const div = document.createElement("div");
             const p = document.createElement("p"); 
             const p1 = document.createElement("p");   
-            tr.style.cssText = "border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};;"
+            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};;"
             
             div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
             p.style.marginLeft = element.LeftSpacing + "px";
@@ -606,7 +656,7 @@
             const div = document.createElement("div");
             const p = document.createElement("p"); 
             const p1 = document.createElement("p");  
-            tr.style.cssText = "border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
             
             div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
             p.style.marginLeft = element.LeftSpacing + "px";
@@ -627,8 +677,7 @@
             tfoot.append(tr);
           })
         }
-
-        const container= document.getElementById("container")
+ 
         const div = document.createElement("div")
         div.style.cssText = "padding:0px;display:flex;flex-direction:column;align-items:center;width:100%;gap:5px;"
         
@@ -637,18 +686,20 @@
           const div2 = document.createElement("div")
           const p = document.createElement("p")
           div1.style.cssText = "width:100%;"
-          div2.style.cssText = "padding-left:10px;padding-right:10px;"
-          p.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;"
-          p.innerHTML =  data.richText.notesText
-          div2.append(p);
+          div2.style.cssText = "padding-left:10px;padding-right:10px;color:{{ block.settings.base_fontColor }};"
+          // p.style.cssText = "margin-block-start:0px;margin-block-end:0px;"
+          let str = data.richText.notesText.replace("<p>", ""); 
+            str = str.replace("</p>", "");  
+          div2.innerHTML =  str
+          // div2.append(p);
           div1.append(div2);
           div.append(div1);
           
           if(shop.location === "EU" && shop.referenceIntakeDisclaimer.trim().length > 0){
             const hr = document.createElement("hr");
-            hr.style.cssText = "margin:0;height:{{block.settings.primaryBorderThickness}}px;width:95%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+            hr.style.cssText = "margin:0;height:{{ block.settings.primaryBorderThickness }}px;width:95%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
             const div1 = document.createElement("div");
-            div1.style.cssText = "padding-left:10px;padding-right:10px;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{body_font_size}}px;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};width:100%;";
+            div1.style.cssText = "padding-left:10px;padding-right:10px;color:{{ block.settings.base_fontColor }};border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};width:100%;";
             div1.innerText = shop.referenceIntakeDisclaimer
             div.append(hr);
             div.append(div1);
@@ -664,13 +715,13 @@
           const hr = document.createElement("hr");
           const image = document.createElement("img");
           const image1 = document.createElement("img");
-          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
+          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
           div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
           div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
-          h4.style.cssText = "font-weight:bolder;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;"
+          h4.style.cssText = "font-size:{{ block.settings.acorddions_headings_font_size }}px;font-weight:bolder;color:{{ block.settings.base_fontColor }};"
           div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
           
-          image.src = "{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}";
+          image.src = "{{ block.settings.custom_accordion_icon_opend | image_url: width: 15, height: 15 }}";
           image.width = "15"
           image.height = "15"
           image.style.cssText = "margin-right:10px;"
@@ -679,14 +730,14 @@
           h4.innerText = shop.Ingredients
           div3.append(h4)
           
-          image1.src = "{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}";
+          image1.src = "{{ block.settings.custom_accordion_icon_closed | image_url: width: 15, height: 15 }}";
           image1.width = "15"
           image1.height = "15"
           image1.style.cssText = "margin-right:10px;"
           div2.append(div3);
           div2.append(image1);
           
-          hr.style.cssText = "margin:0;margin-bottom:10px;height:{{block.settings.primaryBorderThickness}}px;width:100%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};"
+          hr.style.cssText = "margin:0;margin-bottom:10px;height:{{ block.settings.primaryBorderThickness }}px;width:100%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
           div1.append(div2)
           div1.append(hr);
 
@@ -699,10 +750,10 @@
                 const div4 = document.createElement("div");
                 const image3 = document.createElement('img');
                 const p = document.createElement("p"); 
-                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;"
-                p.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px"                
+                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{ block.settings.cell_border_radius }}px;padding:{{ block.settings.Ingredients_allergens_border_padding }}px;background-color:{{ block.settings.cells_background_color }};text-align:center;"
+                p.style.cssText = "color:{{ block.settings.Ingredients_allergens_color }};"                
                   
-                image3.src = "{{block.settings.Custom_ingredient_icon | img_url: '10*10'}}";
+                image3.src = "{{ block.settings.Custom_ingredient_icon | image_url: width: 10, height: 10 }}";
                 image3.width = "10"
                 image3.height = "10"
                 div4.append(image3);
@@ -729,13 +780,13 @@
           const hr = document.createElement("hr");
           const image = document.createElement("img");
           const image1 = document.createElement("img");
-          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};";
+          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
           div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
           div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
-          h4.style.cssText = "font-weight:bolder;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;"
+          h4.style.cssText = "font-size:{{ block.settings.acorddions_headings_font_size }}px;font-weight:bolder;color:{{ block.settings.base_fontColor }};"
           div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
           
-          image.src = "{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}";
+          image.src = "{{ block.settings.custom_accordion_icon_opend | image_url: width: 15, height: 15 }}";
           image.width = "15"
           image.height = "15"
           image.style.cssText = "margin-right:10px;"
@@ -744,14 +795,14 @@
           h4.innerText = shop.AllergyInformation
           div3.append(h4)
           
-          image1.src = "{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}";
+          image1.src = "{{ block.settings.custom_accordion_icon_closed | image_url: width: 15, height: 15 }}";
           image1.width = "15"
           image1.height = "15"
           image1.style.cssText = "margin-right:10px;"
           div2.append(div3);
           div2.append(image1);
           
-          hr.style.cssText = "margin:0;height:{{block.settings.primaryBorderThickness}}px;width:100%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};margin-bottom:10px;"
+          hr.style.cssText = "margin:0;height:{{ block.settings.primaryBorderThickness }}px;width:100%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};margin-bottom:10px;"
           div1.append(div2)
           div1.append(hr);
 
@@ -764,10 +815,10 @@
                 const div4 = document.createElement("div");
                 const image3 = document.createElement('img');
                 const p = document.createElement("p"); 
-                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{block.settings.cell_border_radius}}px;padding:{{block.settings.Ingredients_allergens_border_padding}}px;background-color:{{block.settings.cells_background_color}};text-align:center;"
-                p.style.cssText = "font-family:{{block.settings.body_font.family}};color:{{block.settings.Ingredients_allergens_color}};font-size:{{body_font_size}}px"                
+                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{ block.settings.cell_border_radius }}px;padding:{{ block.settings.Ingredients_allergens_border_padding }}px;background-color:{{ block.settings.cells_background_color }};text-align:center;"
+                p.style.cssText = "color:{{ block.settings.Ingredients_allergens_color }};"                
                   
-                image3.src = "{{block.settings.Custom_allergen_icon | img_url: '10*10'}}";
+                image3.src = "{{ block.settings.Custom_allergen_icon | image_url: width: 10, height: 10 }}";
                 image3.width = "10"
                 image3.height = "10"
                 div4.append(image3);
@@ -785,7 +836,7 @@
         if(data.richText.lEGALNOTICEText.length > 0){
           const div1 = document.createElement("div");
           div1.classList.add("LEGAL_NOTICE");
-          div1.style.cssText = "margin-top:10px;";
+          div1.style.cssText = "margin-top:10px;color:{{ block.settings.base_fontColor }};";
           div1.innerHTML = data.richText.lEGALNOTICEText;
           div.append(div1);
         }
@@ -793,80 +844,61 @@
         container.append(div);
 
       }
-    }).catch((err)=>{ 
-      // {% assign somethingWrong = true %}
-      console.log(err)
+    }).catch((err)=>{  
+      container.style.display = "none";
+      {% comment %} console.log(err) {% endcomment %}
       })
       }
-      fetchProducts({{product.id}});
+      fetchProducts({{ product.id }});
       })
     </script>
-
-
-    {%- if ProductsExist == false -%}
-      <h1>no products stored on the App!</h1>
-      <h2>you need to modify lables in the App first.</h2>
-    {%- endif -%}
-
-    {%- if somethingWrong == true -%}
-      <h1>Something wrong happend!</h1>
-      <h2>if this continues contact the App support.</h2>
-    {%- endif -%}
-
-    <div id="container" style="overflow:hidden;position:relative;z-index:1;width:{{block.settings.tableWidth}}%;border:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};border-radius:{{block.settings.borderRadiusMainTable}}px;background-color:{{block.settings.Table_background_color}};">
+ 
+   
+    <div id="container" style="display:none;overflow:hidden;position:relative;z-index:1;width:{{ block.settings.tableWidth }}%;border:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-radius:{{ block.settings.borderRadiusMainTable }}px;background-color:{{ block.settings.Table_background_color }};">
       
-      {%-if ProductsExist == true -%}
-    {%- if block.settings.back_ground_image-%}
-    <img style="position: absolute;height: 100%;width:100%;background-repeat: no-repeat;background-size: cover;z-index: -1; " src="{{block.settings.back_ground_image | img_url: 'large'}}" alt="" height="" width="">
-    {%- endif -%}
-
-    <div  style="border-bottom: {{block.settings.secondaryBorderThickness}}px solid {{block.settings.secondaryBorder}};">
+      {%- if block.settings.back_ground_image -%}
+      <img style="position:absolute;height:100%;width:100%;background-repeat:no-repeat;background-size:cover;z-index:-1;" src="{{ block.settings.back_ground_image | image_url: width: 1080, height: 1080 }}" loading="lazy" alt="" height="" width="">
+      {%- endif -%}
+    <div id="header_border">
       <div>
-        <div style="display: flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;padding-left:4px;padding-right:4px;border-bottom:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
+        <div style="display: flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;padding-left:4px;padding-right:4px;border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};">
           <div style="display:flex;flex-direction:row;align-items:center;gap:10px;">
 
-            {%- if block.settings.custom_accordion_icon_opend-%}
-            <img src="{{block.settings.custom_accordion_icon_opend | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
+            {%- if block.settings.custom_accordion_icon_opend -%}
+              <img src="{{ block.settings.custom_accordion_icon_opend | image_url: width: 15, height: 15 }}"  loading="lazy"   alt="" width="15" height="15" style="margin-right: 10px;">
             {%- endif -%}
 
-          <h2 id="header1" style="font-weight:bolder;font-size:3rem;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};font-size:{{block.settings.acorddions_headings_font_size}}px;"></h2>
+            <h2 id="header1" style="font-weight:bolder;font-size:3rem;color:{{ block.settings.base_fontColor }};"></h2>
           </div>
 
-          {%- if block.settings.custom_accordion_icon_closed-%}
-          <img src="{{block.settings.custom_accordion_icon_closed | img_url: '15*15'}}"   alt="" width="15" height="15" style="margin-right: 10px;">
+          {%- if block.settings.custom_accordion_icon_closed -%}
+            <img src="{{ block.settings.custom_accordion_icon_closed | image_url: width: 15, height: 15 }}" loading="lazy"  alt="" width="15" height="15" style="margin-right: 10px;">
           {%- endif -%}
 
         </div>
       </div>
     </div>
 
-    {%-if aPreparedPortionIsEquivalentTo == true -%}
-      <div id="aPreparedPortionIsEquivalentTo" style="color:white; text-align: center; background-color: black; width: 100%; padding-top: 10px; padding-bottom: 10px;"></div>
-    {%- endif -%}
-
-    {%-if ServingspercontainerNA == true -%}
-      <div style="border-bottom: 3px solid black;">
+   
+      <div id="aPreparedPortionIsEquivalentTo" style="display:none;color:white; text-align: center; background-color: black; width: 100%; padding-top: 10px; padding-bottom: 10px;"></div>
+ 
+      <div id="ServingspercontainerNAContainer" style="display:none;border-bottom: 3px solid black;">
         <div id="ServingspercontainerNA"></div>
-        <div id="ServingSizeNA" style="display: flex; flex-direction: row;align-items: center;justify-content: space-between;">
+          <div id="ServingSizeNA" style="display: flex; flex-direction: row;align-items: center;justify-content: space-between;">
         </div>
-      </div>
-    {%- endif -%}
+      </div> 
 
-    {%-if servingSizeCA== true -%}
       <div id="servingSizeCA" style="display:flex;flex-direction:column;border-bottom: 3px solid black;"></div>
-    {%- endif -%}
-
-    {%-if caloriesPerServingBasic == true -%}
-      <div>
+ 
+      <div id="caloriesPerServingBasicContainer" style="display:none;">
         <div id="caloriesPerServingBasic" style="padding-left:4px;padding-right:4px;display: flex; flex-direction: row;align-items: center; justify-content: space-between;"></div>
         <div style="height:40px;display:flex;flex-direction:row;align-items:center;gap:10px;">
-        <hr style="width:150%;border-top:{{block.settings.primaryBorderThickness}}px solid {{block.settings.primaryBorder}};">
-        <p style="width: 100%;text-align: end;">
-        <strong style="display:flex;flex-direction:row;align-items:center;text-align:end;font-family:{{block.settings.body_font.family}};color:{{block.settings.body_fontColor}};">% valeur quotidienne*</strong>
-        </p>
+          <hr style="width:150%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};">
+          <p style="width: 100%;text-align: end;">
+          <strong style="display:flex;flex-direction:row;align-items:center;text-align:end;color:{{ block.settings.base_fontColor }};">% valeur quotidienne*</strong>
+          </p>
       </div>
       </div>
-    {%- endif -%}
 
     <table  class="table_cont">
      <thead></thead>
@@ -874,11 +906,11 @@
       </tbody>
       <tfoot id="tfoot"></tfoot>
     </table>
-
-    {%-endif-%}
+ 
   </div>
   </section>
-</nutrition-Table>
+</nutrition-Table> 
+
 
 {% schema %}
 {
@@ -986,19 +1018,19 @@
    },
    {
     "type": "font_picker",
-    "id": "body_font",
+    "id": "body_font_family",
     "label": "Body Font",
     "default": "helvetica_n4"
   },
   {
     "type": "color",
-    "id": "body_fontColor",
+    "id": "base_fontColor",
     "label": "Font color",
     "default": "#000000"
   },
   {
     "type": "range",
-    "id": "body_font_size",
+    "id": "base_font_size",
     "min": 2,
     "max": 18,
     "step": 1,

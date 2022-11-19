@@ -105,10 +105,18 @@ function Minerals({
       storeData.recommendedIntake.forEach((elem, i) => {
         if (vitamin.name === elem.name) {
           if (elem.quantity > 0) {
-            const newRI = Math.floor(
-              (vitamin.perportion / elem.quantity) * 100
-            ).toString();
-            handleChange(newRI, "minerals", "RI", index);
+            const newRI = (vitamin.perportion / elem.quantity) * 100;
+            var num = Number(newRI);
+            var roundedString = num.toFixed(1);
+            let numAfterUnitCheck;
+            if (elem.unit === "Milligrams") {
+              numAfterUnitCheck = roundedString + " k";
+            } else if (elem.unit === "Micrograms") {
+              numAfterUnitCheck = roundedString + " m";
+            } else {
+              numAfterUnitCheck = roundedString;
+            }
+            handleChange(numAfterUnitCheck, "minerals", "RI", index);
           } else {
             handleChange("0", "minerals", "RI", index);
           }
@@ -127,12 +135,9 @@ function Minerals({
       allData?.servingSize.EU.DefaultAmount /
       allData?.servingSize.EU.PortionSize;
     const newVitamonPortion = data[index].per100g / division;
-    handleChange(
-      Math.floor(newVitamonPortion).toString(),
-      "minerals",
-      "perportion",
-      index
-    );
+    var num = Number(newVitamonPortion);
+    var roundedString = num.toFixed(1);
+    handleChange(roundedString, "minerals", "perportion", index);
     handleRiAutoCalculs();
   });
 
@@ -142,12 +147,9 @@ function Minerals({
       allData?.servingSize.EU.PortionSize;
     allData?.minerals.forEach((elem, index) => {
       const newMineralPortion = elem.per100g / division;
-      handleChange(
-        Math.floor(newMineralPortion).toString(),
-        "minerals",
-        "perportion",
-        index
-      );
+      var num = Number(newMineralPortion);
+      var roundedString = num.toFixed(1);
+      handleChange(roundedString, "minerals", "perportion", index);
     });
     handleRiAutoCalculs();
   };
@@ -181,12 +183,9 @@ function Minerals({
     const newNutritionDV =
       (allData.minerals[index].quantity / allData.minerals[index].dailyValue) *
       100;
-    handleChange(
-      Math.floor(newNutritionDV).toString(),
-      "minerals",
-      "RI",
-      index
-    );
+    var num = Number(newNutritionDV);
+    var roundedString = num.toFixed(1);
+    handleChange(roundedString, "minerals", "RI", index);
   });
 
   return (
