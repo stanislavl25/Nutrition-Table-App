@@ -1,6 +1,7 @@
 import Products from "./models/productModel.js";
 import Stores from "./models/storeModel.js";
 import AppSession from "./models/AppSessionModel.js";
+import saveProducts_variants from "./middleware/saveProducts_variants.js";
 export async function handleAllWebhooks(shop, topic, body) {
   switch (topic) {
     case "PRODUCTS_UPDATE":
@@ -16,95 +17,13 @@ export async function handleAllWebhooks(shop, topic, body) {
       await handleAppDeletionHook(shop, body);
       break;
     case "APP_UNINSTALLED":
-      await AppSession.deleteMany({shop:shop})
+      await AppSession.deleteMany({ shop: shop });
       break;
   }
 }
+
 async function handleProductsUpdateHook(shop, body) {
-  // console.log(body);
-  //   try {
-  //     var newPricesArray = [];
-  //     if (shop && body) {
-  //       const res = await Products.find({
-  //         store_id: shop,
-  //         product_id: body.id,
-  //       }).exec();
-  //       if (res) {
-  //         var result = res[0];
-  //         result = JSON.parse(JSON.stringify(result));
-  //         var pricesArray = result.pricesArray.sort(function sortingPrices(a, b) {
-  //           if (parseInt(Object.keys(a)[0]) > parseInt(Object.keys(b)[0]))
-  //             return 1;
-  //           else return -1;
-  //         });
-  //         var minPrice = body.variants[0]["price"];
-  //         if (
-  //           pricesArray.length > 0 &&
-  //           parseInt(body.variants[0]["price"]) !==
-  //             parseInt(
-  //               pricesArray[pricesArray.length - 1][
-  //                 Object.keys(pricesArray[pricesArray.length - 1])[0]
-  //               ]
-  //             )
-  //         ) {
-  //           var datenow = Date.now();
-  //           for (var i = 0; i < pricesArray.length; i++) {
-  //             if (
-  //               (datenow - parseInt(Object.keys(pricesArray[i])[0])) / 86400000 <
-  //               180
-  //             ) {
-  //               if (
-  //                 (datenow - parseInt(Object.keys(pricesArray[i])[0])) /
-  //                   86400000 <
-  //                 parseInt(result.Period)
-  //               ) {
-  //                 if (
-  //                   parseInt(minPrice) >
-  //                   parseInt(pricesArray[i][Object.keys(pricesArray[i])[0]])
-  //                 ) {
-  //                   minPrice = parseInt(
-  //                     pricesArray[i][Object.keys(pricesArray[i])[0]]
-  //                   ).toString();
-  //                 }
-  //               }
-  //               newPricesArray.push(pricesArray[i]);
-  //             }
-  //           }
-  //           datenow = datenow.toString();
-  //           var tempData = {};
-  //           tempData[datenow] = body.variants[0]["price"].toString();
-  //           newPricesArray.push(tempData);
-  //         }
-  //         const update = await Products.updateMany(
-  //           { store_id: shop, product_id: body.id },
-  //           {
-  //             $set: {
-  //               name: body.title,
-  //               current_price: body.variants[0]["price"],
-  //               compare_price: body.variants[0]["compare_at_price"],
-  //               product_type: body.product_type,
-  //               lowest_price_x_days: minPrice,
-  //               pricesArray:
-  //                 newPricesArray.length > 0 ? newPricesArray : res[0].pricesArray,
-  //             },
-  //           },
-  //           { multi: true }
-  //         );
-  //         if (update) {
-  //           console.log("Successfully updated product");
-  //         } else {
-  //           console.log("Could not update product");
-  //         }
-  //       } else {
-  //         console.log("could not find product");
-  //       }
-  //     } else {
-  //       console.log("shop: " + shop + " does not exist in the DB");
-  //     }
-  //   } catch (e) {
-  //     console.log("error at handleProductsUpdateHook");
-  //     console.log(e);
-  //   }
+  await saveProducts_variants(shop, body);
 }
 
 async function handleProductsCreateHook(shop, body) {

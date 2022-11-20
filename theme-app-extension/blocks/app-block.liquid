@@ -15,6 +15,53 @@
   
   <section class="nutrition-TableContainer" style="display:flex;flex-direction:column;justify-content:center;width:100%;align-items:{{ block.settings.vertical_alignment }};"> 
     <script>
+      {% comment %} async function _getCurrentProduct() {
+        const product = document.querySelector(`script[id*='ProductJson']`);
+      
+        if (product) {
+          return JSON.parse(product.innerHTML);
+        }
+      
+        let url;
+      
+        url = `https://${window.location.host + window.location.pathname}.json`;
+      
+        return new Promise(async (resolve, reject) => {
+          let response = await fetch(url);
+      
+          let { product } = await response.json();
+      
+          window.ezfy_product = product;
+      
+          resolve(product);
+        });
+      }
+      
+      async function _getCurrentVariant() {
+        const product = await _getCurrentProduct();
+        const variant = await _getVariantID(product);
+        return variant;
+      }
+      
+      function _getVariantID(product) {
+        const options = document.querySelector(`.product-form__variants`);
+      
+        const currentVariantID = parseInt(
+          options.selectedOptions[0].value.trim().toLowerCase(),
+        );
+      
+        const variant = product.variants.filter((e) => e.id === currentVariantID)[0];
+      
+        return variant;
+      }
+      
+      async function currentVariant() {
+        var variant = await _getCurrentVariant();
+        console.log(variant);
+      }
+      
+      currentVariant();
+      return; {% endcomment %}
     document.addEventListener("DOMContentLoaded",()=>{ 
     const fetchProducts = async(id)=>{ 
        const products = await fetch("/apps/products_liveTheme",{
