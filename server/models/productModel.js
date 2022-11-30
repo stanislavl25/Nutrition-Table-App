@@ -16,7 +16,6 @@ const productSchema = new Schema(
     nutriScore: { type: String, default: "A" },
     productToPrepare: { type: Boolean, default: false },
     product_variants_ids: [],
-    has_variants: { type: Boolean, default: false },
     it_is_variant: { type: Boolean, default: false },
     connected_productId_ifVariant: { type: String },
     richText: {

@@ -11,11 +11,6 @@ import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
 import AppSession from "./models/AppSessionModel.js";
 import { handleAllWebhooks } from "./webhookhandler.js";
-import {
-  storeCallback,
-  loadCallback,
-  deleteCallback,
-} from "./custom-sessions.js";
 const USE_ONLINE_TOKENS = true;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 
@@ -30,7 +25,10 @@ Shopify.Context.initialize({
   API_VERSION: ApiVersion.April22,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
-  SESSION_STORAGE: new Shopify.Session.MongoDBSessionStorage("mongodb://localhost:27017/", "nutritiontable"),
+  SESSION_STORAGE: new Shopify.Session.MongoDBSessionStorage(
+    "mongodb://localhost:27017/",
+    "nutritiontable"
+  ),
 });
 
 // Storing the currently active shops in memory will force them to re-login when your server restarts. You should
@@ -45,7 +43,7 @@ Shopify.Webhooks.Registry.addHandlers({
       handleAllWebhooks(shop, topic, JSON.parse(body));
     },
   },
-   PRODUCTS_CREATE: {
+  PRODUCTS_CREATE: {
     path: "/webhooks",
     webhookHandler: async (topic, shop, body) => {
       console.log(topic);
@@ -98,7 +96,7 @@ export async function createServer(
   app.post("/webhooks", async (req, res) => {
     try {
       await Shopify.Webhooks.Registry.process(req, res);
-      res.status(200).end()
+      res.status(200).end();
     } catch (error) {
       console.log(`Failed to process webhook: ${error}`);
       if (!res.headersSent) {
@@ -114,10 +112,10 @@ export async function createServer(
       console.log("gdpr hmac verified");
       console.log(topic);
       console.log(shop);
-      if (topic === "shop/redact"){
-        handleAllWebhooks(shop, topic, req.body)
+      if (topic === "shop/redact") {
+        handleAllWebhooks(shop, topic, req.body);
       }
-      res.status(200).end()
+      res.status(200).end();
     } catch (error) {
       console.log(`Failed to process webhook: ${error}`);
       if (!res.headersSent) {
@@ -897,7 +895,7 @@ export async function createServer(
 
   app.use(express.json());
 
-    app.use((req, res, next) => {
+  app.use((req, res, next) => {
     const shop = req.query.shop;
     if (Shopify.Context.IS_EMBEDDED_APP && shop) {
       res.setHeader(
@@ -905,17 +903,17 @@ export async function createServer(
         `frame-ancestors https://${shop} https://admin.shopify.com;`
       );
     } else {
-      res.setHeader("Content-Security-Policy", `frame-ancestors 'none';default-src 'self'; img-src https://*; child-src 'none';`);
+      res.setHeader(
+        "Content-Security-Policy",
+        `frame-ancestors 'none';default-src 'self'; img-src https://*; child-src 'none';`
+      );
     }
     next();
   });
 
   app.use("/*", async (req, res, next) => {
-    const {
-      shop
-    } = req.query;
-    const checkShop = await AppSession.find(
-      { id: { $regex:`${shop}_.*`} });
+    const { shop } = req.query;
+    const checkShop = await AppSession.find({ id: { $regex: `${shop}_.*` } });
     // Detect whether we need to reinstall the app, any request from Shopify will
     // include a shop in the query parameters.
     if (checkShop.length === 0 && shop !== undefined) {
@@ -951,10 +949,8 @@ export async function createServer(
     const compression = await import("compression").then(
       ({ default: fn }) => fn
     );
-const serveStatic = await import("serve-static").then(
-      ({
-        default: fn
-      }) => fn
+    const serveStatic = await import("serve-static").then(
+      ({ default: fn }) => fn
     );
     const fs = await import("fs");
     app.use(compression());
@@ -970,12 +966,10 @@ const serveStatic = await import("serve-static").then(
 
   return {
     app,
-    vite
+    vite,
   };
 }
 
 if (!isTest) {
-  createServer().then(({
-    app
-  }) => app.listen(PORT));
+  createServer().then(({ app }) => app.listen(PORT));
 }

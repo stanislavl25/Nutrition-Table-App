@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Banner,
   Button,
@@ -15,10 +16,9 @@ import {
 } from "@shopify/polaris";
 import React, { useCallback, useMemo, useState } from "react";
 import { CircleInformationMajor, SearchMinor } from "@shopify/polaris-icons";
-import { useEffect } from "react";
+import "../../assets/style.css";
 
 function ProductInfo({
-  productToPrepare,
   handleproductToPrepare,
   locationPlan,
   selectedOptions,
@@ -36,6 +36,7 @@ function ProductInfo({
   const [inputValue, setInputValue] = useState("");
   const [nutriScoreCheck, setNutriScore] = useState(false);
   const handleNonFoodProduct = useCallback((newChecked) => {
+    console.log(newChecked);
     handleChange(!newChecked, "food_product");
   }, []);
   const updateText = useCallback(
@@ -163,10 +164,7 @@ function ProductInfo({
             marginBottom: "10px",
           }}
         >
-          <Subheading>
-            {/* // todo Product name goes here */}
-            Product
-          </Subheading>
+          <Subheading>Product</Subheading>
           <Button plain onClick={() => setSourcePicker(true)}>
             Manage
           </Button>
@@ -200,17 +198,28 @@ function ProductInfo({
             <TextContainer>{tagsMarkup}</TextContainer>
           </div>
           <Checkbox
+            id="food_product"
             label="This is a non-food product"
             checked={
-              selectedOptions.length > 0
-                ? data.food_product === true
-                  ? false
-                  : true
-                : false
+              selectedOptions.length > 0 && data.food_product === true
+                ? false
+                : true
             }
             onChange={handleNonFoodProduct}
             disabled={selectedOptions.length === 0 ? true : false}
           />
+          <form class="form">
+            <label class="form__label" for="cb-1">
+              <input id="cb-1" name="cb1" type="checkbox" />
+              <span class="caption">Pitchfork hexagon deep v yes plz</span>
+            </label>
+            <label class="form__label" for="cb-2">
+              <input id="cb-2" name="cb2" type="checkbox" />
+              <span class="caption">
+                Retro food truck distillery lo-fi beard
+              </span>
+            </label>
+          </form>
           <div
             style={{
               display: "flex",
@@ -221,8 +230,13 @@ function ProductInfo({
             }}
           >
             <Checkbox
+              id="productToPrepare"
               label="Product to prepare"
-              checked={productToPrepare}
+              checked={
+                data.food_product === false
+                  ? false
+                  : selectedOptions.length > 0 && data.productToPrepare
+              }
               onChange={handleproductToPrepare}
               disabled={
                 locationPlan.plan === "Basic" ||

@@ -15,888 +15,867 @@
   
   <section class="nutrition-TableContainer" style="display:flex;flex-direction:column;justify-content:center;width:100%;align-items:{{ block.settings.vertical_alignment }};"> 
     <script>
-      {% comment %} async function _getCurrentProduct() {
-        const product = document.querySelector(`script[id*='ProductJson']`);
-      
-        if (product) {
-          return JSON.parse(product.innerHTML);
+      if (typeof lastUrl === "undefined"){
+        let lastUrl = location.href; 
+        new MutationObserver(() => {
+          const url = location.href;
+          if (url !== lastUrl) {
+            lastUrl = url;
+            onUrlChange();
+          }
+        }).observe(document, {subtree: true, childList: true});
         }
-      
-        let url;
-      
-        url = `https://${window.location.host + window.location.pathname}.json`;
-      
-        return new Promise(async (resolve, reject) => {
-          let response = await fetch(url);
-      
-          let { product } = await response.json();
-      
-          window.ezfy_product = product;
-      
-          resolve(product);
-        });
+        function onUrlChange() {
+          const url = new URL(location.href);
+          const new_variant=url.searchParams.get('variant');
+          console.log(new_variant);
+          fetchProducts(new_variant) 
+        }
+     
+    async function fetchProducts(new_variant){ 
+      if ('{{ product.gift_card? }}' === 'true' || '{{product.id}}' === '') {
+        return;
       }
-      
-      async function _getCurrentVariant() {
-        const product = await _getCurrentProduct();
-        const variant = await _getVariantID(product);
-        return variant;
-      }
-      
-      function _getVariantID(product) {
-        const options = document.querySelector(`.product-form__variants`);
-      
-        const currentVariantID = parseInt(
-          options.selectedOptions[0].value.trim().toLowerCase(),
-        );
-      
-        const variant = product.variants.filter((e) => e.id === currentVariantID)[0];
-      
-        return variant;
-      }
-      
-      async function currentVariant() {
-        var variant = await _getCurrentVariant();
-        console.log(variant);
-      }
-      
-      currentVariant();
-      return; {% endcomment %}
-    document.addEventListener("DOMContentLoaded",()=>{ 
-    const fetchProducts = async(id)=>{ 
-       const products = await fetch("/apps/products_liveTheme",{
-        method:"POST",
-       headers:{
-         'Content-Type': 'application/json',
-         Accept: 'application/json'
-       }, 
-       body:JSON.stringify({id:id})
+      var prodId;
+      if (new_variant===""){
+         prodId = '{{ product.id }}';
+      }else {
+         prodId =  new_variant;
+      } 
+     const products = await fetch("/apps/products_liveTheme",{
+      method:"POST",
+      headers:{
+       'Content-Type': 'application/json',
+       Accept: 'application/json'
+      }, 
+      body:JSON.stringify({ id: prodId })
       }).then((res)=>res.json()).then((response)=>{    
-       const data = response.data[0];
-       const shop = response.shopData[0]; 
-       const container = document.getElementById('container'); 
-       const topHeaderElem = document.getElementById("header1"); 
-       const aPreparedPortionIsEquivalentToElem = document.getElementById("aPreparedPortionIsEquivalentTo");
-       const header_border = document.getElementById("header_border"); 
-       if( response.success && response.data.length === 0){ 
-          container.style.display = "none";
-          container.style. height = "50px"; 
-          return;
-      } else if(response.success && response.data.length > 0){  
-          container.style.display = "block";
-          topHeaderElem.style.cssText = "font-weight:bolder;font-size:{{ block.settings.acorddions_headings_font_size }}px;";
-          if(!shop.location === "EU" || !data.productToPrepare ) {
-            header_border.style.cssText = "border-bottom:{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};"
-          }
-          if(shop.location==="EU"){
-          topHeaderElem.innerText = shop.NutritionInformation
-        }else{
-          topHeaderElem.innerText = shop.nutritionFacts
+     const data = response.data[0];
+     const shop = response.shopData[0]; 
+     const container = document.getElementById('container'); 
+     const topHeaderElem = document.getElementById("header1"); 
+     const aPreparedPortionIsEquivalentToElem = document.getElementById("aPreparedPortionIsEquivalentTo");
+     const header_border = document.getElementById("header_border"); 
+     if( response.success && response.data.length === 0){ 
+        container.style.display = "none";
+        container.style. height = "50px"; 
+        return;
+    } else if(response.success && response.data.length > 0){  
+        container.style.display = "block";
+        topHeaderElem.style.cssText = "font-weight:bolder;font-size:{{ block.settings.acorddions_headings_font_size }}px;";
+        if(!shop.location === "EU" || !data.productToPrepare ) {
+          header_border.style.cssText = "border-bottom:{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};"
         }
-        if(shop.location === "EU" && data.productToPrepare){
-          const strong = document.createElement("strong");
-          const unit = data.servingSize.EU.PortionSizeUnit === "Grams"?"g":"mg"
-          const text = shop.aPreparedPortionIsEquivalentTo + " " + data.servingSize.EU.PortionSize + unit 
-          const aPreparedPortionIsEquivalentTo = document.getElementById('aPreparedPortionIsEquivalentTo');
-          aPreparedPortionIsEquivalentTo.style.display = "block";
-          strong.innerText = text
-          aPreparedPortionIsEquivalentToElem.append(strong); 
-        }
-        
-        if(shop.location === "NA"){
-          const ServingspercontainerNAContainer = document.getElementById('ServingspercontainerNAContainer');
-          ServingspercontainerNAContainer.style.display = "block";
-          let strongElem = document.createElement("strong")
-          const ServingspercontainerNAElem = document.getElementById("ServingspercontainerNA")
-          const ServingSizeNAElem = document.getElementById("ServingSizeNA")
-          const text = data.servingSize.NA.Servingspercontainer + " " + shop.servingsPerContainer 
-          ServingspercontainerNAElem.innerHTML = text
-          ServingspercontainerNAElem.style.cssText = 'color:{{ block.settings.base_fontColor }};';
-          strongElem.innerHTML = shop.servingSize
-          strongElem.style.cssText += 'color:{{ block.settings.base_fontColor }};';
-          ServingSizeNAElem.append(strongElem)
-          const strongText = data.servingSize.NA.Servingreference + " " + data.servingSize.NA.servingsize
-          strongElem.innerHTML = strongText
-          strongElem.style.cssText += 'color:{{ block.settings.base_fontColor }};';
-          ServingSizeNAElem.append(strongElem)
-        }
-        
-        if(shop.location === "CA"){ 
-          const servingSizeCA = document.getElementById('servingSizeCA');
-          servingSizeCA.style.display = "block";
-          let  p = document.createElement("p")
-          let  p1 = document.createElement("p")
-          let  strong = document.createElement("strong")
-          let  div = document.createElement("div")
-          strong.innerText = "Valeur nutritive"
-          strong.style.cssText += 'color:{{ block.settings.base_fontColor }};';
-          servingSizeCA.append(strong)
-          const unit = data.servingSize.CA.unitBasic === "Milliliters" ? "ml" : "l";
-          const textelem = data.servingSize.CA.servingRefBasic + " " + data.servingSize.CA.servingSizeBasic + unit
-          p.innerHTML = textelem;
-          p.style.cssText += 'color:{{ block.settings.base_fontColor }};';
-          div.append(p)
-          const unit2 = data.servingSize.CA.unitBasic === "Milliliters" ? "ml" : "l";
-          const text2 = data.servingSize.CA.bilingualRefBasic + " " + data.servingSize.CA.servingSizeBasic + unit2
-          p1.innerHTML = text2
-          p1.style.cssText += 'color:{{ block.settings.base_fontColor }};';
-          div.append(p1)
-          servingSizeCA.append(div)
-        }
-        
-        if(shop.location === "CA"){          
-          const caloriesPerServingBasicContainer = document.getElementById('caloriesPerServingBasicContainer');
-          caloriesPerServingBasicContainer.style.display = "block";
-          const caloriesPerServingBasic = document.getElementById("caloriesPerServingBasic");
-          const h4 = document.createElement("h4");
-          const strong  = document.createElement("strong");
-          const text = "Calories" + " " + data.servingSize.CA.caloriesPerServingBasic
-          h4.innerText = text;
-          h4.style.cssText += 'color:{{ block.settings.base_fontColor }};';
-          caloriesPerServingBasic.append(h4);
-          strong.innerText = "% Daily Value*"
-          strong.style.cssText= 'color:{{ block.settings.base_fontColor }};';
-          caloriesPerServingBasic.append(strong);
-        }
-         
-        const thead = document.querySelector('thead');
-          thead.style.cssText =  shop.location === "NA" && data.productToPrepare ?"{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }}":"{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }}"
-          if(shop.location === "EU"){
-          const tr = document.createElement('tr');
-          tr.style.cssText = "color:{{ block.settings.base_fontColor }};word-break: break-all;";
-          const th = document.createElement("th");
-          const th1 = document.createElement("th");
-          th1.innerText = "Serving size";
-          th1.style.cssText = "text-align:left;color:{{ block.settings.base_fontColor }};"
-          tr.append(th1)
-          const unit = data.servingSize.EU.DefaultAmountUnit === "MilliGrams"? "mg": "g"
-          const text = shop.per + " " + data.servingSize.EU.DefaultAmount + unit
-          th.innerText = text;
-          tr.append(th);
-          if(shop.shop_plan !== "Basic"){
-            const th2 = document.createElement("th");
-            const text2 = data.productToPrepare ? "" : shop.portion
-            const text3 = data.productToPrepare ? shop.preparedPortion : 1 
-            const unit1 = data.servingSize.EU.PortionSizeUnit === "MilliGrams"?"mg": "g";
-            const finalText = data.servingSize.EU.PortionSize + " " + unit1 
-            th2.innerHTML = text3 + "\n" + text2 + "\n" + finalText 
-            tr.append(th2)
-            const th3 = document.createElement("th");
-            th3.innerText = "% RI*"
-            th3.style.cssText = "border-right:none;"
-            tr.append(th3)
-            thead.append(tr);
-          }
-        }
-
-        if(shop.location === "NA"){
-          const tr = document.createElement('tr');
-          const th = document.createElement('th');
-          const strong = document.createElement("strong");
-          const th1 = document.createElement('th');
-          const th2 = document.createElement('th');
-          const strong1 = document.createElement("strong");
-          const strong2 = document.createElement("strong");
-          th.style.cssText = "text-align:left;";
-          tr.style.cssText = "color:{{ block.settings.base_fontColor }};";
-          strong.innerText = shop.amountPerServing;
-          th.append(strong)
-          tr.append(th);
-          th1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align:right;"
-          strong1.innerText = data.servingSize.NA.Servingreference
-          th1.append(strong1);
-          tr.append(th1);
-          th2.style.cssText = "text-align:right;";
-          strong2.innerText = "As prepared";
-          th2.append(strong2)
-          tr.append(th2);
-          thead.append(tr);
-          const tr1 = document.createElement('tr');
-          const th4 = document.createElement("th");
-          const th5 = document.createElement("th");
-          const th6 = document.createElement("th");
-          const strong3 = document.createElement("strong")
-          const strong4 = document.createElement("strong")
-          const strong5 = document.createElement("strong")
-          tr1.style.cssText = "border-bottom:{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};";
-          th4.style.cssText = "text-align:left;";
-          th5.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align: right;"
-          th6.style.cssText = "text-align:right;"
-          strong4.style.cssText = "text-align:right;"
-          strong3.innerText = shop.calories;
-          th4.append(strong3)
-          tr.append(th4)
-          strong4.innerText = data.servingSize.NA.Unpreparedcalories;
-          th5.append(strong4)
-          tr.append(th5)
-          strong5.innerText = data.servingSize.NA.Preparedcalories;
-          th6.append(strong5)
-          tr.append(th6)
-          thead.append(tr);
-          const tr2 = document.createElement('tr');
-          if(data.productToPrepare){
-            const th7 = document.createElement("th");
-            const th8 = document.createElement("th");
-            const th9 = document.createElement("th");
-            tr2.append(th7)
-            th8.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align:right;"
-            th8.innerText = "% DV*"
-            tr2.append(th8)
-            th9.style.cssText = "text-align:right;"
-            th9.innerText = "% DV*"
-            tr2.append(th9)
-            thead.append(tr2)
-          }else{
-            const th10 = document.createElement("th");
-            const strong = document.createElement("strong")
-            th10.style.cssText = "text-align:right;width:100%;border-bottom:none;"
-            strong.innerText = "% Daily Value*"
-            th10.append(strong)
-            tr2.append(th10) 
-            thead.append(tr2)
-          }
-        } 
-
-        const tbody = document.getElementById("tbody");
+        if(shop.location==="EU"){
+        topHeaderElem.innerText = shop.NutritionInformation
+      }else{
+        topHeaderElem.innerText = shop.nutritionFacts
+      }
+      if(shop.location === "EU" && data.productToPrepare){
+        const strong = document.createElement("strong");
+        const unit = data.servingSize.EU.PortionSizeUnit === "Grams"?"g":"mg"
+        const text = shop.aPreparedPortionIsEquivalentTo + " " + data.servingSize.EU.PortionSize + unit 
+        const aPreparedPortionIsEquivalentTo = document.getElementById('aPreparedPortionIsEquivalentTo');
+        aPreparedPortionIsEquivalentTo.style.display = "block";
+        strong.innerText = text
+        aPreparedPortionIsEquivalentToElem.append(strong); 
+      }
+      
+      if(shop.location === "NA"){
+        const ServingspercontainerNAContainer = document.getElementById('ServingspercontainerNAContainer');
+        ServingspercontainerNAContainer.style.display = "block";
+        let strongElem = document.createElement("strong")
+        const ServingspercontainerNAElem = document.getElementById("ServingspercontainerNA")
+        const ServingSizeNAElem = document.getElementById("ServingSizeNA")
+        const text = data.servingSize.NA.Servingspercontainer + " " + shop.servingsPerContainer 
+        ServingspercontainerNAElem.innerHTML = text
+        ServingspercontainerNAElem.style.cssText = 'color:{{ block.settings.base_fontColor }};';
+        strongElem.innerHTML = shop.servingSize
+        strongElem.style.cssText += 'color:{{ block.settings.base_fontColor }};';
+        ServingSizeNAElem.append(strongElem)
+        const strongText = data.servingSize.NA.Servingreference + " " + data.servingSize.NA.servingsize
+        strongElem.innerHTML = strongText
+        strongElem.style.cssText += 'color:{{ block.settings.base_fontColor }};';
+        ServingSizeNAElem.append(strongElem)
+      }
+      
+      if(shop.location === "CA"){ 
+        const servingSizeCA = document.getElementById('servingSizeCA');
+        servingSizeCA.style.display = "block";
+        let  p = document.createElement("p")
+        let  p1 = document.createElement("p")
+        let  strong = document.createElement("strong")
+        let  div = document.createElement("div")
+        strong.innerText = "Valeur nutritive"
+        strong.style.cssText += 'color:{{ block.settings.base_fontColor }};';
+        servingSizeCA.append(strong)
+        const unit = data.servingSize.CA.unitBasic === "Milliliters" ? "ml" : "l";
+        const textelem = data.servingSize.CA.servingRefBasic + " " + data.servingSize.CA.servingSizeBasic + unit
+        p.innerHTML = textelem;
+        p.style.cssText += 'color:{{ block.settings.base_fontColor }};';
+        div.append(p)
+        const unit2 = data.servingSize.CA.unitBasic === "Milliliters" ? "ml" : "l";
+        const text2 = data.servingSize.CA.bilingualRefBasic + " " + data.servingSize.CA.servingSizeBasic + unit2
+        p1.innerHTML = text2
+        p1.style.cssText += 'color:{{ block.settings.base_fontColor }};';
+        div.append(p1)
+        servingSizeCA.append(div)
+      }
+      
+      if(shop.location === "CA"){          
+        const caloriesPerServingBasicContainer = document.getElementById('caloriesPerServingBasicContainer');
+        caloriesPerServingBasicContainer.style.display = "block";
+        const caloriesPerServingBasic = document.getElementById("caloriesPerServingBasic");
+        const h4 = document.createElement("h4");
+        const strong  = document.createElement("strong");
+        const text = "Calories" + " " + data.servingSize.CA.caloriesPerServingBasic
+        h4.innerText = text;
+        h4.style.cssText += 'color:{{ block.settings.base_fontColor }};';
+        caloriesPerServingBasic.append(h4);
+        strong.innerText = "% Daily Value*"
+        strong.style.cssText= 'color:{{ block.settings.base_fontColor }};';
+        caloriesPerServingBasic.append(strong);
+      }
+       
+      const thead = document.querySelector('thead');
+        thead.style.cssText =  shop.location === "NA" && data.productToPrepare ?"{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }}":"{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }}"
         if(shop.location === "EU"){
-          const tr = document.createElement("tr");
-          const td1 = document.createElement("td");
+        const tr = document.createElement('tr');
+        tr.style.cssText = "color:{{ block.settings.base_fontColor }};word-break: break-all;";
+        const th = document.createElement("th");
+        const th1 = document.createElement("th");
+        th1.innerText = "Serving size";
+        th1.style.cssText = "text-align:left;color:{{ block.settings.base_fontColor }};"
+        tr.append(th1)
+        const unit = data.servingSize.EU.DefaultAmountUnit === "MilliGrams"? "mg": "g"
+        const text = shop.per + " " + data.servingSize.EU.DefaultAmount + unit
+        th.innerText = text;
+        tr.append(th);
+        if(shop.shop_plan !== "Basic"){
+          const th2 = document.createElement("th");
+          const text2 = data.productToPrepare ? "" : shop.portion
+          const text3 = data.productToPrepare ? shop.preparedPortion : 1 
+          const unit1 = data.servingSize.EU.PortionSizeUnit === "MilliGrams"?"mg": "g";
+          const finalText = data.servingSize.EU.PortionSize + " " + unit1 
+          th2.innerHTML = text3 + "\n" + text2 + "\n" + finalText 
+          tr.append(th2)
+          const th3 = document.createElement("th");
+          th3.innerText = "% RI*"
+          th3.style.cssText = "border-right:none;"
+          tr.append(th3)
+          thead.append(tr);
+        }
+      }
+
+      if(shop.location === "NA"){
+        const tr = document.createElement('tr');
+        const th = document.createElement('th');
+        const strong = document.createElement("strong");
+        const th1 = document.createElement('th');
+        const th2 = document.createElement('th');
+        const strong1 = document.createElement("strong");
+        const strong2 = document.createElement("strong");
+        th.style.cssText = "text-align:left;";
+        tr.style.cssText = "color:{{ block.settings.base_fontColor }};";
+        strong.innerText = shop.amountPerServing;
+        th.append(strong)
+        tr.append(th);
+        th1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align:right;"
+        strong1.innerText = data.servingSize.NA.Servingreference
+        th1.append(strong1);
+        tr.append(th1);
+        th2.style.cssText = "text-align:right;";
+        strong2.innerText = "As prepared";
+        th2.append(strong2)
+        tr.append(th2);
+        thead.append(tr);
+        const tr1 = document.createElement('tr');
+        const th4 = document.createElement("th");
+        const th5 = document.createElement("th");
+        const th6 = document.createElement("th");
+        const strong3 = document.createElement("strong")
+        const strong4 = document.createElement("strong")
+        const strong5 = document.createElement("strong")
+        tr1.style.cssText = "border-bottom:{{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};";
+        th4.style.cssText = "text-align:left;";
+        th5.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align: right;"
+        th6.style.cssText = "text-align:right;"
+        strong4.style.cssText = "text-align:right;"
+        strong3.innerText = shop.calories;
+        th4.append(strong3)
+        tr.append(th4)
+        strong4.innerText = data.servingSize.NA.Unpreparedcalories;
+        th5.append(strong4)
+        tr.append(th5)
+        strong5.innerText = data.servingSize.NA.Preparedcalories;
+        th6.append(strong5)
+        tr.append(th6)
+        thead.append(tr);
+        const tr2 = document.createElement('tr');
+        if(data.productToPrepare){
+          const th7 = document.createElement("th");
+          const th8 = document.createElement("th");
+          const th9 = document.createElement("th");
+          tr2.append(th7)
+          th8.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};text-align:right;"
+          th8.innerText = "% DV*"
+          tr2.append(th8)
+          th9.style.cssText = "text-align:right;"
+          th9.innerText = "% DV*"
+          tr2.append(th9)
+          thead.append(tr2)
+        }else{
+          const th10 = document.createElement("th");
+          const strong = document.createElement("strong")
+          th10.style.cssText = "text-align:right;width:100%;border-bottom:none;"
+          strong.innerText = "% Daily Value*"
+          th10.append(strong)
+          tr2.append(th10) 
+          thead.append(tr2)
+        }
+      } 
+
+      const tbody = document.getElementById("tbody");
+      if(shop.location === "EU"){
+        const tr = document.createElement("tr");
+        const td1 = document.createElement("td");
+        const td = document.createElement("td");
+        const b = document.createElement("b");
+        const div = document.createElement("div");
+        const div1  = document.createElement("div");
+        const div2 = document.createElement("div");
+        tr.style.cssText = "border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};"
+        td1.classList.add("thtd");
+        td1.style.cssText= "text-align:left;border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+        td.style.cssText= "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+        b.innerText = "Energy";
+        td1.append(b)
+        tr.append(td1)
+        td.classList.add("thtd", "td");
+        div1.innerText = data.calsEnergyInfo.energyKj100 + "kj"
+        div2.innerText = data.calsEnergyInfo.energyKcal100 + "kcal"
+        div.append(div1)
+        div.append(div2)
+        td.append(div)
+        tr.append(td)
+        if(shop.shop_plan !== "Basic"){
           const td = document.createElement("td");
-          const b = document.createElement("b");
+          const td1 = document.createElement("td");
           const div = document.createElement("div");
-          const div1  = document.createElement("div");
+          const div1 = document.createElement("div");
           const div2 = document.createElement("div");
-          tr.style.cssText = "border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};"
-          td1.classList.add("thtd");
-          td1.style.cssText= "text-align:left;border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
-          td.style.cssText= "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
-          b.innerText = "Energy";
-          td1.append(b)
-          tr.append(td1)
-          td.classList.add("thtd", "td");
-          div1.innerText = data.calsEnergyInfo.energyKj100 + "kj"
-          div2.innerText = data.calsEnergyInfo.energyKcal100 + "kcal"
+          td.classList.add("thtd", "td")
+          td1.classList.add("thtd", "td")
+          td.style.cssText = "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          td1.style.cssText = "border-right:none;border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          div1.innerText = data.calsEnergyInfo.energyKj25 + "kj"
+          div2.innerText = data.calsEnergyInfo.energyKcal25 + "kcal"
           div.append(div1)
           div.append(div2)
           td.append(div)
           tr.append(td)
-          if(shop.shop_plan !== "Basic"){
-            const td = document.createElement("td");
-            const td1 = document.createElement("td");
-            const div = document.createElement("div");
-            const div1 = document.createElement("div");
-            const div2 = document.createElement("div");
-            td.classList.add("thtd", "td")
-            td1.classList.add("thtd", "td")
-            td.style.cssText = "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            td1.style.cssText = "border-right:none;border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            div1.innerText = data.calsEnergyInfo.energyKj25 + "kj"
-            div2.innerText = data.calsEnergyInfo.energyKcal25 + "kcal"
-            div.append(div1)
-            div.append(div2)
-            td.append(div)
-            tr.append(td)
-            td1.innerText = data.calsEnergyInfo.Ri + "%"
-            tr.append(td1)
+          td1.innerText = data.calsEnergyInfo.Ri + "%"
+          tr.append(td1)
 
-          }
-          tbody.append(tr);
         }
+        tbody.append(tr);
+      }
 
-        //!!* ~######## nutrition Data 
+      //!!* ~######## nutrition Data 
 
-        if(shop.location === "EU"){
-          data.nutritionData.forEach((element)=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td");
-            const td2 = document.createElement("td");
-            const p = document.createElement("p");
-            tr.style.cssText = "border-bottom: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};"
-            td.classList.add("thtd")
-            td.style.cssText = "text-align:left;border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            td2.style.cssText = "border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
-            p.style.marginLeft = element.leftSpacing + "px";
-            p.innerText = element.name;
-            td.append(p);
-            tr.append(td);
-            td1.classList.add("thtd","td")
-            const unit = element.unit === "MilliGrams" ? "mg" : "g"
-            td1.innerText = element.per100g + " " + unit
-            tr.append(td1);
-            if(shop.plan !== "Basic"){
-              let text1 = (element.RI).toString();
-              for(var i=0; i<shop.recommendedIntake.length;i++){
-                if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
-                  if (shop.recommendedIntake[i].unit === "Milligrams") {
-                    text1 += "k"  + " %";
-                  } else if (shop.recommendedIntake[i].unit === "Micrograms") {
-                    text1 += "m"  + " %";
-                  } else {
-                    text1 += " %";
-                  } 
-                  break;   
-                }
-              } 
-              const td = document.createElement('td');
-              const td1 = document.createElement('td');
-              td.classList.add("thtd","td")
-              td1.classList.add("thtd","td")
-              const unit = element.unit === "MilliGrams" ? "mg" : "g"
-              const text = element.perportion + " " + unit;
-              td.innerText = text;
-              td.style.cssText = "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
-              td1.style.cssText = "border-right:none;";
-              td1.innerText = text1;
-              tr.append(td)
-              tr.append(td1)
-            }
-            tbody.append(tr);
-          })
-        } 
-
-        if(shop.location === "NA"){
-          data.nutritionData.forEach((element)=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td");
-            const td2 = document.createElement("td");
-            const div = document.createElement("div");
-            const p = document.createElement("p");
-            const p1 = document.createElement("p");
-            const p2 = document.createElement("p");
-            const p3 = document.createElement("p");
-            const strong = document.createElement("strong");
-            const strong1 = document.createElement("strong");
-            tr.style.cssText = "border-bottom: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};";
-            div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
-            if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
-            p.style.marginLeft = element.leftSpacing + "px";
-
-            if(data.productToPrepare){
-              p.innerText = element.name;
-              div.append(p)
-              td.append(div);
-              tr.append(td);
-              td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};display:flex;flex-direction:row;align-items:center;justify-content:space-between;"
-              const unit = element.unit === "MilliGrams" ? "mg" : "g"
-              p1.innerText = element.quantity + unit
-              strong.innerText = element.dailyValue + "%"
-              p2.append(strong)
-              td1.append(p1)
-              td1.append(p2)
-              tr.append(td1)
-              td2.style.cssText = "text-align:right;";
-              strong1.innerText = element.preparedProductDV + "%"
-              p3.append(strong1);
-              td2.append(p3);
-              tr.append(td2);
-        
-            }else{
-              p.innerText = element.name;
-              const unit = element.unit === "Grams" ? "g" : "mg"
-              p1.innerText = element.quantity + unit;
-              div.append(p)
-              div.append(p1)
-              td.append(div);
-              tr.append(td);
-              td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:end;text-align:right;"
-              strong.innerText = element.dailyValue + "%"
-              p2.append(strong)
-              td1.append(p2)
-              tr.append(td1)
-            }
-            tbody.append(tr);
-          })
-        } 
-
-        if(shop.location === "CA"){
-          data.nutritionData.forEach((element)=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td"); 
-            const div = document.createElement("div");
-            const p = document.createElement("p");
-            const p1 = document.createElement("p"); 
-         
-            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            td.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
-            if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
-            p.style.marginLeft = element.leftSpacing + "px";
-            p.innerText = element.name;
-            div.append(p)
-            const unit = element.Unit === "Grams" ? "g" : "mg";
-            const text = element.quantity + unit;
-            p1.innerText = text;
-            div.append(p1)
-            td.append(div);
-            tr.append(td);
-            td1.style.cssText = "text-align:right;";
-            td1.innerText =  element.dailyValue;
-            tr.append(td1);
-            tbody.append(tr);
-            })
-        }
-
-
-       
-        const tfoot = document.getElementById('tfoot')
-        tfoot.style.cssText = "border-bottom: {{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};border-top: {{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};"
-        if(shop.location === "EU"){
-           
-          //!!* ~######## vitamins
-
-          data.vitamins.forEach((element)=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td"); 
-            const td2 = document.createElement("td"); 
-            const td3 = document.createElement("td");  
-            const p = document.createElement("p"); 
-            tr.style.cssText = 'border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
-            td.classList.add('thtd');
-            td.style.cssText = 'text-align:left;color:{{ block.settings.base_fontColor }};';
-            td1.style.cssText = 'color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
-            td2.style.cssText = 'color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
-            p.style.marginLeft = element.LeftSpacing + "px";
-            p.innerText = element.name;
-            td.append(p);
-            tr.append(td);
-            td1.classList.add('thtd','td');
-            const unit = element.unit === "Milligrams" ? "mg" : "g";
-            const text = element.per100g + unit;
-            td1.innerText = text;
-            tr.append(td1);
-            if(shop.shop_plan !== "Basic"){
-              let text1 = element.RI;
-              for(var i=0; i<shop.recommendedIntake.length;i++){
-                if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
-                  if (shop.recommendedIntake[i].unit === "Milligrams") {
-                    text1 += "k"  + " %";
-                  } else if (shop.recommendedIntake[i].unit === "Micrograms") {
-                    text1 += "m"  + " %";
-                  } else {
-                    text1 += " %";
-                  }   
-                break;
-                }
-              } 
-              const unit = element.unit === "Milligrams" ? "mg" : "g";
-              const text = element.perportion + unit
-              td2.classList.add('thtd',"td")
-              td3.classList.add('thtd',"td")
-              td2.innerText = text;
-              tr.append(td2);
-              td3.style.cssText ="color:{{ block.settings.base_fontColor }};border-right:none;"
-              td3.innerText = text1;
-              tr.append(td3);
-            }
-            tfoot.append(tr);
-          })
-          //!!* ~######## minerals
-          data.minerals.forEach((element)=>{ 
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td"); 
-            const td2 = document.createElement("td"); 
-            const td3 = document.createElement("td");  
-            const p = document.createElement("p"); 
-            tr.style.cssText = 'border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
-            td.classList.add("thtd");
-            td.style.cssText = "text-align:left;color:{{ block.settings.base_fontColor }};";
-            td1.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
-            td2.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
-            p.style.marginLeft = element.LeftSpacing + "px";
-            p.innerText = element.name;
-            td.append(p);
-            tr.append(td);
-            
-            td1.classList.add("thtd","td");
-            const unit = element.unit === "Milligrams" ? "mg" : "g"
-            const text = element.per100g + unit;
-            td1.innerText = text;
-            tr.append(td1);
-            
-            td2.classList.add("thtd","td");
-            const unit1 = element.unit === "Milligrams" ? "mg" : "g"
-            const text1 = element.perportion + unit1;
-            td2.innerText = text1;
-            tr.append(td2);
-            
-            td3.classList.add("thtd","td");
-            td3.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:none;";
-            let text2 = element.RI;
+      if(shop.location === "EU"){
+        data.nutritionData.forEach((element)=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td");
+          const td2 = document.createElement("td");
+          const p = document.createElement("p");
+          tr.style.cssText = "border-bottom: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};"
+          td.classList.add("thtd")
+          td.style.cssText = "text-align:left;border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          td2.style.cssText = "border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
+          p.style.marginLeft = element.leftSpacing + "px";
+          p.innerText = element.name;
+          td.append(p);
+          tr.append(td);
+          td1.classList.add("thtd","td")
+          const unit = element.unit === "MilliGrams" ? "mg" : "g"
+          td1.innerText = element.per100g + " " + unit
+          tr.append(td1);
+          if(shop.plan !== "Basic"){
+            let text1 = (element.RI).toString();
             for(var i=0; i<shop.recommendedIntake.length;i++){
               if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
                 if (shop.recommendedIntake[i].unit === "Milligrams") {
-                  text2 += "k"  + " %";
+                  text1 += "k"  + " %";
                 } else if (shop.recommendedIntake[i].unit === "Micrograms") {
-                  text2 += "m"  + " %";
+                  text1 += "m"  + " %";
                 } else {
-                  text2 += " %";
+                  text1 += " %";
+                } 
+                break;   
+              }
+            } 
+            const td = document.createElement('td');
+            const td1 = document.createElement('td');
+            td.classList.add("thtd","td")
+            td1.classList.add("thtd","td")
+            const unit = element.unit === "MilliGrams" ? "mg" : "g"
+            const text = element.perportion + " " + unit;
+            td.innerText = text;
+            td.style.cssText = "border-right: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+            td1.style.cssText = "border-right:none;";
+            td1.innerText = text1;
+            tr.append(td)
+            tr.append(td1)
+          }
+          tbody.append(tr);
+        })
+      } 
+
+      if(shop.location === "NA"){
+        data.nutritionData.forEach((element)=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td");
+          const td2 = document.createElement("td");
+          const div = document.createElement("div");
+          const p = document.createElement("p");
+          const p1 = document.createElement("p");
+          const p2 = document.createElement("p");
+          const p3 = document.createElement("p");
+          const strong = document.createElement("strong");
+          const strong1 = document.createElement("strong");
+          tr.style.cssText = "border-bottom: {{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};color:{{ block.settings.base_fontColor }};";
+          div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
+          if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
+          p.style.marginLeft = element.leftSpacing + "px";
+
+          if(data.productToPrepare){
+            p.innerText = element.name;
+            div.append(p)
+            td.append(div);
+            tr.append(td);
+            td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};display:flex;flex-direction:row;align-items:center;justify-content:space-between;"
+            const unit = element.unit === "MilliGrams" ? "mg" : "g"
+            p1.innerText = element.quantity + unit
+            strong.innerText = element.dailyValue + "%"
+            p2.append(strong)
+            td1.append(p1)
+            td1.append(p2)
+            tr.append(td1)
+            td2.style.cssText = "text-align:right;";
+            strong1.innerText = element.preparedProductDV + "%"
+            p3.append(strong1);
+            td2.append(p3);
+            tr.append(td2);
+      
+          }else{
+            p.innerText = element.name;
+            const unit = element.unit === "Grams" ? "g" : "mg"
+            p1.innerText = element.quantity + unit;
+            div.append(p)
+            div.append(p1)
+            td.append(div);
+            tr.append(td);
+            td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:end;text-align:right;"
+            strong.innerText = element.dailyValue + "%"
+            p2.append(strong)
+            td1.append(p2)
+            tr.append(td1)
+          }
+          tbody.append(tr);
+        })
+      } 
+
+      if(shop.location === "CA"){
+        data.nutritionData.forEach((element)=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td"); 
+          const div = document.createElement("div");
+          const p = document.createElement("p");
+          const p1 = document.createElement("p"); 
+       
+          tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          td.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
+          if(element.bold==="Yes")p.style.cssText = "font-weight:bold;"
+          p.style.marginLeft = element.leftSpacing + "px";
+          p.innerText = element.name;
+          div.append(p)
+          const unit = element.Unit === "Grams" ? "g" : "mg";
+          const text = element.quantity + unit;
+          p1.innerText = text;
+          div.append(p1)
+          td.append(div);
+          tr.append(td);
+          td1.style.cssText = "text-align:right;";
+          td1.innerText =  element.dailyValue;
+          tr.append(td1);
+          tbody.append(tr);
+          })
+      }
+
+
+     
+      const tfoot = document.getElementById('tfoot')
+      tfoot.style.cssText = "border-bottom: {{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};border-top: {{ block.settings.secondaryBorderThickness }}px solid {{ block.settings.secondaryBorder }};"
+      if(shop.location === "EU"){
+         
+        //!!* ~######## vitamins
+
+        data.vitamins.forEach((element)=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td"); 
+          const td2 = document.createElement("td"); 
+          const td3 = document.createElement("td");  
+          const p = document.createElement("p"); 
+          tr.style.cssText = 'border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
+          td.classList.add('thtd');
+          td.style.cssText = 'text-align:left;color:{{ block.settings.base_fontColor }};';
+          td1.style.cssText = 'color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
+          td2.style.cssText = 'color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
+          p.style.marginLeft = element.LeftSpacing + "px";
+          p.innerText = element.name;
+          td.append(p);
+          tr.append(td);
+          td1.classList.add('thtd','td');
+          const unit = element.unit === "Milligrams" ? "mg" : "g";
+          const text = element.per100g + unit;
+          td1.innerText = text;
+          tr.append(td1);
+          if(shop.shop_plan !== "Basic"){
+            let text1 = element.RI;
+            for(var i=0; i<shop.recommendedIntake.length;i++){
+              if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
+                if (shop.recommendedIntake[i].unit === "Milligrams") {
+                  text1 += "k"  + " %";
+                } else if (shop.recommendedIntake[i].unit === "Micrograms") {
+                  text1 += "m"  + " %";
+                } else {
+                  text1 += " %";
                 }   
               break;
               }
             } 
-            td3.innerText = text2
+            const unit = element.unit === "Milligrams" ? "mg" : "g";
+            const text = element.perportion + unit
+            td2.classList.add('thtd',"td")
+            td3.classList.add('thtd',"td")
+            td2.innerText = text;
+            tr.append(td2);
+            td3.style.cssText ="color:{{ block.settings.base_fontColor }};border-right:none;"
+            td3.innerText = text1;
             tr.append(td3);
-
-            tfoot.append(tr);
-          })
-        }
-
-        if(shop.location === "NA"){
-          //!!* ~######## vitamins
-          data.vitamins.forEach((element)=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td"); 
-            const td2 = document.createElement("td");   
-            const div = document.createElement("div");
-            const p = document.createElement("p"); 
-            const p1 = document.createElement("p"); 
-            const p2 = document.createElement("p"); 
-            const p3 = document.createElement("p"); 
-            const strong = document.createElement("strong"); 
-            const strong1 = document.createElement("strong"); 
-            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
-            p.style.marginLeft = element.LeftSpacing + "px";
-
-            if(data.productToPrepare){
-              p.innerText = element.name;
-              div.append(p);
-              td.append(div);
-              tr.append(td);
-              
-              td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-              const unit = element.unit === "Grams" ? "g" : "mg"
-              const text = element.quantity + unit;
-              p1.innerText = text;
-              td1.append(p1);
-              strong.innerText = element.dailyValue;
-              p2.append(strong);
-              td1.append(p2);
-              tr.append(td1);
-              
-              td2.style.cssText = "text-align:right;";
-              strong1.innerText = element.dailyValue ? element.RI : "0" + "%"
-              p3.append(strong1);
-              td2.append(p3)
-              tr.append(td2);
-            } else {
-              p.innerText = element.name;
-              const unit = element.unit === "Grams" ? "g" : "mg"
-              const text = element.quantity + unit;
-              p1.innerText = text;
-              div.append(p);
-              div.append(p1);
-              td.append(div);
-              tr.append(td);
-
-              td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:right;text-align:right;"
-              p2.style.cssText = "white-space:nowrap;"
-              strong.innerText = element.dailyValue;
-              p2.append(strong);
-              td1.append(p2);
-              strong1.innerText = "%";
-              td1.append(strong1);
-              tr.append(td1);
+          }
+          tfoot.append(tr);
+        })
+        //!!* ~######## minerals
+        data.minerals.forEach((element)=>{ 
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td"); 
+          const td2 = document.createElement("td"); 
+          const td3 = document.createElement("td");  
+          const p = document.createElement("p"); 
+          tr.style.cssText = 'border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};';
+          td.classList.add("thtd");
+          td.style.cssText = "text-align:left;color:{{ block.settings.base_fontColor }};";
+          td1.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+          td2.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+          p.style.marginLeft = element.LeftSpacing + "px";
+          p.innerText = element.name;
+          td.append(p);
+          tr.append(td);
+          
+          td1.classList.add("thtd","td");
+          const unit = element.unit === "Milligrams" ? "mg" : "g"
+          const text = element.per100g + unit;
+          td1.innerText = text;
+          tr.append(td1);
+          
+          td2.classList.add("thtd","td");
+          const unit1 = element.unit === "Milligrams" ? "mg" : "g"
+          const text1 = element.perportion + unit1;
+          td2.innerText = text1;
+          tr.append(td2);
+          
+          td3.classList.add("thtd","td");
+          td3.style.cssText = "color:{{ block.settings.base_fontColor }};border-right:none;";
+          let text2 = element.RI;
+          for(var i=0; i<shop.recommendedIntake.length;i++){
+            if((shop.recommendedIntake[i].name).toLowerCase()===(element.name).toLowerCase()){ 
+              if (shop.recommendedIntake[i].unit === "Milligrams") {
+                text2 += "k"  + " %";
+              } else if (shop.recommendedIntake[i].unit === "Micrograms") {
+                text2 += "m"  + " %";
+              } else {
+                text2 += " %";
+              }   
+            break;
             }
-         
-            tfoot.append(tr);
-          })
+          } 
+          td3.innerText = text2
+          tr.append(td3);
 
-        }
-        
-        if(shop.location === "NA"){
-          //!!* ~######## minerals
-          data.minerals.forEach(()=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td");   
-            const div = document.createElement("div");
-            const p = document.createElement("p"); 
-            const p1 = document.createElement("p"); 
-            const p2 = document.createElement("p");  
-            const strong = document.createElement("strong"); 
-            const strong1 = document.createElement("strong"); 
-            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
-            p.style.marginLeft = element.LeftSpacing + "px";
+          tfoot.append(tr);
+        })
+      }
+
+      if(shop.location === "NA"){
+        //!!* ~######## vitamins
+        data.vitamins.forEach((element)=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td"); 
+          const td2 = document.createElement("td");   
+          const div = document.createElement("div");
+          const p = document.createElement("p"); 
+          const p1 = document.createElement("p"); 
+          const p2 = document.createElement("p"); 
+          const p3 = document.createElement("p"); 
+          const strong = document.createElement("strong"); 
+          const strong1 = document.createElement("strong"); 
+          tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
+          p.style.marginLeft = element.LeftSpacing + "px";
+
+          if(data.productToPrepare){
             p.innerText = element.name;
             div.append(p);
-
-            if(data.productToPrepare){
-              td.append(div);
-              tr.append(td);
-              
-              td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-              const unit = element.unit === "Grams" ? "g" : "mg";
-              const text = element.quantity + unit;
-              p1.innerText = text;
-              strong.innerText = element.dailyValue + "%"
-              p2.style.cssText = "white-space:nowrap;"
-              p2.append(strong);
-              td1.append(p1)
-              td1.append(p2)
-              tr.append(td1);
-
-            } else {
-              const unit = element.unit === "Grams" ? "g" : "mg";
-              const text = element.quantity + unit;
-              p1.innerText = text;
-              div.append(p1);
-              td.append(div);
-              tr.append(td);
-
-              td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:right;text-align:right;"
-              p2.style.cssText = "white-space:nowrap;"
-              strong.innerText = element.dailyValue;
-              strong1.innerText = "%";
-              p2.append(strong);
-              td1.append(p2)
-              td1.append(strong1)
-              tr.append(td1)
-            }
-
-            tfoot.append(tr);
-          })
-        }
-
-        if(shop.location === "CA"){
-         //!!* ~######## vitamins
-          data.vitamins.forEach((element)=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td");   
-            const div = document.createElement("div");
-            const p = document.createElement("p"); 
-            const p1 = document.createElement("p");   
-            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};;"
+            td.append(div);
+            tr.append(td);
             
-            div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
-            p.style.marginLeft = element.LeftSpacing + "px";
-            if(element.bold === "Yes") p.style.cssText = "font-weight:bold;"
-            p.innerText = element.name
-            const unit = element.unit === "Grams" ? "g" : "mg";
-            const text = element.quantity + unit; 
+            td1.style.cssText = "border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+            const unit = element.unit === "Grams" ? "g" : "mg"
+            const text = element.quantity + unit;
             p1.innerText = text;
-            div.append(p)
-            div.append(p1)
-            td.append(div)
-            tr.append(td)
+            td1.append(p1);
+            strong.innerText = element.dailyValue;
+            p2.append(strong);
+            td1.append(p2);
+            tr.append(td1);
             
-            td1.style.cssText = "text-align:right;"
-            td1.innerText = element.dailyValue + "%";
-            tr.append(td1)
-
-            tfoot.append(tr);
-          })
-          //!!* ~######## minerals
-          data.minerals.forEach(()=>{
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            const td1 = document.createElement("td");   
-            const div = document.createElement("div");
-            const p = document.createElement("p"); 
-            const p1 = document.createElement("p");  
-            tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            
-            div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
-            p.style.marginLeft = element.LeftSpacing + "px";
-            if(element.bold === "Yes") p.style.cssText = "font-weight:bold;"
+            td2.style.cssText = "text-align:right;";
+            strong1.innerText = element.dailyValue ? element.RI : "0" + "%"
+            p3.append(strong1);
+            td2.append(p3)
+            tr.append(td2);
+          } else {
             p.innerText = element.name;
-            const unit = element.unit === "Grams" ? "g" : "mg";
-            const text = element.quantity + unit; 
+            const unit = element.unit === "Grams" ? "g" : "mg"
+            const text = element.quantity + unit;
             p1.innerText = text;
-            div.append(p)
-            div.append(p1)
-            td.append(div)
-            tr.append(td)
+            div.append(p);
+            div.append(p1);
+            td.append(div);
+            tr.append(td);
 
-            td1.style.cssText = "text-align:right;"
-            td1.innerText = element.dailyValue + "%";
-            tr.append(td1)
-
-            tfoot.append(tr);
-          })
-        }
- 
-        const div = document.createElement("div")
-        div.style.cssText = "padding:0px;display:flex;flex-direction:column;align-items:center;width:100%;gap:5px;"
-        
-        if(data.richText.notesText.length > 0){
-          const div1 = document.createElement("div")
-          const div2 = document.createElement("div")
-          const p = document.createElement("p")
-          div1.style.cssText = "width:100%;"
-          div2.style.cssText = "padding-left:10px;padding-right:10px;color:{{ block.settings.base_fontColor }};"
-          // p.style.cssText = "margin-block-start:0px;margin-block-end:0px;"
-          let str = data.richText.notesText.replace("<p>", ""); 
-            str = str.replace("</p>", "");  
-          div2.innerHTML =  str
-          // div2.append(p);
-          div1.append(div2);
-          div.append(div1);
-          
-          if(shop.location === "EU" && shop.referenceIntakeDisclaimer.trim().length > 0){
-            const hr = document.createElement("hr");
-            hr.style.cssText = "margin:0;height:{{ block.settings.primaryBorderThickness }}px;width:95%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-            const div1 = document.createElement("div");
-            div1.style.cssText = "padding-left:10px;padding-right:10px;color:{{ block.settings.base_fontColor }};border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};width:100%;";
-            div1.innerText = shop.referenceIntakeDisclaimer
-            div.append(hr);
-            div.append(div1);
+            td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:right;text-align:right;"
+            p2.style.cssText = "white-space:nowrap;"
+            strong.innerText = element.dailyValue;
+            p2.append(strong);
+            td1.append(p2);
+            strong1.innerText = "%";
+            td1.append(strong1);
+            tr.append(td1);
           }
-        }
-
-        if(data.richText.ingredientsText.length > 0){
-          const div1 = document.createElement("div");
-          const div2 = document.createElement("div");
-          const div3 = document.createElement("div");
-          const div5 = document.createElement("div");
-          const h4 = document.createElement("h4"); 
-          const hr = document.createElement("hr");
-          const image = document.createElement("img");
-          const image1 = document.createElement("img");
-          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
-          div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
-          div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
-          h4.style.cssText = "font-size:{{ block.settings.acorddions_headings_font_size }}px;font-weight:bolder;color:{{ block.settings.base_fontColor }};"
-          div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
-          
-          image.src = "{{ block.settings.custom_accordion_icon_opend | image_url: width: 15, height: 15 }}";
-          image.width = "15"
-          image.height = "15"
-          image.style.cssText = "margin-right:10px;"
-          div3.append(image)
-          
-          h4.innerText = shop.Ingredients
-          div3.append(h4)
-          
-          image1.src = "{{ block.settings.custom_accordion_icon_closed | image_url: width: 15, height: 15 }}";
-          image1.width = "15"
-          image1.height = "15"
-          image1.style.cssText = "margin-right:10px;"
-          div2.append(div3);
-          div2.append(image1);
-          
-          hr.style.cssText = "margin:0;margin-bottom:10px;height:{{ block.settings.primaryBorderThickness }}px;width:100%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
-          div1.append(div2)
-          div1.append(hr);
-
-        
-          let str = data.richText.ingredientsText.replace("<p>", ""); 
-            str = str.replace("</p>", "");             
-            const arr = str.split(','); 
-
-              arr.forEach((elem)=>{
-                const div4 = document.createElement("div");
-                const image3 = document.createElement('img');
-                const p = document.createElement("p"); 
-                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{ block.settings.cell_border_radius }}px;padding:{{ block.settings.Ingredients_allergens_border_padding }}px;background-color:{{ block.settings.cells_background_color }};text-align:center;"
-                p.style.cssText = "color:{{ block.settings.Ingredients_allergens_color }};"                
-                  
-                image3.src = "{{ block.settings.Custom_ingredient_icon | image_url: width: 10, height: 10 }}";
-                image3.width = "10"
-                image3.height = "10"
-                div4.append(image3);
-
-                p.innerHTML = elem;
-                div4.append(p);
-                div5.append(div4)
-              })
        
+          tfoot.append(tr);
+        })
+
+      }
+      
+      if(shop.location === "NA"){
+        //!!* ~######## minerals
+        data.minerals.forEach(()=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td");   
+          const div = document.createElement("div");
+          const p = document.createElement("p"); 
+          const p1 = document.createElement("p"); 
+          const p2 = document.createElement("p");  
+          const strong = document.createElement("strong"); 
+          const strong1 = document.createElement("strong"); 
+          tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
+          p.style.marginLeft = element.LeftSpacing + "px";
+          p.innerText = element.name;
+          div.append(p);
+
+          if(data.productToPrepare){
+            td.append(div);
+            tr.append(td);
             
-            div1.append(div5);
-            div.append(div1);
-            
+            td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;border-right:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};border-left:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+            const unit = element.unit === "Grams" ? "g" : "mg";
+            const text = element.quantity + unit;
+            p1.innerText = text;
+            strong.innerText = element.dailyValue + "%"
+            p2.style.cssText = "white-space:nowrap;"
+            p2.append(strong);
+            td1.append(p1)
+            td1.append(p2)
+            tr.append(td1);
 
-        }
+          } else {
+            const unit = element.unit === "Grams" ? "g" : "mg";
+            const text = element.quantity + unit;
+            p1.innerText = text;
+            div.append(p1);
+            td.append(div);
+            tr.append(td);
 
-        if(data.richText.allergyInfoText.length > 0){
+            td1.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:right;text-align:right;"
+            p2.style.cssText = "white-space:nowrap;"
+            strong.innerText = element.dailyValue;
+            strong1.innerText = "%";
+            p2.append(strong);
+            td1.append(p2)
+            td1.append(strong1)
+            tr.append(td1)
+          }
 
-          const div1 = document.createElement("div");
-          const div2 = document.createElement("div");
-          const div3 = document.createElement("div");
-          const div5 = document.createElement("div");
-          const h4 = document.createElement("h4"); 
-          const hr = document.createElement("hr");
-          const image = document.createElement("img");
-          const image1 = document.createElement("img");
-          div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
-          div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
-          div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
-          h4.style.cssText = "font-size:{{ block.settings.acorddions_headings_font_size }}px;font-weight:bolder;color:{{ block.settings.base_fontColor }};"
-          div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
-          
-          image.src = "{{ block.settings.custom_accordion_icon_opend | image_url: width: 15, height: 15 }}";
-          image.width = "15"
-          image.height = "15"
-          image.style.cssText = "margin-right:10px;"
-          div3.append(image)
-          
-          h4.innerText = shop.AllergyInformation
-          div3.append(h4)
-          
-          image1.src = "{{ block.settings.custom_accordion_icon_closed | image_url: width: 15, height: 15 }}";
-          image1.width = "15"
-          image1.height = "15"
-          image1.style.cssText = "margin-right:10px;"
-          div2.append(div3);
-          div2.append(image1);
-          
-          hr.style.cssText = "margin:0;height:{{ block.settings.primaryBorderThickness }}px;width:100%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};margin-bottom:10px;"
-          div1.append(div2)
-          div1.append(hr);
+          tfoot.append(tr);
+        })
+      }
 
+      if(shop.location === "CA"){
+       //!!* ~######## vitamins
+        data.vitamins.forEach((element)=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td");   
+          const div = document.createElement("div");
+          const p = document.createElement("p"); 
+          const p1 = document.createElement("p");   
+          tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};;"
+          
+          div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
+          p.style.marginLeft = element.LeftSpacing + "px";
+          if(element.bold === "Yes") p.style.cssText = "font-weight:bold;"
+          p.innerText = element.name
+          const unit = element.unit === "Grams" ? "g" : "mg";
+          const text = element.quantity + unit; 
+          p1.innerText = text;
+          div.append(p)
+          div.append(p1)
+          td.append(div)
+          tr.append(td)
+          
+          td1.style.cssText = "text-align:right;"
+          td1.innerText = element.dailyValue + "%";
+          tr.append(td1)
+
+          tfoot.append(tr);
+        })
+        //!!* ~######## minerals
+        data.minerals.forEach(()=>{
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          const td1 = document.createElement("td");   
+          const div = document.createElement("div");
+          const p = document.createElement("p"); 
+          const p1 = document.createElement("p");  
+          tr.style.cssText = "border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+          
+          div.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:10px;"
+          p.style.marginLeft = element.LeftSpacing + "px";
+          if(element.bold === "Yes") p.style.cssText = "font-weight:bold;"
+          p.innerText = element.name;
+          const unit = element.unit === "Grams" ? "g" : "mg";
+          const text = element.quantity + unit; 
+          p1.innerText = text;
+          div.append(p)
+          div.append(p1)
+          td.append(div)
+          tr.append(td)
+
+          td1.style.cssText = "text-align:right;"
+          td1.innerText = element.dailyValue + "%";
+          tr.append(td1)
+
+          tfoot.append(tr);
+        })
+      }
+
+      const div = document.createElement("div")
+      div.style.cssText = "padding:0px;display:flex;flex-direction:column;align-items:center;width:100%;gap:5px;"
+      
+      if(data.richText.notesText.length > 0){
+        const div1 = document.createElement("div")
+        const div2 = document.createElement("div")
+        const p = document.createElement("p")
+        div1.style.cssText = "width:100%;"
+        div2.style.cssText = "padding-left:10px;padding-right:10px;color:{{ block.settings.base_fontColor }};"
+        // p.style.cssText = "margin-block-start:0px;margin-block-end:0px;"
+        let str = data.richText.notesText.replace("<p>", ""); 
+          str = str.replace("</p>", "");  
+        div2.innerHTML =  str
+        // div2.append(p);
+        div1.append(div2);
+        div.append(div1);
         
-          let str = data.richText.allergyInfoText.replace("<p>", ""); 
-            str = str.replace("</p>", "");             
-            const arr = str.split(','); 
-
-              arr.forEach((elem)=>{
-                const div4 = document.createElement("div");
-                const image3 = document.createElement('img');
-                const p = document.createElement("p"); 
-                div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{ block.settings.cell_border_radius }}px;padding:{{ block.settings.Ingredients_allergens_border_padding }}px;background-color:{{ block.settings.cells_background_color }};text-align:center;"
-                p.style.cssText = "color:{{ block.settings.Ingredients_allergens_color }};"                
-                  
-                image3.src = "{{ block.settings.Custom_allergen_icon | image_url: width: 10, height: 10 }}";
-                image3.width = "10"
-                image3.height = "10"
-                div4.append(image3);
-
-                p.innerHTML = elem;
-                div4.append(p);
-                div5.append(div4)
-              })
-       
-            div1.append(div5);
-            div.append(div1);
-
-        }
-
-        if(data.richText.lEGALNOTICEText.length > 0){
+        if(shop.location === "EU" && shop.referenceIntakeDisclaimer.trim().length > 0){
+          const hr = document.createElement("hr");
+          hr.style.cssText = "margin:0;height:{{ block.settings.primaryBorderThickness }}px;width:95%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
           const div1 = document.createElement("div");
-          div1.classList.add("LEGAL_NOTICE");
-          div1.style.cssText = "margin-top:10px;color:{{ block.settings.base_fontColor }};";
-          div1.innerHTML = data.richText.lEGALNOTICEText;
+          div1.style.cssText = "padding-left:10px;padding-right:10px;color:{{ block.settings.base_fontColor }};border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};width:100%;";
+          div1.innerText = shop.referenceIntakeDisclaimer
+          div.append(hr);
           div.append(div1);
         }
-        //append the div that takes elements under table to container
-        container.append(div);
+      }
+
+      if(data.richText.ingredientsText.length > 0){
+        const div1 = document.createElement("div");
+        const div2 = document.createElement("div");
+        const div3 = document.createElement("div");
+        const div5 = document.createElement("div");
+        const h4 = document.createElement("h4"); 
+        const hr = document.createElement("hr");
+        const image = document.createElement("img");
+        const image1 = document.createElement("img");
+        div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+        div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
+        div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
+        h4.style.cssText = "font-size:{{ block.settings.acorddions_headings_font_size }}px;font-weight:bolder;color:{{ block.settings.base_fontColor }};"
+        div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
+        
+        image.src = "{{ block.settings.custom_accordion_icon_opend | image_url: width: 15, height: 15 }}";
+        image.width = "15"
+        image.height = "15"
+        image.style.cssText = "margin-right:10px;"
+        div3.append(image)
+        
+        h4.innerText = shop.Ingredients
+        div3.append(h4)
+        
+        image1.src = "{{ block.settings.custom_accordion_icon_closed | image_url: width: 15, height: 15 }}";
+        image1.width = "15"
+        image1.height = "15"
+        image1.style.cssText = "margin-right:10px;"
+        div2.append(div3);
+        div2.append(image1);
+        
+        hr.style.cssText = "margin:0;margin-bottom:10px;height:{{ block.settings.primaryBorderThickness }}px;width:100%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};"
+        div1.append(div2)
+        div1.append(hr);
+
+      
+        let str = data.richText.ingredientsText.replace("<p>", ""); 
+          str = str.replace("</p>", "");             
+          const arr = str.split(','); 
+
+            arr.forEach((elem)=>{
+              const div4 = document.createElement("div");
+              const image3 = document.createElement('img');
+              const p = document.createElement("p"); 
+              div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{ block.settings.cell_border_radius }}px;padding:{{ block.settings.Ingredients_allergens_border_padding }}px;background-color:{{ block.settings.cells_background_color }};text-align:center;"
+              p.style.cssText = "color:{{ block.settings.Ingredients_allergens_color }};"                
+                
+              image3.src = "{{ block.settings.Custom_ingredient_icon | image_url: width: 10, height: 10 }}";
+              image3.width = "10"
+              image3.height = "10"
+              div4.append(image3);
+
+              p.innerHTML = elem;
+              div4.append(p);
+              div5.append(div4)
+            })
+     
+          
+          div1.append(div5);
+          div.append(div1);
+          
 
       }
-    }).catch((err)=>{  
-      container.style.display = "none";
-      {% comment %} console.log(err) {% endcomment %}
-      })
+
+      if(data.richText.allergyInfoText.length > 0){
+
+        const div1 = document.createElement("div");
+        const div2 = document.createElement("div");
+        const div3 = document.createElement("div");
+        const div5 = document.createElement("div");
+        const h4 = document.createElement("h4"); 
+        const hr = document.createElement("hr");
+        const image = document.createElement("img");
+        const image1 = document.createElement("img");
+        div1.style.cssText = "padding-right:10px;padding-left:10px;width:100%;display:flex;flex-direction:column;align-items:center;border-bottom:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};";
+        div2.style.cssText = "display:flex;flex-direction:row;align-items:center;justify-content:space-between;width:100%;";
+        div3.style.cssText = "display:flex;flex-direction:row;align-items:center;width:90%;padding-left:4px;padding-right:4px;";
+        h4.style.cssText = "font-size:{{ block.settings.acorddions_headings_font_size }}px;font-weight:bolder;color:{{ block.settings.base_fontColor }};"
+        div5.style.cssText = "width:100%;display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"
+        
+        image.src = "{{ block.settings.custom_accordion_icon_opend | image_url: width: 15, height: 15 }}";
+        image.width = "15"
+        image.height = "15"
+        image.style.cssText = "margin-right:10px;"
+        div3.append(image)
+        
+        h4.innerText = shop.AllergyInformation
+        div3.append(h4)
+        
+        image1.src = "{{ block.settings.custom_accordion_icon_closed | image_url: width: 15, height: 15 }}";
+        image1.width = "15"
+        image1.height = "15"
+        image1.style.cssText = "margin-right:10px;"
+        div2.append(div3);
+        div2.append(image1);
+        
+        hr.style.cssText = "margin:0;height:{{ block.settings.primaryBorderThickness }}px;width:100%;border-top:{{ block.settings.primaryBorderThickness }}px solid {{ block.settings.primaryBorder }};margin-bottom:10px;"
+        div1.append(div2)
+        div1.append(hr);
+
+      
+        let str = data.richText.allergyInfoText.replace("<p>", ""); 
+          str = str.replace("</p>", "");             
+          const arr = str.split(','); 
+
+            arr.forEach((elem)=>{
+              const div4 = document.createElement("div");
+              const image3 = document.createElement('img');
+              const p = document.createElement("p"); 
+              div4.style.cssText = "display:flex;flex-direction:row;align-items:center;gap:5px;border-radius:{{ block.settings.cell_border_radius }}px;padding:{{ block.settings.Ingredients_allergens_border_padding }}px;background-color:{{ block.settings.cells_background_color }};text-align:center;"
+              p.style.cssText = "color:{{ block.settings.Ingredients_allergens_color }};"                
+                
+              image3.src = "{{ block.settings.Custom_allergen_icon | image_url: width: 10, height: 10 }}";
+              image3.width = "10"
+              image3.height = "10"
+              div4.append(image3);
+
+              p.innerHTML = elem;
+              div4.append(p);
+              div5.append(div4)
+            })
+     
+          div1.append(div5);
+          div.append(div1);
+
       }
-      fetchProducts({{ product.id }});
+
+      if(data.richText.lEGALNOTICEText.length > 0){
+        const div1 = document.createElement("div");
+        div1.classList.add("LEGAL_NOTICE");
+        div1.style.cssText = "margin-top:10px;color:{{ block.settings.base_fontColor }};";
+        div1.innerHTML = data.richText.lEGALNOTICEText;
+        div.append(div1);
+      }
+      //append the div that takes elements under table to container
+      container.append(div);
+
+    }
+  }).catch((err)=>{  
+    container.style.display = "none";
+    {% comment %} console.log(err) {% endcomment %}
+    })
+    }
+    document.addEventListener("DOMContentLoaded",()=>{ 
+      fetchProducts("");
       })
     </script>
  

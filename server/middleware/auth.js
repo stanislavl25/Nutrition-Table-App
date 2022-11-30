@@ -3,10 +3,13 @@ import Products from "../models/productModel.js";
 import Stores from "../models/storeModel.js";
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js";
 import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
+import saveProducts_variants from "../middleware/saveProducts_variants.js";
 export default function applyAuthMiddleware(app) {
   app.get("/auth", async (req, res) => {
     if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
-      return res.redirect(`/auth/toplevel?${new URLSearchParams(req.query).toString()}`);
+      return res.redirect(
+        `/auth/toplevel?${new URLSearchParams(req.query).toString()}`
+      );
     }
     const redirectUrl = await Shopify.Auth.beginAuth(
       req,
@@ -66,29 +69,17 @@ export default function applyAuthMiddleware(app) {
         );
         const newProducts = await Product.all({
           session: session,
-          fields: "id,title,product_type,images",
+          fields: "id,title,product_type,images,variants",
         });
         newProducts.forEach(async (prod) => {
-          var newProduct = Products();
-          newProduct.productId = prod.id;
-          newProduct.name = prod.title;
-          newProduct.store_id = session.shop;
-          newProduct.product_type = prod.product_type
-            ? prod.product_type
-            : null;
-          newProduct.image =
-            prod.images && prod.images.length ? prod.images[0].src : null;
-          await newProduct.save(function (err, data) {
-            if (err) console.log(err);
-            else console.log("Added product");
-          });
+          await saveProducts_variants(session.shop, prod);
         });
       } else {
         console.log("known shop");
       }
 
-      const shop=session.shop;
-      const accessToken=session.accessToken;
+      const shop = session.shop;
+      const accessToken = session.accessToken;
       const webhookRegister = await Shopify.Webhooks.Registry.registerAll({
         shop,
         accessToken,
@@ -125,4 +116,3 @@ export default function applyAuthMiddleware(app) {
     }
   });
 }
-

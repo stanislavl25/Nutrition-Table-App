@@ -1,0 +1,81 @@
+body {
+  padding: 3rem;
+}
+.form {
+  --rch-c-input-bg: #fff;
+  --rch-c-input-text: #000;
+  --rch-c-input-border: rgba(201, 204, 208, 1);
+  --rch-c-input-border-active: rgba(69, 143, 255, 1);
+  --rch-input-border-radius: 0.25rem;
+  --rch-input-border-width: 2px;
+  --rch-cb-size: 19px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.form input[type="checkbox"] {
+  appearance: none;
+  border: var(--rch-input-border-width) solid var(--rch-c-input-border);
+  background-color: var(--rch-c-input-bg);
+  width: var(--rch-cb-size);
+  height: var(--rch-cb-size);
+  margin: 0;
+  padding: 0;
+  position: relative;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  z-index: 5;
+}
+.form input[type="checkbox"]:checked,
+.form input[type="checkbox"]:focus {
+  border-color: var(--rch-c-input-border-active);
+}
+.form input[type="checkbox"]:after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+  margin: 0;
+  border-radius: 100%;
+  appearance: none;
+  display: block;
+  width: calc(var(--rch-cb-size) - var(--rch-input-border-width));
+  height: calc(var(--rch-cb-size) - var(--rch-input-border-width));
+  background-color: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
+  outline: none;
+  transform: scale(2);
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 0;
+}
+.form input[type="checkbox"]:active:not(:checked):after {
+  transform: scale(0);
+  opacity: 1;
+  transition: opacity 0s, transform 0s;
+}
+.form input[type="checkbox"] {
+  border-radius: var(--rch-input-border-radius);
+}
+.form input[type="checkbox"]:checked:before {
+  content: "";
+  position: absolute;
+  background-color: var(--rch-c-input-border-active);
+  width: calc(var(--rch-cb-size) - (4 * var(--rch-input-border-width)));
+  height: calc(var(--rch-cb-size) - (4 * var(--rch-input-border-width)));
+  top: var(--rch-input-border-width);
+  left: var(--rch-input-border-width);
+  transform-origin: bottom left;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+.form__label {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+  line-height: 1rem;
+}

@@ -335,10 +335,6 @@ function CreateLabel({
     window.removeEventListener("resize", () => {});
   }, []);
 
-  const handleNutriScoreCheckElem = (newState) => {
-    setData((prevState) => ({ ...prevState, nutriScore: newState }));
-  };
-
   const handleproductToPrepare = useCallback((newChecked) => {
     setProductToPrepare(newChecked);
     handleChange(newChecked, "productToPrepare");
@@ -373,9 +369,12 @@ function CreateLabel({
   };
 
   useEffect(() => {
-    if (selectedOptions && selectedOptions.length > 0)
-      handleSettingDefaultData();
-    else return;
+    let subscription = false;
+    if (!subscription) {
+      if (selectedOptions && selectedOptions.length > 0)
+        handleSettingDefaultData();
+    }
+    return (subscription = true);
   }, [selectedOptions]);
 
   const handleBulkProductsReset = async () => {
@@ -436,7 +435,9 @@ function CreateLabel({
   };
 
   useEffect(() => {
-    updateNonFoodStatus();
+    let subscription = false;
+    if (!subscription) updateNonFoodStatus();
+    return (subscription = true);
   }, []);
 
   return (
@@ -469,7 +470,6 @@ function CreateLabel({
             }}
           >
             <ProductInfo
-              productToPrepare={productToPrepare}
               handleproductToPrepare={handleproductToPrepare}
               locationPlan={locationPlan}
               selectedOptions={selectedOptions}

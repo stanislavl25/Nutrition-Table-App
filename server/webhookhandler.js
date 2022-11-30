@@ -29,31 +29,7 @@ async function handleProductsUpdateHook(shop, body) {
 async function handleProductsCreateHook(shop, body) {
   try {
     if (shop && body) {
-      console.log(shop);
-      const id = body.id.toString();
-      const check = await Products.exists({ store_id: shop, product_id: id });
-      console.log(
-        "################################################ create",
-        check
-      );
-      if (check) {
-        console.log("Product already exists!");
-      } else {
-        var newProduct = Products();
-        newProduct.product_id = body.id;
-        newProduct.name = body.title;
-        newProduct.store_id = shop;
-        newProduct.product_type = body.product_type;
-        newProduct.image =
-          body.images && body.images.length ? body.images[0].src : null;
-        await newProduct.save(function (err, data) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("Added product");
-          }
-        });
-      }
+      await saveProducts_variants(shop, body);
     } else {
       console.log("shop: " + shop + " does not exist in the DB");
     }
@@ -66,18 +42,25 @@ async function handleProductsCreateHook(shop, body) {
 async function handleProductsDeletionHook(shop, body) {
   try {
     if (shop && body) {
-      const id = body.id.toString();
-      const check = await Products.exists({ store_id: shop, product_id: id });
-      if (check) {
-        console.log(
-          "################################################# delete",
-          id
-        );
-        const deleted = await Products.deleteOne({
+      if (
+        await Products.exists({
+          productId: body.id.toString(),
           store_id: shop,
-          product_id: id,
-        });
-        console.log("Deleted product Successfully");
+        })
+      ) {
+        await Products.findOneAndRemove(
+          {
+            productId: body.id,
+            store_id: shop,
+          },
+          function (err, result) {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log("Deleted product Successfully", result);
+            }
+          }
+        );
       } else {
         console.log("product already deleted");
       }
