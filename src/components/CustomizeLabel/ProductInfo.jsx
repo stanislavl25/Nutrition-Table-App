@@ -19,7 +19,6 @@ import { CircleInformationMajor, SearchMinor } from "@shopify/polaris-icons";
 import "../../assets/style.css";
 
 function ProductInfo({
-  handleproductToPrepare,
   locationPlan,
   selectedOptions,
   setSelectedOptions,
@@ -28,16 +27,22 @@ function ProductInfo({
   setMemoOptions,
   removeTag,
   productsAredifferent,
-  setSourcePicker,
   handleSelectedProducts,
   data,
   handleChange,
+  productsArray,
+  handleTabChange,
 }) {
   const [inputValue, setInputValue] = useState("");
-  const [nutriScoreCheck, setNutriScore] = useState(false);
-  const handleNonFoodProduct = useCallback((newChecked) => {
-    console.log(newChecked);
-    handleChange(!newChecked, "food_product");
+  const [nutriScoreCheck, setNutriScore] = useState(data.nutriScoreCheck);
+  const handleNonFoodProduct = useCallback((food_product) => {
+    if (!food_product && data.productToPrepare) {
+      handleChange(true, "productToPrepare");
+    }
+    handleChange(!food_product, "food_product");
+  }, []);
+  const handleproductToPrepare = useCallback((productToPrepare) => {
+    handleChange(productToPrepare, "productToPrepare");
   }, []);
   const updateText = useCallback(
     (value) => {
@@ -77,10 +82,10 @@ function ProductInfo({
   const handleSelectChange = useCallback((value) => {
     handleChange(value, "nutriScore");
   }, []);
-  const handleNutriScore = useCallback(
-    (newChecked) => setNutriScore(newChecked),
-    []
-  );
+  const handleNutriScore = useCallback((newChecked) => {
+    handleChange(newChecked, "nutriScoreCheck");
+    setNutriScore(newChecked);
+  }, []);
 
   const options = [
     { label: "A", value: "A" },
@@ -93,6 +98,7 @@ function ProductInfo({
     if (selectedOptions.length === 1) return;
     handleSelectedProducts(selectedOptions, false);
   }, [selectedOptions]);
+
   const optionsMarkup =
     memoOptions?.length > 0
       ? memoOptions?.map((option) => {
@@ -113,11 +119,19 @@ function ProductInfo({
     selectedOptions?.length !== 0 ? (
       <>
         <Stack>
-          {selectedOptions?.map((option) => (
-            <Tag key={`option-${option}`} onRemove={removeTag(option)}>
-              {option}
-            </Tag>
-          ))}
+          {Array.isArray(productsArray) ? (
+            productsArray?.map((elem, index) =>
+              selectedOptions.includes(elem._id) ? (
+                <Tag key={`option-${index}`} onRemove={removeTag(elem._id)}>
+                  {elem.name}
+                </Tag>
+              ) : (
+                <></>
+              )
+            )
+          ) : (
+            <></>
+          )}
         </Stack>
         {(productsAredifferent &&
           data.food_product === false &&
@@ -165,9 +179,6 @@ function ProductInfo({
           }}
         >
           <Subheading>Product</Subheading>
-          <Button plain onClick={() => setSourcePicker(true)}>
-            Manage
-          </Button>
         </div>
         <div
           style={{
@@ -197,29 +208,19 @@ function ProductInfo({
           <div style={{ marginTop: "10px", marginBottom: "10px" }}>
             <TextContainer>{tagsMarkup}</TextContainer>
           </div>
-          <Checkbox
-            id="food_product"
-            label="This is a non-food product"
-            checked={
-              selectedOptions.length > 0 && data.food_product === true
-                ? false
-                : true
-            }
-            onChange={handleNonFoodProduct}
-            disabled={selectedOptions.length === 0 ? true : false}
-          />
-          <form class="form">
-            <label class="form__label" for="cb-1">
-              <input id="cb-1" name="cb1" type="checkbox" />
-              <span class="caption">Pitchfork hexagon deep v yes plz</span>
-            </label>
-            <label class="form__label" for="cb-2">
-              <input id="cb-2" name="cb2" type="checkbox" />
-              <span class="caption">
-                Retro food truck distillery lo-fi beard
-              </span>
-            </label>
-          </form>
+          <div>
+            <Checkbox
+              ariaControls="food_product"
+              ariaDescribedBy="food_product"
+              id="food_product"
+              name="food_product"
+              label="This is a non-food product"
+              checked={selectedOptions.length > 0 ? !data.food_product : false}
+              onChange={handleNonFoodProduct}
+              disabled={selectedOptions.length === 0 ? true : false}
+            />
+          </div>
+
           <div
             style={{
               display: "flex",
@@ -230,12 +231,13 @@ function ProductInfo({
             }}
           >
             <Checkbox
+              ariaControls="productToPrepare"
+              ariaDescribedBy="productToPrepare"
               id="productToPrepare"
+              name="productToPrepare"
               label="Product to prepare"
               checked={
-                data.food_product === false
-                  ? false
-                  : selectedOptions.length > 0 && data.productToPrepare
+                data.food_product === false ? false : data.productToPrepare
               }
               onChange={handleproductToPrepare}
               disabled={
@@ -262,13 +264,25 @@ function ProductInfo({
             >
               <Icon source={CircleInformationMajor} color="base" />
             </Tooltip>
-            {locationPlan.plan === "Basic" ? (
-              <div style={{ marginLeft: "5px" }}>
-                <Button plain>Upgrade your plan to use this feature</Button>
-              </div>
-            ) : (
-              <></>
-            )}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "start",
+                gap: "5px",
+              }}
+            >
+              {locationPlan.plan === "Basic" ? (
+                <div style={{ marginLeft: "5px" }}>
+                  <Button onClick={() => handleTabChange(5)} plain>
+                    Upgrade your plan to use this feature
+                  </Button>
+                </div>
+              ) : (
+                <></>
+              )}
+            </div>
           </div>
           <div
             style={{
@@ -283,7 +297,9 @@ function ProductInfo({
               <>
                 <Checkbox
                   label="Show Nutri-Score"
-                  checked={nutriScoreCheck}
+                  checked={
+                    data.food_product === false ? false : nutriScoreCheck
+                  }
                   onChange={handleNutriScore}
                   disabled={
                     locationPlan.plan === "Basic" ||
@@ -311,14 +327,16 @@ function ProductInfo({
 
             {locationPlan.plan === "Basic" && locationPlan.location === "EU" ? (
               <div style={{ marginLeft: "5px" }}>
-                <Button plain>Upgrade your plan to use this feature</Button>
+                <Button onClick={() => handleTabChange(5)} plain>
+                  Upgrade your plan to use this feature
+                </Button>
               </div>
             ) : (
               <></>
             )}
           </div>
         </div>
-        {nutriScoreCheck ? (
+        {data.food_product && nutriScoreCheck ? (
           <div style={{ marginTop: "10px" }}>
             <Subheading>Nutri-Score Letter</Subheading>
             <div style={{ marginTop: "10px" }}>

@@ -11,14 +11,7 @@ import {
 } from "@shopify/polaris";
 import React, { useCallback, useState } from "react";
 
-const Edit = ({
-  index,
-  element,
-  handleChange,
-  handleDelete,
-  saveRecomIntake,
-  recommendedIntake,
-}) => {
+const Edit = ({ index, element, handleChange, handleDelete }) => {
   const [popoverActive, setPopoverActive] = useState(false);
 
   const togglePopoverActive = useCallback(
@@ -47,7 +40,6 @@ const Edit = ({
           label="Name"
           value={element.name}
           onChange={(e) => handleChange(e, index, "name")}
-          onBlur={() => saveRecomIntake(recommendedIntake)}
           autoComplete="off"
           inputMode="text"
         />
@@ -55,7 +47,6 @@ const Edit = ({
           label="Quantity"
           value={element.quantity}
           onChange={(e) => handleChange(e, index, "quantity")}
-          onBlur={() => saveRecomIntake(recommendedIntake)}
           autoComplete="off"
           inputMode="number"
           type="number"
@@ -64,7 +55,6 @@ const Edit = ({
           label="Show all customers where:"
           value={element.unit}
           onChange={(e) => handleChange(e, index, "unit")}
-          onBlur={() => saveRecomIntake(recommendedIntake)}
           options={["Grams", "Milligrams", "Micrograms", "Kcal", "Kj"]}
         />
         <Button
@@ -72,8 +62,6 @@ const Edit = ({
           outline
           onClick={() => {
             handleDelete(index);
-            console.log(recommendedIntake);
-            saveRecomIntake(recommendedIntake);
           }}
         >
           Delete
@@ -87,9 +75,9 @@ function RecommendedIntake({
   setStoreData,
   storeData,
   saveRecomIntake,
-  recommendedIntakeData,
   toggleActive,
   setToastMessage,
+  handleRIDataReset,
 }) {
   const handleChange = useCallback((value, i, tag) => {
     let newSotreData = { ...storeData };
@@ -141,10 +129,23 @@ function RecommendedIntake({
         title="Recommended Intake Standards"
         fullWidth
         primaryAction={
-          <Button onClick={handleAddNewRow} primary>
-            Add Reference
+          <Button onClick={saveRecomIntake} primary>
+            Save
           </Button>
         }
+        secondaryActions={[
+          {
+            content: "Reset",
+            destructive: true,
+            onAction: () => handleRIDataReset(),
+          },
+          {
+            content: "Add Reference",
+            onAction: () => {
+              handleAddNewRow();
+            },
+          },
+        ]}
       >
         <Card sectioned>
           <div style={{ width: "100%", overflowX: "scroll" }}>
@@ -215,9 +216,6 @@ function RecommendedIntake({
                         element={elem}
                         handleChange={handleChange}
                         handleDelete={handleDelete}
-                        saveRecomIntake={saveRecomIntake}
-                        recommendedIntake={storeData.recommendedIntake}
-                        recommendedIntakeData={recommendedIntakeData}
                       />
                     </td>
                   </tr>

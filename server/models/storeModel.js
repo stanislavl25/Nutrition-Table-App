@@ -8,6 +8,8 @@ const storeSchema = new Schema(
     shop_id: { type: String, required: true, trim: true, unique: true },
     shop_plan: { type: String, trim: true, default: "Advanced" },
     AlreadySubscribed: { type: Boolean, default: false },
+    needsUpdate: { type: Boolean, default: false },
+    needsUpdate: { type: Boolean, default: false },
     firstTimeOpenApp: { type: Boolean, default: true },
     NutritionInformation: { type: String, default: "Nutrition Information" },
     portionSizeModalCheckBox: { type: Boolean, default: false },

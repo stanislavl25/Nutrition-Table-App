@@ -5,6 +5,14 @@ import {
   Tabs,
   Frame,
   useIndexResourceState,
+  Loading,
+  Modal,
+  TextContainer,
+  Spinner,
+  Badge,
+  ButtonGroup,
+  Button,
+  Link,
 } from "@shopify/polaris";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { useAppBridge } from "@shopify/app-bridge-react";
@@ -26,6 +34,7 @@ import {
   mineralsEU,
   mineralsNA,
 } from "../defaultData.js";
+import { subscribe } from "graphql";
 
 const recommendedIntakeRows = [
   { name: "Energy", quantity: "2000", unit: "Kcal" },
@@ -56,7 +65,7 @@ function TabsPage() {
   const [emptyStore, setEmptyStore] = useState(false);
   const [checkPlan, setCheckPlan] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [storeData, setStoreData] = useState([]);
+  const [storeData, setStoreData] = useState({});
   const [active, setActive] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [defaultSet, setDefaultSet] = useState(false);
@@ -67,6 +76,7 @@ function TabsPage() {
   );
   const [arraydata, setArrayData] = useState({});
   const [productExist, setProductExist] = useState(false);
+  const [shopifyData, setShopifyData] = useState({});
   const [defaultData, setDefaultData] = useState({
     richText: {
       ingredientsText:
@@ -114,18 +124,36 @@ function TabsPage() {
     vitamins: [],
     calsEnergyInfo: {},
   });
-
+  const [hasPages, setHasPages] = useState();
   const toggleActive = useCallback(() => setActive((active) => !active), []);
+  const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(async () => {
-    let isSubscribed = true;
-    if (storeData.recommendedIntake !== recommendedIntakeData) {
-      setTimeout(async () => {
-        await setRecommendedIntakeData(storeData.recommendedIntake);
-      }, 1000);
-    }
-    return () => (isSubscribed = false);
-  }, [storeData]);
+  // modal settings
+  const [activeModal, setActiveModal] = useState(false);
+  const [activeUpdateModal, setActiveUpdateModal] = useState(false);
+
+  const [isSpinnerActive, setIsSpinnerActive] = useState(false);
+
+  /************************* INDEX TABLE INFORMATION *****************************/
+  const [shopName, setShop] = useState("");
+  const [collections, setCollections] = useState([]);
+  const [collectionSelected, setCollectionSelected] = useState([""]);
+  const [queryValue, setQueryValue] = useState("");
+  const [allProductsSelected, setAllproductsSelected] = useState(false);
+  /******************************************************************************/
+
+  const handleChangeModal = useCallback(
+    () => setActiveModal(!activeModal),
+    [activeModal]
+  );
+  const handleChangeModalAndUpdateData = async () => {
+    handleChangeModal();
+    window.location.reload(false);
+  };
+  const handleChangeModalAndRedirectDocumentation = () => {
+    handleChangeModal();
+    handleTabChange(4);
+  };
 
   /*** get store needed data */
   const getStoreData = async () => {
@@ -134,9 +162,24 @@ function TabsPage() {
       if (shopData.data.recommendedIntake.length === 0) {
         shopData.data.recommendedIntake = recommendedIntakeRows;
       }
+      if (shopData.data.recommendedIntake.length > 0)
+        setRecommendedIntakeData(storeData.recommendedIntake);
+      setShop(shopData.shopName);
       setStoreData(shopData.data);
       setShopPlan(shopData.data.shop_plan);
     }
+  };
+
+  /// handle recommended Intake reset
+  const handleRIDataReset = () => {
+    let newSotreData = { ...storeData };
+    newSotreData.recommendedIntake = recommendedIntakeData;
+    setStoreData(newSotreData);
+    setLangState((langState) => ({
+      ...langState,
+      values: newSotreData,
+      checked: newSotreData,
+    }));
   };
 
   /*** get store location */
@@ -146,9 +189,9 @@ function TabsPage() {
         .then((res) => res.json())
         .then((response) => {
           // console.log(response);
-          // setLocation(response.location)
+          setLocation(response.location);
         });
-      setLocation("EU");
+      // setLocation("EU");
       return;
     } catch (err) {
       //Todo
@@ -180,15 +223,53 @@ function TabsPage() {
     }
   };
 
+  /** check app updates **/
+  const check_updates = async () => {
+    try {
+      const checkUpdateResponse = await fetch("check-updates").then((res) =>
+        res.json()
+      );
+      if (
+        checkUpdateResponse.success === true &&
+        checkUpdateResponse.check === true
+      ) {
+        setActiveUpdateModal(true);
+        const updateResponse = await fetch("update").then((res) => res.json());
+        window.location.reload(false);
+      }
+    } catch (err) {
+      console.log(err);
+      console.log("error occured!");
+    }
+    setActiveUpdateModal(false);
+  };
+
   /*** get store products and check if some primary elements empty */
   const fetchProducts = async () => {
     try {
-      const data = await fetch("products-list").then((res) => res.json());
-      if (data.data.length > 999) {
-        setCheckPlan(true);
-      }
+      const fetchOptions = {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filters: { collections: collectionSelected, query: queryValue },
+        }),
+      };
+      const data = await fetch("products-list", fetchOptions).then((res) =>
+        res.json()
+      );
+
       if (data.success) {
+        if (data.data.length > 999) {
+          setCheckPlan(true);
+        }
+        setCollections(data.collections);
         setProductsArray(data.data);
+        setHasPages(data.hasPages);
+        setShopifyData(data.shopifyData);
         setArrayData(defaultData);
         setDefaultSet(true);
         var array = [];
@@ -244,7 +325,7 @@ function TabsPage() {
    * @param {recommendedIntake data}
    */
 
-  const saveRecomIntake = async (formVal) => {
+  const saveRecomIntake = async () => {
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -252,21 +333,24 @@ function TabsPage() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ formVal }),
+      body: JSON.stringify({ formVal: storeData.recommendedIntake }),
     };
     const data = await fetch("/recommendedIntake_save", fetchOptions)
       .then((res) => res.json())
       .then((response) => {
-        setToastMessage(response.message);
-        toggleActive();
+        if (response.success) {
+          setToastMessage(response.message);
+          toggleActive();
+          setRecommendedIntakeData(response.data.recommendedIntake);
+        }
       })
       .catch((err) => {
         handleSnackToggle("Something wrong happend!");
       });
   };
 
-  const fetchLangChanges = async (name, value) => {
-    const formValues = { name, value };
+  /// handle translations updates
+  const fetchLangChanges = async () => {
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -274,26 +358,30 @@ function TabsPage() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formValues),
+      body: JSON.stringify({ updates: langState.values }),
     };
-    if (langState.checked[name] !== value) {
-      const data = await fetch("/LangFieldsSave", fetchOptions)
-        .then((res) => res.json())
-        .then((response) => {
-          // console.log(response, "translation data saved");
+    const data = await fetch("/LangFieldsSave", fetchOptions)
+      .then((res) => res.json())
+      .then((response) => {
+        if (response.success) {
           setToastMessage(response.message);
           toggleActive();
-        })
-        .catch((err) => {
-          console.log(err);
-          // handleSnackToggle("Something wrong happend!");
-        });
-    }
+          const updatedLang = langState.values;
+          setLangState((langState) => ({
+            ...langState,
+            values: updatedLang,
+            checked: updatedLang,
+          }));
+          setStoreData(updatedLang);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   /***handle save non food products to database */
-  const handleSaveNonFoodProducts = async (products) => {
-    console.log("here non food ##########");
+  const handleSaveNonFoodProducts = async (products, data) => {
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -301,15 +389,20 @@ function TabsPage() {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ products }),
+      body: JSON.stringify({ products, data }),
     };
     try {
       const data = await fetch("/save_non-food", fetchOptions)
         .then((res) => res.json())
         .then(async (response) => {
           if (response.success) {
+            setIsSaving(false);
             await fetchProducts();
             setSelected(0);
+            setToastMessage(response.message);
+            toggleActive();
+          } else {
+            setIsSaving(false);
             setToastMessage(response.message);
             toggleActive();
           }
@@ -322,33 +415,30 @@ function TabsPage() {
   /** saving food products */
   const handleSaveProducts = async (products, data) => {
     try {
-      productsArray.forEach(async (elem) => {
-        if (products.includes(elem.name)) {
-          console.log(elem);
-          const fetchOptions = {
-            method: "POST",
-            mode: "cors",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: elem._id, data: data }),
-          };
-          const update = await fetch("/save_foodProducts", fetchOptions)
-            .then((res) => res.json())
-            .then(async (response) => {
-              if (response.success) {
-                await fetchProducts();
-                setSelected(0);
-                setToastMessage(response.message);
-                toggleActive();
-              } else {
-                setToastMessage(response.message);
-                toggleActive();
-              }
-            });
-        }
-      });
+      const fetchOptions = {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ products, data: data }),
+      };
+      const update = await fetch("/save_foodProducts", fetchOptions)
+        .then((res) => res.json())
+        .then(async (response) => {
+          if (response.success) {
+            setIsSaving(false);
+            await fetchProducts();
+            setSelected(0);
+            setToastMessage(response.message);
+            toggleActive();
+          } else {
+            setIsSaving(false);
+            setToastMessage(response.message);
+            toggleActive();
+          }
+        });
     } catch (err) {
       console.log(err);
     }
@@ -360,20 +450,25 @@ function TabsPage() {
     data,
     selectedOptions
   ) => {
-    if (!selectedOptions) {
+    if (!selectedOptions.length) {
       setToastMessage("No products selected!");
       toggleActive();
       return;
     }
-    if (nonFoodProduct) {
-      handleSaveNonFoodProducts(selectedOptions);
-    }
+    setIsSaving(true);
     if (!nonFoodProduct) {
+      handleSaveNonFoodProducts(selectedOptions, data);
+    }
+    if (nonFoodProduct) {
       handleSaveProducts(selectedOptions, data);
     }
   };
 
   const handleSelectedProducts = (selectedPro, boolean) => {
+    if (selectedPro.length === 0) {
+      setSelectedOptions(selectedPro);
+      return;
+    }
     if (!boolean || boolean === undefined) {
       setSelectedOptions(selectedPro);
       const products = productsArray;
@@ -384,7 +479,7 @@ function TabsPage() {
         setSelected(1);
       }, 500);
       for (var i = 0; i < productsArray.length; i++) {
-        if (selectedPro.includes(productsArray[i].name)) {
+        if (selectedPro.includes(productsArray[i]._id)) {
           setArrayData(productsArray[i]);
           break;
         }
@@ -393,7 +488,7 @@ function TabsPage() {
     let selectedElements = [];
     if (selectedPro.length > 1) {
       productsArray.forEach((elem) => {
-        if (selectedPro.includes(elem.name)) {
+        if (selectedPro.includes(elem._id)) {
           selectedElements.push(elem);
         }
       });
@@ -401,8 +496,6 @@ function TabsPage() {
         if (
           selectedElements[0].food_product !==
             selectedElements[i].food_product ||
-          selectedElements[0].product_type !==
-            selectedElements[i].product_type ||
           selectedElements[0].nutriScore !== selectedElements[i].nutriScore ||
           selectedElements[0].richText.ingredientsText !==
             selectedElements[i].richText.ingredientsText ||
@@ -469,11 +562,7 @@ function TabsPage() {
           selectedElements[0].calsEnergyInfo.energyKcal25 !==
             selectedElements[i].calsEnergyInfo.energyKcal25 ||
           selectedElements[0].calsEnergyInfo.Ri !==
-            selectedElements[i].calsEnergyInfo.Ri ||
-          selectedElements[0].minerals !== selectedElements[i].minerals ||
-          selectedElements[0].vitamins !== selectedElements[i].vitamins ||
-          selectedElements[0].nutritionData !==
-            selectedElements[i].nutritionData
+            selectedElements[i].calsEnergyInfo.Ri
         ) {
           setProductsAredifferent(true);
           return;
@@ -491,49 +580,71 @@ function TabsPage() {
       setSelected(1);
     }, 500);
   };
-  const resourceIDResolver = (products) => {
-    return products.name;
+  const resourceIDResolver = (product) => {
+    return product._id;
   };
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(productsArray, {
       resourceIDResolver,
     });
-  const handleRecommendedIntakeData = () => {
-    // recommendedIntakeData.forEach((elem, index) => {
-    //   console.log(elem.name);
-    // });
+
+  /** check if we have products in our dataBase **/
+
+  const check_init = async () => {
+    try {
+      const checkInitProductResponse = await fetch("/check-init-product").then(
+        (res) => res.json()
+      );
+      if (
+        checkInitProductResponse.success === true &&
+        !checkInitProductResponse.message
+      ) {
+        setIsSpinnerActive(true);
+        setActiveModal(true);
+        const productInitiateResponse = await fetch("product-initiate").then(
+          (res) => res.json()
+        );
+      }
+    } catch (err) {
+      console.log(err);
+      console.log("error occured!");
+    }
+    setIsSpinnerActive(false);
   };
-  // todo clean up after the use effect
+
   useEffect(async () => {
-    let isSubscribed = true;
+    // await check_updates();
+    await check_init();
     await fetchLocations();
-    await getStoreData();
-    await fetchLang();
-    return () => (isSubscribed = false);
   }, []);
+
   useEffect(async () => {
-    let isSubscribed = true;
     await getStoreData();
-    return () => (isSubscribed = false);
   }, [storeData?.portionSizeModalCheckBox, shop_plan]);
 
   useEffect(async () => {
-    let isSubscribed = true;
+    await fetchLang();
     await handlePlan();
+  }, []);
+
+  useEffect(async () => {
     await fetchProducts();
     handleSettingDefaultData();
-    handleRecommendedIntakeData();
-    return () => (isSubscribed = false);
-  }, []);
+    // handleRecommendedIntakeData();
+  }, [collectionSelected, queryValue]);
 
   /** handle memo set for filter functionality */
   const handleMemo = () => {
     let array = [];
     if (productsArray?.length === 0) return array;
-    if (productsArray?.length > 0 && productsArray !== "none") {
-      productsArray.forEach((element) => {
+    if (
+      productsArray?.length > 0 &&
+      productsArray !== "none" &&
+      !productsArray !== null
+    ) {
+      productsArray?.forEach((element) => {
         const name = element.name;
-        array.push({ value: name, label: name });
+        array.push({ value: element._id, label: name });
       });
     }
     return array;
@@ -756,6 +867,63 @@ function TabsPage() {
     }
   };
 
+  const handleNextPrevious = async (type) => {
+    setProductsArray("none");
+    let check;
+    let filters = {};
+    if (type === "next") {
+      check = {
+        type: "last",
+        cursor: shopifyData.lastCursor,
+        filters: { collections: collectionSelected, query: queryValue },
+      };
+    } else {
+      check = {
+        type: "first",
+        cursor: shopifyData.firstCursor,
+        filters: filters,
+      };
+    }
+    const fetchOptions = {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(check),
+    };
+    const data = await fetch("/handle_nextProducts", fetchOptions)
+      .then((res) => res.json())
+      .then(async (response) => {
+        if (response.success) {
+          setProductsArray(response.data);
+          setHasPages(response.hasPages);
+          setShopifyData(response.shopifyData);
+        } else {
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const synchronizeData = async () => {
+    try {
+      const data = await fetch("synchronize-products").then((res) =>
+        res.json()
+      );
+      return { success: data.success, message: data.message };
+    } catch (err) {
+      console.log(err);
+      return {
+        success: false,
+        message:
+          "an error has occured during the synchronization of the products",
+      };
+    }
+  };
+
   const toastMarkup = active ? (
     <Toast content={toastMessage} onDismiss={toggleActive} duration={3000} />
   ) : null;
@@ -766,6 +934,7 @@ function TabsPage() {
       setLangState={setLangState}
       fetchLang={fetchLangChanges}
       location={location}
+      setStoreData={setStoreData}
     />
   );
   const tabs = [
@@ -792,6 +961,18 @@ function TabsPage() {
           setToastMessage={setToastMessage}
           toggleActive={toggleActive}
           fetchProducts={fetchProducts}
+          handleNextPrevious={handleNextPrevious}
+          hasPages={hasPages}
+          synchronizeData={synchronizeData}
+          isSaving={isSaving}
+          setIsSaving={setIsSaving}
+          shopName={shopName}
+          collections={collections}
+          collectionSelected={collectionSelected}
+          setCollectionSelected={setCollectionSelected}
+          setQueryValue={setQueryValue}
+          setAllproductsSelected={setAllproductsSelected}
+          allProductsSelected={allProductsSelected}
         />
       ),
     },
@@ -850,6 +1031,7 @@ function TabsPage() {
           recommendedIntakeData={recommendedIntakeData}
           setToastMessage={setToastMessage}
           toggleActive={toggleActive}
+          handleRIDataReset={handleRIDataReset}
         />
       ),
     },
@@ -873,11 +1055,110 @@ function TabsPage() {
   return (
     <div>
       <Frame>
+        {isSaving ? <Loading /> : <></>}
         <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
           <Card.Section>{tabs[selected].tab}</Card.Section>
         </Tabs>
         {toastMarkup}
       </Frame>
+      <Modal
+        open={activeModal}
+        title="Welcome! We are glad that you have installed our app 🎉"
+      >
+        {isSpinnerActive ? (
+          <Modal.Section>
+            <TextContainer>
+              <p>
+                Hey and welcome! Thank you so much for installing our app!
+                <br />
+                We are currently checking your shop and indexing all your
+                products. This may take a few minutes. In the meantime, you can
+                watch{" "}
+                <Link url="https://www.youtube.com">this short video</Link> to
+                learn everything there is to know about our App.
+              </p>
+            </TextContainer>
+            <br />
+            <br />
+            <div style={{ textAlign: "center" }}>
+              <Spinner accessibilityLabel="Spinner" size="large" />
+              <p>
+                Product indexing in progress. Please be patient, this may take
+                several minutes depending on the number of products/variants you
+                have in your store.
+              </p>
+            </div>
+          </Modal.Section>
+        ) : (
+          <Modal.Section>
+            <Card>
+              <Card.Section>
+                <TextContainer>
+                  Product indexing successful! Congratulations, you can now
+                  configure the app according to your needs! Once you have
+                  configured the app, the price change indication will be
+                  visible in your store. Depending on which theme you use and
+                  how much it is customized, there may be display problems. If
+                  you experience these problems, please contact our support.
+                </TextContainer>
+                <div style={{ textAlign: "center" }}>
+                  <br />
+                  <br />
+                  <Badge status="success">Success</Badge>
+                  <br />
+                  <br />
+                  <p>Product indexing completed successfully!</p>
+                </div>
+                <br />
+                <br />
+              </Card.Section>
+              <Card.Section>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <p>The app is now ready to use.</p>
+                  <ButtonGroup>
+                    <Button
+                      onClick={() =>
+                        handleChangeModalAndRedirectDocumentation()
+                      }
+                    >
+                      Documentation
+                    </Button>
+                    <Button
+                      primary
+                      onClick={() => handleChangeModalAndUpdateData()}
+                    >
+                      Start configuration
+                    </Button>
+                  </ButtonGroup>
+                </div>
+              </Card.Section>
+            </Card>
+          </Modal.Section>
+        )}
+      </Modal>
+
+      {/* <Modal
+        open={activeUpdateModal}
+        title="Update in progress - please wait a short moment"
+      >
+        <Modal.Section>
+          <Card>
+            <Card.Section>
+              <TextContainer>
+                Good news! We just launched a big update for your App. This will significantly improve the loading time. You can read more details in our <Link url="https://feedback.cronum.app/updates">changelog</Link>. Please be patient for a moment while we install the update for you in your store. This will not take long, please wait a little while.
+              </TextContainer>
+              <div style={{ textAlign: "center" }}>
+                <Spinner accessibilityLabel="Spinner" size="large" />
+                <p>
+                  App update in progress. Please be patient for a moment.
+                </p>
+              </div>
+            </Card.Section>
+          </Card>
+        </Modal.Section>
+      </Modal> */}
     </div>
   );
 }

@@ -43,14 +43,9 @@ function CalsEnergyInfos({
     handleAutoCalculs();
     return () => (isSubscribed = false);
   }, [energyKj100, data?.servingSize.EU.PortionSize]);
-  useEffect(() => {
-    let isSubscribed = true;
-    handleAutoCalculs();
-    return () => (isSubscribed = false);
-  }, []);
 
   const handleRiAutoCalculs = () => {
-    storeData.recommendedIntake.forEach((elem) => {
+    storeData?.recommendedIntake?.forEach((elem) => {
       if (elem.name === "Energy" || elem.name === "energy") {
         const newRI = Math.floor(
           (data.calsEnergyInfo.energyKcal25 / elem.quantity) * 100
@@ -128,44 +123,49 @@ function CalsEnergyInfos({
             />
           </Stack>
         </div>
-        <div style={{ marginTop: "10px" }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "start",
-              position: "relative",
-            }}
-          >
-            <div>
-              <TextField
-                label="% RI* Recommended intake"
-                value={data?.calsEnergyInfo?.Ri}
-                onChange={(e) => {
-                  handleChange(e, "calsEnergyInfo", "Ri");
-                }}
-                type="number"
-              />
-            </div>
-            <div style={{ position: "absolute", marginLeft: "178px" }}>
-              <Tooltip
-                dismissOnMouseOut
-                content={
-                  <p>
-                    The RI* percentage is automatically calculated based on your
-                    country standard %RI*: you can still edit these values on{" "}
-                    <a href="#" style={{ textDecoration: "none" }}>
-                      the Recommended Intake page
-                    </a>
-                    .
-                  </p>
-                }
-              >
-                <Icon source={CircleInformationMajor} color="base" />
-              </Tooltip>
+        {storeData.shop_plan === "Basic" ? (
+          <></>
+        ) : (
+          <div style={{ marginTop: "10px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "start",
+                position: "relative",
+              }}
+            >
+              <div>
+                <TextField
+                  label="% RI* Recommended intake"
+                  value={data?.calsEnergyInfo?.Ri}
+                  onChange={(e) => {
+                    handleChange(e, "calsEnergyInfo", "Ri");
+                  }}
+                  type="number"
+                />
+              </div>
+              <div style={{ position: "absolute", marginLeft: "178px" }}>
+                <Tooltip
+                  dismissOnMouseOut
+                  content={
+                    <p>
+                      The RI* percentage is automatically calculated based on
+                      your country standard %RI*: you can still edit these
+                      values on{" "}
+                      <a href="#" style={{ textDecoration: "none" }}>
+                        the Recommended Intake page
+                      </a>
+                      .
+                    </p>
+                  }
+                >
+                  <Icon source={CircleInformationMajor} color="base" />
+                </Tooltip>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         <div>
           <div></div>
         </div>

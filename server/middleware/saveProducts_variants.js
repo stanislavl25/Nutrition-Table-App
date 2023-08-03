@@ -1,5 +1,5 @@
 import Products from "../models/productModel.js";
-
+// import { Shopify } from "@shopify/shopify-api";
 function search_array(array, valuetofind) {
   if (array !== undefined) {
     for (let i = 0; i < array.length; i++) {
@@ -13,7 +13,7 @@ function search_array(array, valuetofind) {
 
 //save variant if it does not exist
 const saveVariant = async (prod, variants_productsObj, shop) => {
-  if (prod.title === "Default Title") return;
+  if (prod.node?.title === "Default Title") return;
   var newProduct = Products();
   const prodID = prod.id;
   newProduct.productId = prodID;
@@ -22,7 +22,6 @@ const saveVariant = async (prod, variants_productsObj, shop) => {
   newProduct.product_type = variants_productsObj.product_type
     ? variants_productsObj.product_type
     : null;
-
   newProduct.it_is_variant = true;
   newProduct.connected_productId_ifVariant = variants_productsObj.id;
   for (var i = 0; i < variants_productsObj.images.length; i++) {
@@ -72,13 +71,17 @@ const updateVariant = async (prod, variants_productsObj, shop) => {
 
 const saveProduct = async (prod, shop) => {
   var newProduct = Products();
-  const prodID = prod.id;
+  const prodID = prod.node?.id;
   newProduct.productId = prodID;
-  newProduct.name = prod.title;
+  newProduct.name = prod.node?.title;
   newProduct.store_id = shop;
-  newProduct.product_type = prod.product_type ? prod.product_type : null;
+  newProduct.product_type = prod.node?.productType
+    ? prod.node?.productType
+    : null;
   newProduct.image =
-    prod.images && prod.images.length > 0 ? prod.images[0]?.src : null;
+    prod?.node?.images?.edges && prod?.node?.images?.edges?.length > 0
+      ? prod?.node?.images?.edges[0]?.node?.src
+      : null;
 
   await newProduct.save(function (err, data) {
     if (err) console.log(err);
@@ -90,13 +93,15 @@ const saveProduct = async (prod, shop) => {
 const updateProduct = async (prod, shop) => {
   await Products.findOneAndUpdate(
     {
-      productId: prod.id,
+      productId: prod.node?.id,
       store_id: shop,
     },
     {
-      name: prod.title,
-      product_type: prod.product_type,
-      image: prod?.image?.src ? prod.image.src : null,
+      name: prod.node?.title,
+      product_type: prod.node?.productType,
+      image: prod?.node?.images?.edges[0]?.node?.src
+        ? prod.node.images.edges[0].node.src
+        : null,
     },
     { new: true }
   );
@@ -108,7 +113,7 @@ const saveProducts_variants = async (shop, body) => {
       const res = await Products.findOne(
         {
           store_id: shop,
-          product_id: body.id,
+          productId: body.node?.id,
         },
         null,
         { strictQuery: false }
@@ -119,16 +124,16 @@ const saveProducts_variants = async (shop, body) => {
       } else {
         await updateProduct(body, shop);
       }
-      if (!!body?.variants) {
-        for (let count = 0; count < body.variants.length; count++) {
+      if (!!body?.node?.variants) {
+        for (let count = 0; count < body.node?.variants.length; count++) {
           var variant_exist = search_array(
             result?.product_variants_ids ? result.product_variants_ids : [],
-            body.variants[count].id
+            body.node?.variants[count].id
           );
           if (!variant_exist) {
-            await saveVariant(body.variants[count], body, shop);
+            await saveVariant(body.node?.variants[count], body, shop);
           } else if (variant_exist) {
-            await updateVariant(body.variants[count], body, shop);
+            await updateVariant(body.node?.variants[count], body, shop);
           }
         }
       }

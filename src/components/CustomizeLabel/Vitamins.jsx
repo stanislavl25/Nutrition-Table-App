@@ -93,6 +93,7 @@ function Vitamins({
   allData,
   storeData,
   handleTabChange,
+  setNewRiName,
 }) {
   const handleRiAutoCalculs = () => {
     allData.vitamins.forEach((vitamin, index) => {
@@ -101,17 +102,25 @@ function Vitamins({
           if (elem.quantity > 0) {
             const newRI = (vitamin.perportion / elem.quantity) * 100;
             var num = Number(newRI);
-            var roundedString = num.toFixed(1);
-            let numAfterUnitCheck;
-            if (elem.unit === "Milligrams") {
-              numAfterUnitCheck = roundedString + " k";
-            } else if (elem.unit === "Micrograms") {
-              numAfterUnitCheck = roundedString + " m";
+            var roundedString =
+              elem.unit === "Milligrams"
+                ? (num / 1000).toFixed(1)
+                : elem.unit === "Micrograms"
+                ? (num / 1000000).toFixed(1)
+                : num.toFixed(1);
+            if (roundedString[2] !== "0") {
+              let numAfterUnitCheck;
+              if (elem.unit === "Milligrams") {
+                numAfterUnitCheck = roundedString + "k";
+              } else if (elem.unit === "Micrograms") {
+                numAfterUnitCheck = roundedString + "m";
+              } else {
+                numAfterUnitCheck = roundedString;
+              }
+              handleChange(numAfterUnitCheck, "vitamins", "RI", index);
             } else {
-              numAfterUnitCheck = roundedString;
+              handleChange("0", "vitamins", "RI", index);
             }
-
-            handleChange(numAfterUnitCheck, "vitamins", "RI", index);
           } else {
             handleChange("0", "vitamins", "RI", index);
           }
@@ -156,10 +165,11 @@ function Vitamins({
   }, [allData?.servingSize.EU.PortionSize]);
 
   const handleNewRIElem = useCallback(
-    (e) => {
+    (value) => {
+      setNewRiName(value);
       let check;
       storeData.recommendedIntake.forEach((elem) => {
-        if (elem.name === e) {
+        if (elem.name === value) {
           check = true;
         }
       });

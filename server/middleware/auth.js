@@ -1,9 +1,8 @@
 import { Shopify } from "@shopify/shopify-api";
-import Products from "../models/productModel.js";
 import Stores from "../models/storeModel.js";
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js";
 import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
-import saveProducts_variants from "../middleware/saveProducts_variants.js";
+
 export default function applyAuthMiddleware(app) {
   app.get("/auth", async (req, res) => {
     if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
@@ -38,6 +37,7 @@ export default function applyAuthMiddleware(app) {
       })
     );
   });
+
   app.get("/auth/callback", async (req, res) => {
     try {
       const session = await Shopify.Auth.validateAuthCallback(
@@ -60,19 +60,11 @@ export default function applyAuthMiddleware(app) {
         var newShop = Stores();
         newShop.shop_id = AuthenticatedShop;
         newShop.shop_plan = "Basic";
-        await newShop.save(function (err, data) {
+        await newShop.save(async function (err, data) {
           if (err) console.error(err);
-          else console.log("Added new Store");
-        });
-        const { Product } = await import(
-          `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-        );
-        const newProducts = await Product.all({
-          session: session,
-          fields: "id,title,product_type,images,variants",
-        });
-        newProducts.forEach(async (prod) => {
-          await saveProducts_variants(session.shop, prod);
+          else {
+            console.log("Added new Store");
+          }
         });
       } else {
         console.log("known shop");

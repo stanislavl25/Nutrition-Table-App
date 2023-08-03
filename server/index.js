@@ -10,7 +10,16 @@ import db from "./db.js";
 import StoreModel from "./models/storeModel.js";
 import Products from "./models/productModel.js";
 import AppSession from "./models/AppSessionModel.js";
-import { handleAllWebhooks } from "./webhookhandler.js";
+import { handleAllWebhooks } from "./webhookshandle.js";
+import { synchronizeData } from "./synchronizeData.js";
+import { initiateProducts } from "./initiateProducts.js";
+import { SaveAndUpdateProduct, SaveStoreInfo } from "./metafieldHandler.js";
+import {
+  handleProductsPagination,
+  getCollections,
+  handleProductsPaginationWithFilter,
+} from "./paginationHandler.js";
+import { launchUpdate, checkNewUpdate } from "./newUpdates.js";
 const USE_ONLINE_TOKENS = true;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
 
@@ -126,28 +135,39 @@ export async function createServer(
   /** handle food products save */
   app.post("/save_foodProducts", verifyRequest(app), async (req, res) => {
     const updates = req.body.data;
-    updates["edited"] = true;
-    const id = req.body.id;
+    const products = req.body.products;
+    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     delete updates._id;
     delete updates.name;
     delete updates.product_type;
     delete updates.image;
+    delete updates.updatedAt;
+    delete updates.createdAt;
     try {
-      const update = Products.findByIdAndUpdate(
-        { _id: id },
+      await SaveAndUpdateProduct(
         updates,
-        (err, docs) => {
-          if (err) {
-            console.log("######### error", err);
-            res
-              .status(400)
-              .send({ message: "Something wrong happend!", success: false });
-          } else {
-            console.log("######### success", docs);
-            res.status(200).send({ message: "updates saved!", success: true });
-          }
-        }
+        products,
+        session.shop,
+        session.accessToken
       );
+      updates["edited"] = true;
+      products.map(async (elem) => {
+        const update = Products.findByIdAndUpdate(
+          { _id: elem },
+          updates,
+          (err, docs) => {
+            if (err) {
+              console.log("######### error", err);
+              res
+                .status(400)
+                .send({ message: "Something wrong happend!", success: false });
+            } else {
+              console.log("######### success");
+            }
+          }
+        );
+      });
+      res.status(200).send({ message: "updates saved!", success: true });
     } catch (e) {
       res
         .status(400)
@@ -161,11 +181,25 @@ export async function createServer(
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const products = req.body.products;
     const storeId = session.shop;
+    const updates = req.body.data;
+    delete updates._id;
+    delete updates.name;
+    delete updates.product_type;
+    delete updates.image;
+    delete updates.updatedAt;
+    delete updates.createdAt;
+    updates.food_product = false;
     try {
+      await SaveAndUpdateProduct(
+        updates,
+        products,
+        session.shop,
+        session.accessToken
+      );
       let updateData;
       for (var i = 0; i < products.length; i++) {
         updateData = await Products.findOneAndUpdate(
-          { store_id: storeId, name: products[i] },
+          { store_id: storeId, _id: products[i] },
           { food_product: false }
         );
       }
@@ -182,31 +216,31 @@ export async function createServer(
    */
 
   app.post("/LangFieldsSave", verifyRequest(app), async (req, res) => {
-    const name = req.body.name;
-    const value = req.body.value;
+    const updates = req.body.updates;
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     const store = session.shop;
+    delete updates.id;
+    delete updates.AlreadySubscribed;
+    delete updates.firstTimeOpenApp;
+    delete updates.freeTrialDone_Paid;
+    delete updates._id;
+    delete updates.shop_id;
     try {
-      const update = { [name]: value };
-      if (typeof name === "string" && typeof value === "string") {
-        const updateData = await StoreModel.findOneAndUpdate(
-          { shop_id: store },
-          update,
-          { returnOriginal: false }
-        );
-        // console.log(updateData);
-        if (updateData) {
-          res.status(200).send({
-            success: true,
-            message: "Changes Saved!",
-          });
-        }
-      } else {
-        throw new Error("type of data is bad!");
+      const updateData = await StoreModel.findOneAndUpdate(
+        { shop_id: store },
+        updates,
+        { returnDocument: "after", returnOriginal: false }
+      );
+      if (updateData) {
+        res.status(200).send({
+          success: true,
+          message: "Changes Saved!",
+        });
       }
+      await SaveStoreInfo(updateData, session);
     } catch (err) {
       res.status(400).send({ message: "Something wrong happend!" });
-      console.log(err);
+      console.log(err, "err at /LangFieldsSave");
     }
   });
 
@@ -214,17 +248,20 @@ export async function createServer(
    * handle Language page data response
    */
   app.get("/LangData", verifyRequest(app), async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-    const store = session.shop;
-    const shopData = await StoreModel.find({ shop_id: store }).exec();
-    if (shopData) {
-      res
-        .status(200)
-        .send({ success: true, message: "Data Exists", data: shopData });
-    } else {
-      res
-        .status(500)
-        .send({ success: false, message: "something wrong happend!" });
+    try {
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const store = session.shop;
+      const shopData = await StoreModel.find({ shop_id: store }).exec();
+      if (shopData) {
+        res
+          .status(200)
+          .send({ success: true, message: "Data Exists", data: shopData });
+      } else {
+        res.status(200).send({ success: false, message: "Data doesn't exist" });
+      }
+    } catch (err) {
+      console.log(err, "error at /LangData");
+      res.status(500).send({ success: false, message: "Data doesn't exist" });
     }
   });
 
@@ -237,12 +274,30 @@ export async function createServer(
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     try {
       const shop = await checkShopExist(session.shop);
-      res
-        .status(200)
-        .send({ data: shop, success: true, message: "shop data back!" });
+      await SaveStoreInfo(shop, session);
+      const shopName = session.shop.split(".")[0];
+      if (!shop) {
+        res.status(200).send({
+          data: [],
+          success: false,
+          message: "shop data back!",
+          shopName,
+        });
+      } else {
+        res.status(200).send({
+          data: shop,
+          success: true,
+          message: "shop data back!",
+          shopName,
+        });
+      }
     } catch (err) {
-      res.status(400).send("Something wrong happend");
-      console.log(err);
+      res.status(400).send({
+        data: [],
+        success: false,
+        message: "shop data back!",
+      });
+      console.log(err, "error at /store-data");
     }
   });
 
@@ -250,7 +305,6 @@ export async function createServer(
    * handle recommended intake save
    */
   app.post("/recommendedIntake_save", verifyRequest(app), async (req, res) => {
-    console.log(req.body);
     const session = await Shopify.Utils.loadCurrentSession(req, res, true);
     try {
       const update = await StoreModel.findOneAndUpdate(
@@ -259,9 +313,15 @@ export async function createServer(
         },
         {
           recommendedIntake: req.body.formVal,
-        }
+        },
+        { returnDocument: "after", returnOriginal: false }
       );
-      res.status(200).send({ message: "Recommended Intake updated!" });
+      res.status(200).send({
+        success: true,
+        message: "Recommended Intake updated!",
+        data: update,
+      });
+      await SaveStoreInfo(update, session);
     } catch (err) {
       console.log(err);
       res.status(400).send({ message: "something wrong happened" });
@@ -294,28 +354,132 @@ export async function createServer(
     }
   });
 
-  /***
-   * get all products with the same shop_id
+  /**
+   * check if store have any products (at least one)
+   *
    */
-  function subtractDays(dateObj, numDays) {
-    dateObj.setDate(dateObj.getDate() - numDays);
-    return dateObj;
-  }
 
-  app.get("/products-list", verifyRequest(app), async (req, res) => {
+  app.get("/check-init-product", verifyRequest(app), async (req, res) => {
     try {
       const session = await Shopify.Utils.loadCurrentSession(req, res, true);
-      const query = Products.find({
+      const hasProducts = await Products.find({
         store_id: session.shop,
-      }).select("-store_id -productId -is_deleted");
-      const productsDatabase = await query.exec();
+      })
+        .limit(1)
+        .count();
+      console.log(
+        "checking if store have any registered products",
+        hasProducts
+      );
       res.status(200).send({
-        data: productsDatabase,
-        message: "found products!",
+        message: hasProducts,
         success: true,
       });
     } catch (err) {
-      res.status(400).send({ success: false, message: "no products found!" });
+      console.log(err, "err at /check-init-product");
+      res.status(404).send({
+        message: "an error has occured",
+        success: false,
+      });
+    }
+  });
+
+  /**
+   * save all store products in DB
+   *
+   */
+
+  app.get("/product-initiate", verifyRequest(app), async (req, res) => {
+    try {
+      console.log("initiating products");
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      await initiateProducts(session);
+      res.status(200).send({
+        message: "Products added successfully",
+        success: true,
+      });
+    } catch (err) {
+      console.log(err, "err at /product-initiate");
+      res.status(404).send({
+        message: "an error has occured",
+        success: false,
+      });
+    }
+  });
+
+  /***
+   * get all products with the same shop_id
+   */
+
+  app.post("/products-list", verifyRequest(app), async (req, res) => {
+    try {
+      let data;
+      console.log("/products-list");
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const collections = await getCollections(session);
+      if (
+        req.body.filters.query.length > 0 ||
+        req.body.filters.collections[0].length > 0
+      ) {
+        data = await handleProductsPaginationWithFilter(
+          session,
+          null,
+          "",
+          req.body.filters
+        );
+      } else {
+        data = await handleProductsPagination("load", null, null, session);
+      }
+      if (data.synchronisedElements.length) {
+        res.status(200).send({
+          data: data.synchronisedElements,
+          message: "found products!",
+          success: true,
+          hasPages: data.hasPages,
+          shopifyData: {
+            firstCursor: data.firstCursor,
+            lastCursor: data.lastCursor,
+          },
+          collections: collections,
+        });
+      } else {
+        res.status(200).send({
+          data: [],
+          shopifyData: { firstCursor: "", lastCursor: "" },
+          success: false,
+          hasPages: { hasNextPage: false, hasPreviousPage: false },
+          collections: [""],
+        });
+      }
+    } catch (err) {
+      console.log("Error at /products-list", err);
+      res.status(400).send({
+        data: [],
+        shopifyData: { firstCursor: "", lastCursor: "" },
+        success: false,
+        hasPages: { hasNextPage: false, hasPreviousPage: false },
+        collections: [""],
+        message: "no products found!",
+      });
+    }
+  });
+
+  /** check for app updates **/
+
+  app.get("/check-updates", verifyRequest(app), async (req, res) => {
+    try {
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const check = await checkNewUpdate(session.shop);
+      res.status(200).send({
+        check: check,
+        success: true,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(404).send({
+        message: "an error has occured",
+        success: false,
+      });
     }
   });
 
@@ -323,7 +487,7 @@ export async function createServer(
   const checkShopExist = async (storeId) => {
     const check = await StoreModel.findOne(
       { shop_id: storeId },
-      "-_id -shop_id"
+      "-_id -shop_id -id -createdAt -updatedAt -needsUpdate"
     ).exec();
     const data = check;
     if (check) return data;
@@ -401,7 +565,7 @@ export async function createServer(
     const store = session.shop;
     const storeQuery = StoreModel.find({ shop_id: store });
     const shopData = await storeQuery.exec();
-    const firstTimeOpen = shopData[0].firstTimeOpenApp;
+    const firstTimeOpen = shopData[0]?.firstTimeOpenApp;
     if (plan === undefined && firstTimeOpen) {
       plan = "Basic";
     }
@@ -409,7 +573,6 @@ export async function createServer(
       res.status(200).send({ success: true });
       return;
     }
-    console.log("plan ############", firstTimeOpen);
     try {
       const data = await StoreModel.findOneAndUpdate(
         {
@@ -451,7 +614,7 @@ export async function createServer(
       console.log("trial done and plan paid!");
     }
     if (check === true) {
-      console.log("your free trial still on mf!!", check);
+      console.log("your free trial still on!!", check);
       try {
         const data = await StoreModel.findOneAndUpdate(
           {
@@ -686,7 +849,6 @@ export async function createServer(
           console.log("err", err);
           return false;
         } else {
-          console.log("location updated successfully!");
           return true;
         }
       }
@@ -701,7 +863,7 @@ export async function createServer(
         `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
       );
       const session = await Shopify.Utils.loadCurrentSession(req, res);
-      console.log("###############", session.shop);
+
       const locations = await Location.all({
         session: session,
       });
@@ -716,7 +878,7 @@ export async function createServer(
         } else {
           location = "EU";
         }
-      } else {
+      } else if (!locations.length) {
         res.status(200).send({ location: "EU" });
         updateStoreLocation(session.shop, "EU");
       }
@@ -749,6 +911,57 @@ export async function createServer(
       }
     );
   });
+
+  app.post("/handle_nextProducts", verifyRequest(app), async (req, res) => {
+    const type = req.body.type;
+    const cursor = req.body.cursor;
+    const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+    let data;
+    try {
+      if (req?.body?.filters?.query?.length > 0) {
+        data = await handleProductsPaginationWithFilter(
+          session,
+          req.body.type,
+          req.body.cursor,
+          req.body.filters
+        );
+      } else {
+        data = await handleProductsPagination(type, cursor, null, session);
+      }
+
+      if (data.synchronisedElements.length) {
+        res.status(200).send({
+          success: true,
+          data: data.synchronisedElements,
+          hasPages: data.hasPages,
+          shopifyData: {
+            firstCursor: data.firstCursor,
+            lastCursor: data.lastCursor,
+          },
+        });
+      } else {
+        res.status(200).send({
+          data: [],
+          shopifyData: { firstCursor: "", lastCursor: "" },
+          success: false,
+          hasPages: { hasNextPage: false, hasPreviousPage: false },
+        });
+      }
+    } catch (err) {
+      console.log("Error at /handle_nextProducts", err);
+      res.status(200).send({
+        data: [],
+        shopifyData: { firstCursor: "", lastCursor: "" },
+        success: false,
+        hasPages: { hasNextPage: false, hasPreviousPage: false },
+      });
+    }
+  });
+  app.post(
+    "/handle_previousProducts",
+    verifyRequest(app),
+    async (req, res) => {}
+  );
 
   app.post("/product_bulk_Hide", verifyRequest(app), async (req, res) => {
     console.log("product bulk hide! ########################");
@@ -882,6 +1095,47 @@ export async function createServer(
         }
       }
     );
+  });
+  //***get products count to calculate time for synchronisation process */
+
+  app.get("/product-count", verifyRequest(app), async (req, res) => {
+    try {
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      const { Product } = await import(
+        `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+      );
+      let count = await Product.count({
+        session: session,
+      });
+      res.status(200).send({
+        count: count.count,
+        success: true,
+      });
+    } catch (err) {
+      console.log("error at /product-count", err);
+      res.status(404).send({
+        count: 0,
+        success: false,
+      });
+    }
+  });
+
+  //*** synchronize products */
+  app.get("/synchronize-products", verifyRequest(app), async (req, res) => {
+    try {
+      const session = await Shopify.Utils.loadCurrentSession(req, res, true);
+      await synchronizeData(session);
+      res.status(200).send({
+        message: "products has been synchronized!",
+        success: true,
+      });
+    } catch (err) {
+      console.log("Error at /synchronize-products", err);
+      res.status(400).send({
+        message: "an error has occured",
+        success: false,
+      });
+    }
   });
 
   app.post("/graphql", verifyRequest(app), async (req, res) => {

@@ -14,6 +14,7 @@ const productSchema = new Schema(
     image: { type: String },
     product_type: { type: String },
     nutriScore: { type: String, default: "A" },
+    nutriScoreCheck: { type: Boolean, default: false },
     productToPrepare: { type: Boolean, default: false },
     product_variants_ids: [],
     it_is_variant: { type: Boolean, default: false },

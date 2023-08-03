@@ -114,6 +114,7 @@ function NutritionInfo({
   handleChange,
   productToPrepare,
   storeData,
+  setNewRiName,
 }) {
   const options = [
     { label: "Grams", value: "Grams" },
@@ -127,16 +128,25 @@ function NutritionInfo({
           if (elem.quantity > 0) {
             const newRI = (nutrition.perportion / elem.quantity) * 100;
             var num = Number(newRI);
-            var roundedString = num.toFixed(1);
-            let numAfterUnitCheck;
-            if (elem.unit === "Milligrams") {
-              numAfterUnitCheck = roundedString + " k";
-            } else if (elem.unit === "Micrograms") {
-              numAfterUnitCheck = roundedString + " m";
+            var roundedString =
+              elem.unit === "Milligrams"
+                ? (num / 1000).toFixed(1)
+                : elem.unit === "Micrograms"
+                ? (num / 1000000).toFixed(1)
+                : num.toFixed(1);
+            if (roundedString[2] !== "0") {
+              let numAfterUnitCheck;
+              if (elem.unit === "Milligrams") {
+                numAfterUnitCheck = roundedString + "k";
+              } else if (elem.unit === "Micrograms") {
+                numAfterUnitCheck = roundedString + "m";
+              } else {
+                numAfterUnitCheck = roundedString;
+              }
+              handleChange(numAfterUnitCheck, "nutritionData", "RI", index);
             } else {
-              numAfterUnitCheck = roundedString;
+              handleChange("0", "nutritionData", "RI", index);
             }
-            handleChange(numAfterUnitCheck, "nutritionData", "RI", index);
           } else {
             handleChange("0", "nutritionData", "RI", index);
           }
@@ -181,10 +191,11 @@ function NutritionInfo({
   }, []);
 
   const handleNewRIElem = useCallback(
-    (e) => {
+    (value) => {
+      setNewRiName(value);
       let check;
       storeData.recommendedIntake.forEach((elem) => {
-        if (elem.name === e) {
+        if (elem.name === value) {
           check = true;
         }
       });

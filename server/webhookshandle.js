@@ -48,19 +48,16 @@ async function handleProductsDeletionHook(shop, body) {
           store_id: shop,
         })
       ) {
-        await Products.findOneAndRemove(
-          {
-            productId: body.id,
-            store_id: shop,
-          },
-          function (err, result) {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log("Deleted product Successfully", result);
-            }
+        await Products.findOneAndRemove({
+          productId: body.id,
+          store_id: shop,
+        }).then(function (err, result) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("Deleted product Successfully", result);
           }
-        );
+        });
       } else {
         console.log("product already deleted");
       }

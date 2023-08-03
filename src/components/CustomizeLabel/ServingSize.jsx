@@ -13,7 +13,14 @@ import {
 import React from "react";
 import { useState } from "react";
 
-const PortionSizeModal = ({ checked, setChecked, handlePortionSizeModal }) => {
+const PortionSizeModal = ({
+  checked,
+  setChecked,
+  handlePortionSizeModal,
+  prevPortionSize,
+  setEdited,
+  handleChangePortionSizeChange,
+}) => {
   const [active, setActive] = useState(false);
   const handleChange = () => {
     setActive(!active);
@@ -31,6 +38,13 @@ const PortionSizeModal = ({ checked, setChecked, handlePortionSizeModal }) => {
     if (checked) handlePortionSizeModal(checked);
   };
   const handleCancel = () => {
+    handleChangePortionSizeChange(
+      prevPortionSize,
+      "servingSize",
+      "PortionSize",
+      "EU"
+    );
+    setEdited(false);
     handleChange();
     if (checked) setChecked(false);
   };
@@ -103,6 +117,8 @@ function ServingSize({
   handlePortionSizeModal,
 }) {
   const [checked, setChecked] = useState(portionSizeModalCheckBox);
+  const [prevPortionSize, setPrevPortionSize] = useState("");
+  const [edited, setEdited] = useState(false);
   return (
     <div
       style={{
@@ -205,6 +221,10 @@ function ServingSize({
                   label="Portion Size"
                   value={data.servingSize.EU.PortionSize}
                   onChange={(e) => {
+                    if (!edited) {
+                      setEdited(true);
+                      setPrevPortionSize(data.servingSize.EU.PortionSize);
+                    }
                     handleChange(e, "servingSize", "PortionSize", "EU");
                     if (!portionSizeModalCheckBox)
                       document.getElementById("portionSizeID").click();
@@ -227,6 +247,9 @@ function ServingSize({
                   checked={checked}
                   setChecked={setChecked}
                   handlePortionSizeModal={handlePortionSizeModal}
+                  prevPortionSize={prevPortionSize}
+                  setEdited={setEdited}
+                  handleChangePortionSizeChange={handleChange}
                 />
               </div>
             </Stack>

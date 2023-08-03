@@ -10,6 +10,7 @@ body {
   --rch-input-border-width: 2px;
   --rch-cb-size: 19px;
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 10px;

@@ -1,8 +1,17 @@
-import React from "react";
-
-import { Button, Heading, Card, Page, EmptyState } from "@shopify/polaris";
+import React, { useState } from "react";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { Redirect } from "@shopify/app-bridge/actions";
+import {
+  Button,
+  Heading,
+  Card,
+  Page,
+  EmptyState,
+  Link,
+} from "@shopify/polaris";
 import MyLablesTable from "./MyLablesTable";
 import star from "../../assets/nta_star_for_plan_banner.png";
+import chair from "../../assets/empty_chair.png";
 function MyLables({
   handleTabChange,
   handleSelectedProducts,
@@ -10,7 +19,6 @@ function MyLables({
   productsArray,
   setProductsArray,
   emptyStore,
-  categories,
   checkPlan,
   deselectedOptions,
   memoOptions,
@@ -24,7 +32,69 @@ function MyLables({
   toggleActive,
   setToastMessage,
   fetchProducts,
+  handleNextPrevious,
+  hasPages,
+  setIsSaving,
+  isSaving,
+  synchronizeData,
+  shopName,
+  collections,
+  collectionSelected,
+  setCollectionSelected,
+  setQueryValue,
+  setAllproductsSelected,
+  allProductsSelected,
 }) {
+  const [loadingSynchronize, setLoadingSynchronize] = useState(false);
+  const app = useAppBridge();
+  const GeneralHandleSelectionChange = (
+    selectionType,
+    isSelecting,
+    selection
+  ) => {
+    handleSelectionChange(selectionType, isSelecting, selection);
+    setAllproductsSelected(selectionType === "all");
+  };
+  const handleProductSynchronisation = async () => {
+    if (!loadingSynchronize) {
+      setIsSaving(true);
+      try {
+        setLoadingSynchronize(true);
+        const synchronizeResponse = await synchronizeData();
+        setLoadingSynchronize(false);
+
+        if (synchronizeResponse.success === true) {
+          let count;
+          let minutesWait = 0;
+          let secondsWait = 0;
+          if (allResourcesSelected) {
+            count = await fetch("/product-count").then((res) => res.json());
+            count = count.count;
+          } else {
+            count = selectedResources.length;
+          }
+          minutesWait = parseInt(((count / 25) * 2) / 60);
+          secondsWait = parseInt(((count / 25) * 2) % 60);
+          toggleActive(false);
+          setToastMessage(
+            `Success! Changes to your store have been saved and will become effective in approximately ${minutesWait} minutes and ${secondsWait} seconds.`
+          );
+        } else {
+          toggleActive(true);
+          setToastMessage(synchronizeResponse.message);
+        }
+        window.location.reload(false);
+      } catch (e) {
+        toggleActive(true);
+        setToastMessage(
+          "an error has occured during the synchronization of the products"
+        );
+        console.log(e);
+      }
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div>
       {shop_plan && shop_plan === "Basic" && productsArray?.length < 999 ? (
@@ -157,17 +227,29 @@ function MyLables({
           <Card sectioned>
             {emptyStore ? (
               <EmptyState
-                heading="This is where you'll manage your lables"
-                image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+                heading="This is where you'll manage the nutrition table of your products"
+                image={chair}
               >
                 <div style={{ marginBottom: "10px", color: "#808080" }}>
-                  You can create a new label or edit
+                  No products found
                   <br />
                   <div style={{ marginLeft: "20px" }}>
-                    your products label here
+                    You can create a new product in the{" "}
+                    <span style={{ color: "#0b78b4" }}>Shopify admin</span>.
                   </div>
                 </div>
-                <Button primary>Create a new Label</Button>
+                <Button
+                  primary
+                  onClick={() => {
+                    app.dispatch(
+                      Redirect.toRemote({
+                        url: `https://admin.shopify.com/store/${shopName}/products/new`,
+                      })
+                    );
+                  }}
+                >
+                  Create a new product
+                </Button>
               </EmptyState>
             ) : (
               <MyLablesTable
@@ -176,7 +258,6 @@ function MyLables({
                 }
                 setProductsArray={setProductsArray}
                 handleSelectedProducts={handleSelectedProducts}
-                categories={categories}
                 handleEditProduct={handleEditProduct}
                 deselectedOptions={deselectedOptions}
                 memoOptions={memoOptions}
@@ -189,10 +270,38 @@ function MyLables({
                 fetchProducts={fetchProducts}
                 setToastMessage={setToastMessage}
                 toggleActive={toggleActive}
+                handleNextPrevious={handleNextPrevious}
+                hasPages={hasPages}
+                isSaving={isSaving}
+                setIsSaving={setIsSaving}
+                collections={collections}
+                collectionSelected={collectionSelected}
+                setCollectionSelected={setCollectionSelected}
+                setQueryValue={setQueryValue}
+                GeneralHandleSelectionChange={GeneralHandleSelectionChange}
+                setAllproductsSelected={setAllproductsSelected}
               />
             )}
           </Card>
         </div>
+        {!loadingSynchronize ? (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <span style={{ opacity: "0.5" }}>
+              {" "}
+              Do you have problems with finding specific products?{" "}
+              <Link onClick={handleProductSynchronisation}>
+                Make a manual synchronisiaton
+              </Link>
+            </span>
+          </div>
+        ) : (
+          <div style={{ width: "100%", textAlign: "center" }}>
+            <span style={{ opacity: "0.5" }}>
+              {" "}
+              Please wait while we synchronize your data.
+            </span>
+          </div>
+        )}
       </Page>
     </div>
   );

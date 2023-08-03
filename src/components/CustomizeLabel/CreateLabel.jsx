@@ -41,26 +41,7 @@ import {
   calsEnergyInfo,
 } from "../defaultData.js";
 import BasicVitaminsMineralsPage from "./BasicVitaminsMineralsPage";
-import { ResourcePicker } from "@shopify/app-bridge-react";
-// import createApp from "@shopify/app-bridge";
-// import { ResourcePicker } from "@shopify/app-bridge/actions";
 
-// const app = createApp({
-//   apiKey: process.env.SHOPIFY_API_KEY,
-//   host: new URL(location).searchParams.get("host"),
-// });
-// const productPicker = ResourcePicker.create(app, {
-//   resourceType: ResourcePicker.ResourceType.Product,
-// });
-// const picker = ResourcePicker.create(app, {
-//   resourceType: ResourcePicker.ResourceType.Product,
-// });
-// picker.subscribe(ResourcePicker.Action.SELECT, (selectPayload) => {
-//   const selection = selectPayload.selection;
-//   console.log(selection);
-//   // Do something with `selection`
-// });
-// console.log(picker);
 const formLablesEU = ["Name", "Per 100 g", "Per portion", "Unit"];
 const formLablesCA_NA = ["Name", "Quantity", "Unit", "% Daily Value*"];
 const formLables = {
@@ -123,13 +104,21 @@ const MissingRIModal = ({
   setStoreData,
   storeData,
   saveRecomIntake,
+  newRiName,
 }) => {
   const [active, setActive] = useState(false);
   const handleChange = () => {
     setActive(!active);
   };
+  useEffect(() => {
+    if (active) {
+      const newData = { ...newRIdata };
+      newData["name"] = newRiName;
+      setNewRIdata(newData);
+    }
+  }, [active]);
   const [newRIdata, setNewRIdata] = useState({
-    name: "",
+    name: newRiName,
     quantity: "",
     unit: "Grams",
   });
@@ -157,6 +146,11 @@ const MissingRIModal = ({
     setStoreData(newStoreData);
     handleChange();
     saveRecomIntake(newStoreData.recommendedIntake);
+    setNewRIdata({
+      name: "",
+      quantity: "",
+      unit: "Grams",
+    });
   };
 
   const handleCancel = () => {
@@ -276,11 +270,10 @@ function CreateLabel({
     location: location,
     plan: shop_plan,
   });
-  const [productToPrepare, setProductToPrepare] = useState(false);
   const [rightSideWidth, setRightSideWidth] = useState("35%");
   const [leftSideWidth, setLeftSideWidth] = useState("60%");
   const [flexDirection, setFlexDirection] = useState("row");
-  const [openResourcePicker, setSourcePicker] = useState(false);
+  const [newRiName, setNewRiName] = useState("");
 
   const updateProducts = async () => {
     if (data.richText.notesText === undefined) {
@@ -333,11 +326,6 @@ function CreateLabel({
       }
     });
     window.removeEventListener("resize", () => {});
-  }, []);
-
-  const handleproductToPrepare = useCallback((newChecked) => {
-    setProductToPrepare(newChecked);
-    handleChange(newChecked, "productToPrepare");
   }, []);
 
   const handleIngredientsTextChange = async (e, editor) => {
@@ -408,38 +396,6 @@ function CreateLabel({
       });
   };
 
-  const handleResoucePickerSelection = useCallback((elem) => {
-    const newSelectedOptions = [];
-    elem.selection.forEach((element) => {
-      newSelectedOptions.push(element.title);
-    });
-    setSelectedOptions(newSelectedOptions);
-  });
-
-  const updateNonFoodStatus = () => {
-    let count = 0;
-    if (selectedOptions.length === 0 || data.food_product === undefined) {
-      handleChange(true, "food_product");
-      return;
-    }
-    productsArray.forEach((elem) => {
-      if (selectedOptions.includes(elem.name)) {
-        if (!elem.food_product) {
-          count++;
-        }
-      }
-    });
-    if (count === selectedOptions.length && count > 1) {
-      handleChange(true, "food_product");
-    }
-  };
-
-  useEffect(() => {
-    let subscription = false;
-    if (!subscription) updateNonFoodStatus();
-    return (subscription = true);
-  }, []);
-
   return (
     <Page
       title="Create Label"
@@ -470,7 +426,6 @@ function CreateLabel({
             }}
           >
             <ProductInfo
-              handleproductToPrepare={handleproductToPrepare}
               locationPlan={locationPlan}
               selectedOptions={selectedOptions}
               setSelectedOptions={setSelectedOptions}
@@ -479,10 +434,11 @@ function CreateLabel({
               setMemoOptions={setMemoOptions}
               removeTag={removeTag}
               productsAredifferent={productsAredifferent}
-              setSourcePicker={setSourcePicker}
               handleSelectedProducts={handleSelectedProducts}
               data={data}
               handleChange={handleChange}
+              productsArray={productsArray}
+              handleTabChange={handleTabChange}
             />
             {selectedOptions.length > 0 && data.food_product === false ? (
               <Card sectioned>
@@ -510,7 +466,7 @@ function CreateLabel({
             ) : (
               <div>
                 <ServingSize
-                  productToPrepare={productToPrepare}
+                  productToPrepare={data.productToPrepare}
                   servingSize={data.servingSize}
                   locationPlan={locationPlan}
                   data={data}
@@ -541,8 +497,9 @@ function CreateLabel({
                   handleAddNutritionData={handleAddNutritionData}
                   handleRemoveNutritionData={handleRemoveNutritionData}
                   handleChange={handleChange}
-                  productToPrepare={productToPrepare}
+                  productToPrepare={data.productToPrepare}
                   storeData={storeData}
+                  setNewRiName={setNewRiName}
                 />
                 {locationPlan.plan === "Basic" && location === "EU" ? (
                   <BasicVitaminsMineralsPage
@@ -559,6 +516,7 @@ function CreateLabel({
                       allData={data}
                       storeData={storeData}
                       handleTabChange={handleTabChange}
+                      setNewRiName={setNewRiName}
                     />
                     <Minerals
                       data={data.minerals}
@@ -569,6 +527,7 @@ function CreateLabel({
                       allData={data}
                       storeData={storeData}
                       handleTabChange={handleTabChange}
+                      setNewRiName={setNewRiName}
                     />
                   </>
                 )}
@@ -626,7 +585,7 @@ function CreateLabel({
             ) : (
               <TablePreview
                 data={data}
-                productToPrepare={productToPrepare}
+                productToPrepare={data.productToPrepare}
                 locationPlan={locationPlan}
                 langState={langState?.values}
               />
@@ -680,17 +639,13 @@ function CreateLabel({
           </Layout>
         </SkeletonPage>
       )}
-      <ResourcePicker
-        resourceType="Product"
-        open={openResourcePicker}
-        onSelection={handleResoucePickerSelection}
-      />
       <div style={{ display: "none" }}>
         <MissingRIModal
           handleTabChange={handleTabChange}
           setStoreData={setStoreData}
           storeData={storeData}
           saveRecomIntake={saveRecomIntake}
+          newRiName={newRiName}
         />
       </div>
     </Page>

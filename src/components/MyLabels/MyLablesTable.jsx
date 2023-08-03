@@ -1,21 +1,20 @@
 import {
   Button,
   IndexTable,
-  Select,
   TextStyle,
   Thumbnail,
   FormLayout,
   Popover,
-  Combobox,
   Listbox,
-  Icon,
   Modal,
   TextContainer,
+  Pagination,
+  Filters,
+  ChoiceList,
 } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { userLoggedInFetch } from "../../App";
-import React, { useCallback, useState } from "react";
-import { SearchMinor } from "@shopify/polaris-icons";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 const ResetProducts = ({ handleBulkProductsReset }) => {
   const [active, setActive] = useState(false);
@@ -178,7 +177,6 @@ function MyLablesTable({
   productsArray,
   setProductsArray,
   handleSelectedProducts,
-  categories,
   handleEditProduct,
   deselectedOptions,
   memoOptions,
@@ -189,6 +187,16 @@ function MyLablesTable({
   fetchProducts,
   setToastMessage,
   toggleActive,
+  handleNextPrevious,
+  hasPages,
+  setIsSaving,
+  isSaving,
+  collections,
+  collectionSelected,
+  setCollectionSelected,
+  setQueryValue,
+  GeneralHandleSelectionChange,
+  setAllproductsSelected,
 }) {
   const resourceName = {
     singular: "product",
@@ -197,6 +205,10 @@ function MyLablesTable({
 
   const [sortValue, setSortValue] = useState("");
   const [inputValue, setInputValue] = useState("");
+  // collection filter states
+  const [searchValue, setSearchValue] = useState("");
+  const TimerRef = useRef(null);
+
   const app = useAppBridge();
   const fetch = userLoggedInFetch(app);
   const updateText = useCallback(
@@ -260,7 +272,7 @@ function MyLablesTable({
       selectedResources.splice(0, selectedResources.length);
       productsArray.forEach((elem) => {
         if (elem.product_type !== null && elem.product_type.includes(value)) {
-          selectedResources.push(elem.name);
+          selectedResources.push(elem._id);
         }
       });
     },
@@ -268,6 +280,7 @@ function MyLablesTable({
   );
 
   const handleProductHide = async (productId) => {
+    setIsSaving(true);
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -291,8 +304,10 @@ function MyLablesTable({
       .catch((err) => {
         console.log(err);
       });
+    setIsSaving(false);
   };
   const handleProductReset = async (productId) => {
+    setIsSaving(true);
     const fetchOptions = {
       method: "POST",
       mode: "cors",
@@ -316,11 +331,42 @@ function MyLablesTable({
       .catch((err) => {
         console.log(err);
       });
+    setIsSaving(false);
   };
+  const bulkActions = [];
+  const promotedBulkActions = [
+    {
+      content: "Edit Labels",
+      onAction: () => handleSelectedProducts(selectedResources),
+      disabled: isSaving,
+    },
+    {
+      title: "More actions",
+      actions: [
+        {
+          content: "Hide Labels",
+          onAction: () => {
+            document.getElementById("Hide_Lables").click();
+          },
+          destructive: true,
+          disabled: isSaving,
+        },
+        {
+          content: "Reset products",
+          onAction: () => {
+            document.getElementById("Reset_products").click();
+          },
+          destructive: true,
+          disabled: isSaving,
+        },
+      ],
+    },
+  ];
+
   const handleBulkProductsReset = async () => {
     const products = [];
     await productsArray.forEach((elem) => {
-      if (selectedResources.includes(elem.name)) products.push(elem._id);
+      if (selectedResources.includes(elem._id)) products.push(elem._id);
     });
     const fetchOptions = {
       method: "POST",
@@ -335,6 +381,7 @@ function MyLablesTable({
       .then((res) => res.json())
       .then(async (response) => {
         if (response.success) {
+          selectedResources.splice(0, selectedResources.length);
           await fetchProducts();
           setToastMessage(response.message);
           toggleActive();
@@ -349,7 +396,7 @@ function MyLablesTable({
   const handleBulkProductsHide = async () => {
     const products = [];
     await productsArray.forEach((elem) => {
-      if (selectedResources.includes(elem.name)) products.push(elem._id);
+      if (selectedResources.includes(elem._id)) products.push(elem._id);
     });
     const fetchOptions = {
       method: "POST",
@@ -360,11 +407,11 @@ function MyLablesTable({
       },
       body: JSON.stringify({ products }),
     };
-    console.log(products);
     const data = await fetch("/product_bulk_Hide", fetchOptions)
       .then((res) => res.json())
       .then(async (response) => {
         if (response.success) {
+          selectedResources.splice(0, selectedResources.length);
           await fetchProducts();
           setToastMessage(response.message);
           toggleActive();
@@ -377,46 +424,111 @@ function MyLablesTable({
       });
   };
 
-  const categorieOptions = categories;
-  const bulkActions = [];
-  const promotedBulkActions = [
+  // *filter settings
+
+  const handleCollectionSelected = useCallback(async (value) => {
+    selectedResources.splice(0, selectedResources.length);
+    GeneralHandleSelectionChange("page", false, undefined);
+    handleSelectedProducts([]);
+    setQueryValue(() => {
+      return "";
+    });
+    setSearchValue("");
+    setCollectionSelected((prev) => {
+      return [...value];
+    });
+    setAllproductsSelected(false);
+    setProductsArray("none");
+  }, []);
+
+  const handleCollectionSelectedRemove = useCallback(() => {
+    GeneralHandleSelectionChange("page", false, undefined);
+    handleSelectedProducts([]);
+    setCollectionSelected([""]);
+    setAllproductsSelected(false);
+    setProductsArray("none");
+  }, []);
+
+  const filters = [
     {
-      content: "Edit Labels",
-      onAction: () => handleSelectedProducts(selectedResources),
-    },
-    {
-      title: "More actions",
-      actions: [
-        {
-          content: "Hide Labels",
-          onAction: () => {
-            document.getElementById("Hide_Lables").click();
-          },
-          destructive: true,
-        },
-        {
-          content: "Reset products",
-          onAction: () => {
-            document.getElementById("Reset_products").click();
-          },
-          destructive: true,
-        },
-      ],
+      key: "Collections",
+      label: "Collections",
+      filter: (
+        <ChoiceList
+          title="Collections"
+          choices={collections}
+          selected={collectionSelected}
+          onChange={handleCollectionSelected}
+        />
+      ),
+      shortcut: true,
     },
   ];
+  const appliedFilters = !isEmpty(collectionSelected)
+    ? [
+        {
+          key: "Collections",
+          label: disambiguateLabel(
+            "Collections",
+            collectionSelected,
+            collections
+          ),
+          onRemove: handleCollectionSelectedRemove,
+        },
+      ]
+    : [];
+
+  const handleOnQueryChange = (newQuery) => {
+    setSearchValue(newQuery);
+    clearTimeout(TimerRef.current);
+    TimerRef.current = setTimeout(() => {
+      selectedResources.splice(0, selectedResources.length);
+      GeneralHandleSelectionChange("page", false, undefined);
+      handleSelectedProducts([]);
+      setAllproductsSelected(false);
+      setProductsArray("none");
+      setCollectionSelected(() => {
+        return [""];
+      });
+      setQueryValue((previous) => {
+        return newQuery;
+      });
+    }, 1500);
+  };
+  const handleQueryValueRemove = () => {
+    setSearchValue("");
+    setQueryValue("");
+  };
+  const handleClearAll = useCallback(() => {
+    GeneralHandleSelectionChange("page", false, undefined);
+    handleCollectionSelectedRemove();
+    handleQueryValueRemove();
+  }, [handleQueryValueRemove, handleCollectionSelectedRemove]);
+
+  const handleBeforeNextPrevious = (value) => {
+    GeneralHandleSelectionChange("page", false, undefined);
+    setAllproductsSelected(false);
+    handleNextPrevious(value);
+  };
 
   const rowMarkup =
     productsArray !== "none" ? (
       productsArray?.map(
-        ({ _id, name, Calories, food_product, image }, index) => (
+        (
+          { _id, name, Calories, food_product, image, product_variants_ids },
+          index
+        ) => (
           <IndexTable.Row
-            id={name}
-            key={index}
-            selected={selectedResources.includes(name)}
+            id={_id}
+            key={_id}
+            selected={selectedResources.includes(_id)}
             position={index}
           >
             <IndexTable.Cell>
-              <Thumbnail source={image !== null ? image : ""} alt="" />
+              <Thumbnail
+                source={!!image && image !== null ? image : ""}
+                alt=""
+              />
             </IndexTable.Cell>
             <IndexTable.Cell>
               <TextStyle variation="strong">{name}</TextStyle>
@@ -430,7 +542,6 @@ function MyLablesTable({
             <IndexTable.Cell></IndexTable.Cell>
             <IndexTable.Cell></IndexTable.Cell>
             <IndexTable.Cell></IndexTable.Cell>
-
             <IndexTable.Cell>
               <div
                 style={{
@@ -439,7 +550,7 @@ function MyLablesTable({
                   alignItems: "center",
                 }}
               >
-                <Button primary onClick={() => handleSelectedProducts([name])}>
+                <Button primary onClick={() => handleSelectedProducts([_id])}>
                   Edit
                 </Button>
                 <PopOverElem
@@ -459,44 +570,17 @@ function MyLablesTable({
 
   return (
     <div>
-      <div style={{ padding: "16px", display: "flex" }}>
+      <div style={{ display: "flex" }}>
         <div style={{ flex: 1 }}>
-          <Combobox
-            activator={
-              <Combobox.TextField
-                prefix={<Icon source={SearchMinor} />}
-                onChange={updateText}
-                label="Filter"
-                labelHidden
-                value={inputValue}
-                placeholder="Filter"
-              />
-            }
-          >
-            {memoOptions?.length > 0 ? (
-              <Listbox onSelect={updateSelection}>{optionsMarkup}</Listbox>
-            ) : null}
-          </Combobox>
-        </div>
-        <div
-          style={{
-            paddingLeft: "0.25rem",
-            maxWidth: "130px",
-            marginLeft: "10px",
-          }}
-        >
-          {categorieOptions?.length > 0 ? (
-            <Select
-              labelInline
-              label="Categories"
-              options={categorieOptions}
-              value={sortValue}
-              onChange={(e) => handleSortChange(e)}
-              key={sortValue}
-            />
-          ) : (
-            <></>
-          )}
+          <Filters
+            queryValue={searchValue}
+            filters={filters}
+            appliedFilters={appliedFilters}
+            onQueryChange={handleOnQueryChange}
+            onQueryClear={handleQueryValueRemove}
+            onClearAll={handleClearAll}
+            disableQueryField={collectionSelected[0].length > 0}
+          />
         </div>
       </div>
 
@@ -510,6 +594,7 @@ function MyLablesTable({
         bulkActions={bulkActions}
         promotedBulkActions={promotedBulkActions}
         onSelectionChange={handleSelectionChange}
+        hasMoreItems={hasPages?.hasPreviousPage || hasPages?.hasNextPage}
         headings={[
           { title: "" },
           { title: "Product" },
@@ -519,12 +604,47 @@ function MyLablesTable({
       >
         {rowMarkup}
       </IndexTable>
+      <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+        <Pagination
+          previousTooltip={"Previous"}
+          nextTooltip={"Next"}
+          hasPrevious={hasPages?.hasPreviousPage}
+          onPrevious={() => {
+            handleBeforeNextPrevious("previous");
+          }}
+          hasNext={hasPages?.hasNextPage}
+          onNext={() => {
+            handleBeforeNextPrevious("next");
+          }}
+        />
+      </div>
       <div style={{ display: "none" }}>
         <HideLablesModal handleBulkProductsHide={handleBulkProductsHide} />
         <ResetProducts handleBulkProductsReset={handleBulkProductsReset} />
       </div>
     </div>
   );
+}
+
+function disambiguateLabel(key, value, collections) {
+  switch (key) {
+    case "Collections":
+      return `Collection: ${
+        collections.filter((collect) => collect.value === value[0])[0]?.label
+      }`;
+    default:
+      return value;
+  }
+}
+
+function isEmpty(value) {
+  if (Array.isArray(value)) {
+    let temp = value;
+    temp = temp.filter((elm) => elm.length !== 0);
+    return temp.length === 0;
+  } else {
+    return value === "" || value == null;
+  }
 }
 
 export default MyLablesTable;
