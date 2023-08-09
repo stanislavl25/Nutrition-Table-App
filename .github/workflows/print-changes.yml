@@ -1,0 +1,19 @@
+name: Print Changes
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  print-changes:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Print Changes
+      run: |
+        echo "Changes in this push:"
+        git diff --name-status ${{ github.event.before }} ${{ github.sha }}
