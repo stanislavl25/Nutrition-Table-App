@@ -32,14 +32,14 @@ jobs:
         run: |
           zip -r ${{ env.ARTIFACT_NAME }} ./*
           aws s3 cp ${{ env.ARTIFACT_NAME }} s3://nutrition-table-deployment-artifacts/${{ env.ARTIFACT_NAME }}
-      # - name: Create and monitor deployment
-      #   id: deploy
-      #   run: |
-      #     DEPLOYMENT_ID=$(aws deploy create-deployment \
-      #       --application-name your-codedeploy-app-name \
-      #       --deployment-config-name CodeDeployDefault.OneAtATime \
-      #       --deployment-group-name your-deployment-group-name \
-      #       --s3-location bucket=your-s3-bucket,key=${{ env.ARTIFACT_NAME }},bundleType=zip \
-      #       --output text --query 'deploymentId')
-      #     echo "Deployment ID: $DEPLOYMENT_ID"
+      - name: Create and monitor deployment
+        id: deploy
+        run: |
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+            --application-name nutrition-table-app \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --deployment-group-name nutrition-table-app \
+            --s3-location bucket=nutrition-table-deployment-artifacts,key=${{ env.ARTIFACT_NAME }},bundleType=zip \
+            --output text --query 'deploymentId')
+          echo "Deployment ID: $DEPLOYMENT_ID"
       # aws deploy wait deployment-successful --deployment-id $DEPLOYMENT_I
