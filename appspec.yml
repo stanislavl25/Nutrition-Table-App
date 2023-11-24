@@ -3,3 +3,5 @@ os: linux
 files:
   - source: /
     destination: /home/bitnami/htdocs/nutrition-table
+    overwrite: true
+file_exists_behavior: OVERWRITE
