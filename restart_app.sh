@@ -1,5 +1,6 @@
 #!/bin/bash
 echo "Stopping any existing node servers"
+cd /htdocs/nutrition-table
+sudo chown -R bitnami:bitnami
 pkill node || true
-cd /htdocs/nutritoon-table
 nohup yarn start </dev/null &>/dev/null &
