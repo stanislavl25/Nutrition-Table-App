@@ -1,3 +1,4 @@
 #!/bin/bash
 pkill node || true
-nohup yarn start --cwd /home/bitnami/htdocs/nutrition-table </dev/null &>/dev/null &
+cd /home/bitnami/htdocs/nutrition-table
+nohup yarn start </dev/null &>/dev/null &
