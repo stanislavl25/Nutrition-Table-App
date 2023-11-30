@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 16.15.0
       - name: Install requirements
-        run: npm install
+        run: yarn install
       - name: Generate artifact name
         id: artifact
         run: |
