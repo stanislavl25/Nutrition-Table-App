@@ -19,7 +19,7 @@ jobs:
       - name: Generate artifact name
         id: artifact
         run: |
-          echo "ARTIFACT_NAME=artifact-$(date +%Y%m%d%H%M%S).zip" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=artifact-$(date +%Y/%m/%d).zip" >> $GITHUB_ENV
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
