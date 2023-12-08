@@ -1,4 +1,4 @@
-name: Deployment with AWS CodeDeploy
+name: Deployment to STAGE (with AWS CodeDeploy)
 
 on:
   push:
