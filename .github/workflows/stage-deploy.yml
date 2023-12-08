@@ -3,7 +3,7 @@ name: Deployment to STAGE (with AWS CodeDeploy)
 on:
   push:
     branches:
-      - main
+      - stage
 jobs:
   deploy:
     runs-on: ubuntu-latest
