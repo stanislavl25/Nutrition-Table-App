@@ -3,7 +3,7 @@ name: Deployment to PROD (with AWS CodeDeploy)
 on:
   push:
     branches:
-      - main
+      - ci/decrease-downtime
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -28,18 +28,18 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-central-1
-      # - name: Zip and upload the artifact to S3
-      #   run: |
-      #     zip -r ${{ env.ARTIFACT_NAME }} ./*
-      #     aws s3 cp ${{ env.ARTIFACT_NAME }} s3://nutrition-table-deployment-artifacts/${{ env.ARTIFACT_NAME }}
-      # - name: Create and monitor deployment
-      #   id: deploy
-      #   run: |
-      #     DEPLOYMENT_ID=$(aws deploy create-deployment \
-      #       --application-name nutrition-table-app \
-      #       --deployment-config-name CodeDeployDefault.OneAtATime \
-      #       --deployment-group-name new-nutrition-table \
-      #       --s3-location bucket=nutrition-table-deployment-artifacts,key=${{ env.ARTIFACT_NAME }},bundleType=zip \
-      #       --output text --query 'deploymentId')
-      #     echo "Deployment ID: $DEPLOYMENT_ID"
+      - name: Zip and upload the artifact to S3
+        run: |
+          zip -r ${{ env.ARTIFACT_NAME }} ./*
+          aws s3 cp ${{ env.ARTIFACT_NAME }} s3://nutrition-table-deployment-artifacts/${{ env.ARTIFACT_NAME }}
+      - name: Create and monitor deployment
+        id: deploy
+        run: |
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+            --application-name nutrition-table-app \
+            --deployment-config-name CodeDeployDefault.OneAtATime \
+            --deployment-group-name new-nutrition-table \
+            --s3-location bucket=nutrition-table-deployment-artifacts,key=${{ env.ARTIFACT_NAME }},bundleType=zip \
+            --output text --query 'deploymentId')
+          echo "Deployment ID: $DEPLOYMENT_ID"
       # aws deploy wait deployment-successful --deployment-id $DEPLOYMENT_I
