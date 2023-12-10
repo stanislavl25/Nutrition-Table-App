@@ -1,4 +1,5 @@
 #!/bin/bash
 pkill node || true
-cd /home/bitnami/htdocs/nutrition-table
-sudo -u bitnami nohup yarn start >> /var/log/myapp-deploy.log 2>&1 &
+cd /home/ec2-user/nutrition-table
+npm install
+cross-env NODE_ENV=production node server/index.js >> /home/ec2-user/myapp-deploy.log 2>&1 &
