@@ -10,10 +10,6 @@ hooks:
     - location: codedeploy-hooks/application_stop.sh
       timeout: 300
       runas: root
-  AfterInstall:
-    - location: codedeploy-hooks/after_install.sh
-      timeout: 3600
-      runas: root
   ApplicationStart:
     - location: codedeploy-hooks/application_start.sh
       timeout: 3600
