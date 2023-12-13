@@ -10,7 +10,7 @@ import React from "react";
 
 function Documentation() {
   return (
-    <Page title="Documentation about our App">
+    <Page title="Documentation for our App">
       <Card sectioned title="Getting Started">
         <TextContainer>
           <div
