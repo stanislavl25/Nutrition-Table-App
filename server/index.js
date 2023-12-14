@@ -606,7 +606,7 @@ export async function createServer(
     if (plan === "Advanced") {
       plan_price = 25;
     }
-    if (plan === "Entreprise") {
+    if (plan === "Enterprise") {
       plan_price = 100;
     }
     const check = await checkTrialEnd(session.shop);

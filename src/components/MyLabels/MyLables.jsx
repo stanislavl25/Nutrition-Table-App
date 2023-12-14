@@ -198,7 +198,7 @@ function MyLables({
                     handleTabChange(5);
                   }}
                 >
-                  Get the Entreprise plan
+                  Get the Enterprise plan
                 </Button>
               </div>
             </div>
