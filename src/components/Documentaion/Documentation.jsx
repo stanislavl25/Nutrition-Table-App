@@ -216,7 +216,7 @@ function Documentation() {
             <List.Item>
               <TextStyle>
                 United States |{" "}
-                <a href="#" style={{ textDecoration: "none" }}>
+                <a href="https://ods.od.nih.gov/HealthInformation/nutrientrecommendations.aspx" target="_blank" style={{ textDecoration: "none" }}>
                   <span> U.S. Department of Health & Human Services</span>
                 </a>
               </TextStyle>
@@ -224,7 +224,7 @@ function Documentation() {
             <List.Item>
               <TextStyle>
                 Canada |{" "}
-                <a href="#" style={{ textDecoration: "none" }}>
+                <a href="https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/dietary-reference-intakes/tables.html" target="_blank" style={{ textDecoration: "none" }}>
                   <span> Government of Canada</span>
                 </a>
               </TextStyle>
@@ -232,7 +232,7 @@ function Documentation() {
             <List.Item>
               <TextStyle>
                 Europe |
-                <a href="#" style={{ textDecoration: "none" }}>
+                <a href="https://www.efsa.europa.eu/en/topics/topic/dietary-reference-values" target="_blank" style={{ textDecoration: "none" }}>
                   <span> European Food Safety Authority</span>
                 </a>
               </TextStyle>
