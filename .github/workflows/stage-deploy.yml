@@ -1,4 +1,4 @@
-name: Deployment to STAGE (with AWS CodeDeploy)
+name: Deployment to PROD (with AWS CodeDeploy)
 
 on:
   push:
@@ -14,6 +14,28 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.13.0
+      - name: Install dependencies
+        run: npm install
+      - name: Create .env file
+        run: |
+          echo "SHOPIFY_API_KEY=12782b4542e3e6e249ab54cda51c4669" >> .env
+          echo "SHOPIFY_API_SECRET=81a57add137002b088873613db0ca069" >> .env
+          echo "SHOP=nutritiontable.myshopify.com" >> .env
+          echo "SCOPES=write_products,read_products" >> .env
+          echo "HOST=https://nutrition-table.dev.cronum.app/" >> .env
+          echo "MONGO_DB_URL=mongodb://localhost:27017/nutritiontable" >> .env
+          # echo "SHOPIFY_API_KEY=${{ secrets.SHOPIFY_API_KEY }}" >> .env
+          # echo "SHOPIFY_API_SECRET=${{ secrets.SHOPIFY_API_SECRET }}" >> .env
+          # echo "SHOP=${{ secrets.SHOP }}" >> .env
+          # echo "SCOPES=${{ secrets.SCOPES }}" >> .env
+          # echo "HOST=${{ secrets.HOST }}" >> .env
+          # echo "MONGO_DB_URL=${{ secrets.MONGO_DB_URL }}" >> .env
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Remove node_modules folder
+        run: rm -rf node_modules
       - name: Generate artifact name
         id: artifact
         run: |
