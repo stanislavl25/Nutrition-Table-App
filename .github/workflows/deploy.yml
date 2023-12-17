@@ -1,4 +1,4 @@
-name: Deployment with AWS CodeDeploy
+name: Deployment to PROD (with AWS CodeDeploy)
 
 on:
   push:
@@ -14,10 +14,28 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.13.0
-      # - name: Install specific Yarn version
-      #   run: npm install -g yarn@1.22.18
-      # - name: Install requirements
-      #   run: yarn install
+      - name: Install dependencies
+        run: npm install
+      - name: Create .env file
+        run: |
+          echo "SHOPIFY_API_KEY=5e4deb395cd9c5dc287a520456a695bb" >> .env
+          echo "SHOPIFY_API_SECRET=41031fd828744cd4b118f78ad5602cc9" >> .env
+          echo "SHOP=nutritiontable.myshopify.com" >> .env
+          echo "SCOPES=write_products,read_products" >> .env
+          echo "HOST=https://nutrition-table.cronum.app/" >> .env
+          echo "MONGO_DB_URL=mongodb://localhost:27017/nutritiontable" >> .env
+          # echo "SHOPIFY_API_KEY=${{ secrets.SHOPIFY_API_KEY }}" >> .env
+          # echo "SHOPIFY_API_SECRET=${{ secrets.SHOPIFY_API_SECRET }}" >> .env
+          # echo "SHOP=${{ secrets.SHOP }}" >> .env
+          # echo "SCOPES=${{ secrets.SCOPES }}" >> .env
+          # echo "HOST=${{ secrets.HOST }}" >> .env
+          # echo "MONGO_DB_URL=${{ secrets.MONGO_DB_URL }}" >> .env
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Remove node_modules folder
+        run: rm -rf node_modules
       - name: Generate artifact name
         id: artifact
         run: |

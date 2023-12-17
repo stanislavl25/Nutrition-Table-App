@@ -125,7 +125,7 @@ function PricinPlans({ plan, handlePlan }) {
                 }}
               >
                 {plan && plan !== "Advanced" ? (
-                  plan === "Entreprise" ? (
+                  plan === "Enterprise" ? (
                     <Button
                       size="large"
                       primary
@@ -208,7 +208,7 @@ function PricinPlans({ plan, handlePlan }) {
                   textAlign: "center",
                 }}
               >
-                {plan && plan === "Entreprise" ? (
+                {plan && plan === "Enterprise" ? (
                   <Button size="large" fullWidth>
                     Current Plan
                   </Button>
@@ -217,7 +217,7 @@ function PricinPlans({ plan, handlePlan }) {
                     size="large"
                     primary
                     fullWidth
-                    onClick={() => handlePlan("Entreprise")}
+                    onClick={() => handlePlan("Enterprise")}
                   >
                     Upgrade
                   </Button>
