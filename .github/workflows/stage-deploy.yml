@@ -1,4 +1,4 @@
-name: Deployment to PROD (with AWS CodeDeploy)
+name: Deployment to STAGE (with AWS CodeDeploy)
 
 on:
   push:
