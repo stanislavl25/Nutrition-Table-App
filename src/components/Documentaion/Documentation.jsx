@@ -19,7 +19,7 @@ function Documentation() {
             }}
           >
             <TextStyle>
-              Welcome! We are glad that you have installed our app 🎉
+              We are glad that you have installed our app 🎉
             </TextStyle>
           </div>
           <List type="number">
